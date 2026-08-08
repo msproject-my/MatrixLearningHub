@@ -3,1965 +3,451 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🧮 MATRIX LEARNING HUB - Login & Analytics Portal</title>
+    <title>Matrix Learning Hub - Interactive Tools & Calculators</title>
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&family=Inter:wght@300;400;500;600;700;800&family=Fira+Code:wght@400;500;600&display=swap" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
-    
+    <!-- Google Fonts: Inter & Outfit -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@600;700;800;900&display=swap" rel="stylesheet">
+    <!-- Alpine.js Core -->
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.13.3/dist/cdn.min.js"></script>
+
     <style>
-        body {
-            font-family: 'Inter', sans-serif;
-            background: linear-gradient(135deg, #0284c7 0%, #38bdf8 50%, #bae6fd 100%);
-            background-attachment: fixed;
+        body { 
+            font-family: 'Inter', sans-serif; 
+            background: linear-gradient(180deg, #1ca0f2 0%, #0088de 100%);
             min-height: 100vh;
         }
-
-        .font-handwriting {
-            font-family: 'Caveat', cursive;
+        h1, h2, h3, h4, .font-heading { 
+            font-family: 'Outfit', sans-serif; 
         }
-
-        .font-mono-code {
-            font-family: 'Fira Code', monospace;
+        .main-card {
+            background-color: #f8fafc;
+            box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.2);
         }
-
-        /* Lined Poster-Style Notebook Paper Background */
-        .notebook-paper {
-            background-color: #ffffff;
-            background-image: linear-gradient(#e0f2fe 1px, transparent 1px);
-            background-size: 100% 2.2rem;
-            position: relative;
-            box-shadow: 0 20px 30px -10px rgba(2, 132, 199, 0.3), 0 0 0 4px #0284c7;
-            border-radius: 1.5rem;
+        .title-banner {
+            background: linear-gradient(135deg, #1d4ed8 0%, #2563eb 50%, #1e40af 100%);
+            box-shadow: 0 8px 20px -4px rgba(37, 99, 235, 0.4);
         }
-
-        /* Notebook Margin Line */
-        .notebook-margin {
-            border-left: 3px solid #ef4444;
-            padding-left: 1.5rem;
+        .btn-basic {
+            background: linear-gradient(135deg, #1d4ed8 0%, #2563eb 100%);
+            box-shadow: 0 6px 16px -3px rgba(37, 99, 235, 0.5);
         }
-
-        /* Binder Punch Holes */
-        .binder-hole {
-            width: 18px;
-            height: 18px;
-            background: #0284c7;
-            border-radius: 50%;
-            box-shadow: inset 2px 2px 4px rgba(0,0,0,0.3), 0 1px 1px rgba(255,255,255,0.8);
+        .btn-gaussian {
+            background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
         }
-
-        ::-webkit-scrollbar {
-            width: 8px;
-            height: 8px;
+        .btn-doolittle {
+            background: linear-gradient(135deg, #16a34a 0%, #15803d 100%);
         }
-        ::-webkit-scrollbar-track {
-            background: #e0f2fe;
-            border-radius: 4px;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #0284c7;
-            border-radius: 4px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: #0369a1;
-        }
-
-        .matrix-bracket {
-            position: relative;
-            padding: 6px 12px;
-        }
-        .matrix-bracket::before {
-            content: "";
-            position: absolute;
-            left: 0;
-            top: 0;
-            bottom: 0;
-            width: 6px;
-            border-left: 3px solid #1e293b;
-            border-top: 3px solid #1e293b;
-            border-bottom: 3px solid #1e293b;
-            border-radius: 4px 0 0 4px;
-        }
-        .matrix-bracket::after {
-            content: "";
-            position: absolute;
-            right: 0;
-            top: 0;
-            bottom: 0;
-            width: 6px;
-            border-right: 3px solid #1e293b;
-            border-top: 3px solid #1e293b;
-            border-bottom: 3px solid #1e293b;
-            border-radius: 0 4px 4px 0;
+        .btn-crout {
+            background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
         }
     </style>
 </head>
-<body class="text-slate-800 antialiased selection:bg-amber-300 selection:text-slate-900" x-data="matrixApp()">
+<body class="p-4 md:p-8 flex flex-col justify-between" x-data="hubApp()" x-init="initApp()">
 
-    <div class="min-h-screen flex flex-col justify-between p-3 sm:p-6 lg:p-8">
-
-        <!-- GLOBAL TOP USER STATUS & ADMIN BAR -->
-        <div class="max-w-5xl mx-auto w-full mb-3 flex flex-wrap items-center justify-between gap-2 px-2">
-            <!-- Student Profile Badge -->
-            <template x-if="currentUser && currentUser.isLoggedIn">
-                <div class="bg-white/90 backdrop-blur border-2 border-[#0284c7] px-4 py-1.5 rounded-full shadow flex items-center gap-2.5 text-xs font-bold text-slate-800">
-                    <div class="w-6 h-6 rounded-full bg-[#16a34a] text-white flex items-center justify-center text-xs">
-                        <i x-show="currentUser.userType === 'Student'" class="fa-solid fa-graduation-cap"></i>
-                        <i x-show="currentUser.userType === 'Teacher / Lecturer'" class="fa-solid fa-chalkboard-user"></i>
-                        <i x-show="currentUser.userType === 'Other'" class="fa-solid fa-user"></i>
-                    </div>
-                    <span>
-                        <span class="text-[#0284c7]" x-text="currentUser.name"></span>
-                        <span class="text-slate-400">|</span>
-                        <span class="bg-sky-100 text-[#0284c7] px-2 py-0.5 rounded-md" x-text="currentUser.userType"></span>
-                        <span class="text-slate-400">|</span>
-                        <span class="text-slate-600" x-text="currentUser.institution"></span>
-                    </span>
-                    <button @click="logout()" class="ml-2 text-red-600 hover:text-red-800 text-xs font-black underline flex items-center gap-1">
-                        <i class="fa-solid fa-right-from-bracket"></i> Edit Profile / Logout
-                    </button>
-                </div>
-            </template>
-            <template x-if="!currentUser || !currentUser.isLoggedIn">
-                <div class="bg-amber-100 border-2 border-amber-400 px-3.5 py-1.5 rounded-full text-xs font-extrabold text-amber-900 flex items-center gap-2 shadow">
-                    <i class="fa-solid fa-lock text-amber-600"></i> Public Profiling Active
-                </div>
-            </template>
-
-            <!-- Admin Dashboard Toggle Button -->
-            <div class="flex items-center gap-2">
-                <button @click="handleAdminClick()" class="px-4 py-1.5 bg-[#dc2626] hover:bg-[#b91c1c] text-white font-extrabold text-xs rounded-full border-2 border-white shadow-md flex items-center gap-1.5 transition active:scale-95">
-                    <i class="fa-solid fa-lock text-amber-300" x-show="!isAdminAuthenticated"></i>
-                    <i class="fa-solid fa-chart-line text-amber-300" x-show="isAdminAuthenticated"></i>
-                    <span>Admin Analytics</span>
-                </button>
+    <div>
+        <!-- TOP NAVIGATION BAR -->
+        <header class="max-w-5xl mx-auto flex justify-between items-center mb-6">
+            <!-- Left: Profiling Status Badge -->
+            <div @click="openProfileModal()" class="cursor-pointer bg-amber-100 hover:bg-amber-200 text-amber-900 border border-amber-300 font-bold text-xs md:text-sm px-4 py-2 rounded-full shadow-sm flex items-center space-x-2 transition">
+                <i class="fa-solid fa-lock text-amber-700"></i>
+                <span x-text="userProfile.registered ? 'User Profile: ' + userProfile.name : 'Public Profiling Active'"></span>
+                <i class="fa-solid fa-pen-to-square ml-1 text-amber-700 text-xs"></i>
             </div>
-        </div>
 
-        <!-- ================= VIEW 0: WELCOME & PROFILING MODAL ================= -->
-        <template x-if="showLoginModal">
-            <div class="fixed inset-0 z-50 bg-slate-900/80 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
-                <div class="bg-white border-4 border-[#0284c7] rounded-3xl max-w-lg w-full p-6 sm:p-7 text-slate-900 shadow-2xl relative my-auto">
-                    
-                    <div class="text-center mb-5">
-                        <div class="w-14 h-14 rounded-2xl bg-gradient-to-tr from-[#1d4ed8] to-[#0284c7] text-white flex items-center justify-center mx-auto mb-2 text-2xl shadow-lg border-2 border-white">
-                            <i class="fa-solid fa-hand-wave text-amber-300"></i>
+            <!-- Right: Admin Analytics Button -->
+            <button @click="openAdminModal()" class="bg-red-600 hover:bg-red-700 text-white font-bold text-xs md:text-sm px-5 py-2.5 rounded-full shadow-md transition flex items-center space-x-2 transform active:scale-95">
+                <i class="fa-solid fa-lock"></i>
+                <span>Admin Analytics</span>
+            </button>
+        </header>
+
+        <!-- MAIN CONTAINER -->
+        <main class="max-w-5xl mx-auto main-card rounded-3xl p-6 md:p-10 border border-white/60 mb-8">
+
+            <!-- SUITE PILL BADGE -->
+            <div class="text-center mb-4">
+                <span class="inline-flex items-center space-x-2 bg-blue-600 text-white font-bold text-xs uppercase tracking-wider px-5 py-2 rounded-full shadow-md">
+                    <i class="fa-solid fa-graduation-cap"></i>
+                    <span>NUMERICAL LINEAR ALGEBRA SUITE</span>
+                </span>
+            </div>
+
+            <!-- TITLE BANNER -->
+            <div class="title-banner rounded-2xl p-6 md:p-8 text-center text-white mb-8 relative overflow-hidden">
+                <div class="flex flex-col items-center justify-center space-y-3">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-12 h-12 bg-amber-500 rounded-xl flex items-center justify-center text-white text-2xl shadow-md border-2 border-amber-300">
+                            <i class="fa-solid fa-calculator"></i>
                         </div>
-                        <h2 class="text-2xl font-black text-slate-900">WELCOME TO MATRIX HUB 👋</h2>
-                        <p class="text-xs font-bold text-slate-500 mt-0.5">Please complete this quick profile to access interactive tools</p>
+                        <h1 class="text-3xl md:text-5xl font-black tracking-tight drop-shadow-md">
+                            MATRIX LEARNING HUB
+                        </h1>
                     </div>
-
-                    <form @submit.prevent="handleLogin()" class="space-y-3.5">
-                        <!-- User Type Selection -->
-                        <div>
-                            <label class="block text-xs font-extrabold text-slate-700 uppercase tracking-wider mb-1">
-                                <i class="fa-solid fa-users text-[#0284c7] mr-1"></i> Who are you?
-                            </label>
-                            <div class="grid grid-cols-3 gap-2 text-xs font-black">
-                                <button type="button" @click="loginForm.userType = 'Student'" :class="loginForm.userType === 'Student' ? 'bg-[#0284c7] text-white border-[#0284c7]' : 'bg-sky-50 text-slate-700 border-sky-200 hover:bg-sky-100'" class="py-2 px-2 border-2 rounded-xl flex flex-col items-center gap-1 transition">
-                                    <i class="fa-solid fa-graduation-cap text-base"></i>
-                                    <span>🎓 Student</span>
-                                </button>
-                                <button type="button" @click="loginForm.userType = 'Teacher / Lecturer'" :class="loginForm.userType === 'Teacher / Lecturer' ? 'bg-[#0284c7] text-white border-[#0284c7]' : 'bg-sky-50 text-slate-700 border-sky-200 hover:bg-sky-100'" class="py-2 px-2 border-2 rounded-xl flex flex-col items-center gap-1 transition">
-                                    <i class="fa-solid fa-chalkboard-user text-base"></i>
-                                    <span>👨‍🏫 Educator</span>
-                                </button>
-                                <button type="button" @click="loginForm.userType = 'Other'" :class="loginForm.userType === 'Other' ? 'bg-[#0284c7] text-white border-[#0284c7]' : 'bg-sky-50 text-slate-700 border-sky-200 hover:bg-sky-100'" class="py-2 px-2 border-2 rounded-xl flex flex-col items-center gap-1 transition">
-                                    <i class="fa-solid fa-user text-base"></i>
-                                    <span>👤 Other</span>
-                                </button>
-                            </div>
-                        </div>
-
-                        <!-- Name -->
-                        <div>
-                            <label class="block text-xs font-extrabold text-slate-700 uppercase tracking-wider mb-1">
-                                <i class="fa-solid fa-user text-[#0284c7] mr-1"></i> Your Name
-                            </label>
-                            <input type="text" x-model="loginForm.name" required placeholder="e.g. Ahmad Hakimi" class="w-full px-4 py-2 font-bold text-sm bg-sky-50 border-2 border-sky-300 rounded-xl focus:ring-2 focus:ring-[#0284c7] focus:outline-none">
-                        </div>
-
-                        <!-- Institution & Country -->
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                            <div>
-                                <label class="block text-xs font-extrabold text-slate-700 uppercase tracking-wider mb-1">
-                                    <i class="fa-solid fa-building-columns text-[#0284c7] mr-1"></i> Institution
-                                </label>
-                                <input type="text" x-model="loginForm.institution" required placeholder="e.g. Politeknik Port Dickson" class="w-full px-3 py-2 font-bold text-xs bg-sky-50 border-2 border-sky-300 rounded-xl focus:ring-2 focus:ring-[#0284c7] focus:outline-none">
-                            </div>
-                            <div>
-                                <label class="block text-xs font-extrabold text-slate-700 uppercase tracking-wider mb-1">
-                                    <i class="fa-solid fa-earth-americas text-[#0284c7] mr-1"></i> Country
-                                </label>
-                                <select x-model="loginForm.country" class="w-full px-3 py-2 font-bold text-xs bg-sky-50 border-2 border-sky-300 rounded-xl focus:ring-2 focus:ring-[#0284c7] focus:outline-none">
-                                    <option value="Malaysia">Malaysia 🇲🇾</option>
-                                    <option value="Indonesia">Indonesia 🇮🇩</option>
-                                    <option value="Singapore">Singapore 🇸🇬</option>
-                                    <option value="Brunei">Brunei 🇧🇳</option>
-                                    <option value="Other">Other</option>
-                                </select>
-                            </div>
-                        </div>
-
-                        <!-- Purpose of Access -->
-                        <div>
-                            <label class="block text-xs font-extrabold text-slate-700 uppercase tracking-wider mb-1">
-                                <i class="fa-solid fa-bullseye text-[#0284c7] mr-1"></i> Purpose of Access
-                            </label>
-                            <select x-model="loginForm.purpose" class="w-full px-3 py-2 font-bold text-xs bg-sky-50 border-2 border-sky-300 rounded-xl focus:ring-2 focus:ring-[#0284c7] focus:outline-none">
-                                <option value="Learning">📚 Learning</option>
-                                <option value="Teaching">👨‍🏫 Teaching</option>
-                                <option value="Research / Project">🔬 Research / Project</option>
-                                <option value="Self-learning">💻 Self-learning</option>
-                                <option value="Other">Other</option>
-                            </select>
-                        </div>
-
-                        <!-- How did you find us? -->
-                        <div>
-                            <label class="block text-xs font-extrabold text-slate-700 uppercase tracking-wider mb-1">
-                                <i class="fa-solid fa-compass text-[#0284c7] mr-1"></i> How did you find us?
-                            </label>
-                            <select x-model="loginForm.discoverySource" class="w-full px-3 py-2 font-bold text-xs bg-sky-50 border-2 border-sky-300 rounded-xl focus:ring-2 focus:ring-[#0284c7] focus:outline-none">
-                                <option value="Lecturer / Teacher">👨‍🏫 Lecturer / Teacher</option>
-                                <option value="QR Code">📱 QR Code</option>
-                                <option value="Google Search">🔍 Google Search</option>
-                                <option value="Friend / Student">👥 Friend / Student</option>
-                                <option value="Social Media">📲 Social Media</option>
-                                <option value="Website">🌐 Website</option>
-                                <option value="Other">Other</option>
-                            </select>
-                        </div>
-
-                        <div class="pt-2">
-                            <button type="submit" class="w-full py-3 bg-gradient-to-r from-[#16a34a] to-[#15803d] hover:from-[#15803d] text-white font-black text-sm rounded-2xl border-2 border-white shadow-lg flex items-center justify-center gap-2 transition active:scale-95">
-                                <span>ENTER MATRIX LEARNING HUB</span>
-                                <i class="fa-solid fa-arrow-right"></i>
-                            </button>
-                        </div>
-                    </form>
-
-                    <div class="mt-4 text-center">
-         
+                    
+                    <div>
+                        <span class="inline-block bg-red-600 text-white font-black text-xs md:text-sm uppercase tracking-wider px-5 py-1.5 rounded-full shadow-md">
+                            INTERACTIVE MATRIX TOOLS & CALCULATORS
+                        </span>
                     </div>
                 </div>
             </div>
-        </template>
 
-        <!-- ================= VIEW 1: OUTSIDE COVER & MAIN SELECTION ================= -->
-        <template x-if="currentView === 'cover'">
-            <main class="max-w-5xl mx-auto w-full my-auto py-4">
-                <!-- Main Outer Box -->
-                <div class="bg-white/95 border-4 border-[#0284c7] rounded-3xl shadow-2xl p-6 sm:p-10 relative overflow-hidden backdrop-blur-md">
-                    
-                    <!-- Header Banner -->
-                    <div class="text-center mb-10 relative z-10">
-                        <div class="inline-flex items-center gap-2 px-5 py-2 rounded-full bg-[#1d4ed8] text-white text-xs sm:text-sm font-black tracking-wider uppercase mb-4 shadow-lg border-2 border-white">
-                            <i class="fa-solid fa-graduation-cap text-amber-300"></i> Numerical Linear Algebra Suite
+            <!-- MODULE CARDS GRID -->
+            <div class="grid md:grid-cols-2 gap-8 mb-8">
+
+                <!-- LEFT CARD: BASIC MATRIX -->
+                <div class="bg-white rounded-2xl border-2 border-sky-400 overflow-hidden shadow-md flex flex-col justify-between">
+                    <div>
+                        <!-- Header -->
+                        <div class="bg-sky-600 text-white p-4 flex items-center space-x-3">
+                            <div class="w-9 h-9 bg-white/20 rounded-lg flex items-center justify-center text-white font-bold">
+                                <i class="fa-solid fa-folder"></i>
+                            </div>
+                            <h3 class="font-heading font-extrabold text-xl tracking-wide uppercase">BASIC MATRIX</h3>
                         </div>
-                        
-                        <!-- Main Title Bar -->
-                        <div class="bg-gradient-to-r from-[#1d4ed8] via-[#0284c7] to-[#1d4ed8] text-white rounded-2xl p-4 sm:p-6 border-4 border-white shadow-xl max-w-3xl mx-auto">
-                            <h1 class="text-3xl sm:text-5xl font-black tracking-tight drop-shadow-md">
-                                🧮 MATRIX LEARNING HUB
-                            </h1>
-                            <div class="mt-2 inline-block bg-[#ef4444] text-white px-4 py-1 rounded-full text-xs sm:text-sm font-extrabold border-2 border-white uppercase tracking-wider shadow">
-                                Interactive Matrix Tools & Calculators
+
+                        <!-- Body -->
+                        <div class="p-6 space-y-5">
+                            <p class="text-slate-600 text-sm leading-relaxed">
+                                Perform standard matrix additions, subtractions, multiplications, transpose calculations, determinants, and matrix inverses.
+                            </p>
+
+                            <!-- Checkbox List Box -->
+                            <div class="bg-sky-50/60 border border-sky-200 rounded-xl p-4 space-y-2.5">
+                                <div class="flex items-center space-x-2.5 text-xs md:text-sm font-bold text-slate-800">
+                                    <i class="fa-solid fa-circle-check text-sky-600 text-base"></i>
+                                    <span>Addition, Subtraction & Multiplication</span>
+                                </div>
+                                <div class="flex items-center space-x-2.5 text-xs md:text-sm font-bold text-slate-800">
+                                    <i class="fa-solid fa-circle-check text-sky-600 text-base"></i>
+                                    <span>Determinants & Inverse Matrices (A⁻¹)</span>
+                                </div>
                             </div>
                         </div>
                     </div>
 
-                    <div class="grid md:grid-cols-2 gap-6 lg:gap-8 max-w-4xl mx-auto relative z-10">
-                        
-                        <!-- CARD 1: BASIC MATRIX -->
-                        <div class="bg-[#f0f9ff] border-4 border-[#0284c7] rounded-3xl overflow-hidden shadow-xl flex flex-col justify-between transition-all duration-300 transform hover:-translate-y-1">
-                            <!-- Blue Header Strip -->
-                            <div class="bg-[#0284c7] p-4 text-white flex items-center justify-between border-b-4 border-sky-300">
-                                <div class="flex items-center gap-3">
-                                    <div class="w-10 h-10 rounded-xl bg-white text-[#0284c7] flex items-center justify-center text-xl font-black shadow">
-                                        <i class="fa-solid fa-folder-open"></i>
-                                    </div>
-                                    <h2 class="text-xl font-black tracking-wide">BASIC MATRIX</h2>
-                                </div>
-                            </div>
-
-                            <div class="p-6">
-                                <p class="text-slate-700 text-sm font-semibold leading-relaxed">
-                                    Perform standard matrix additions, subtractions, multiplications, transpose calculations, determinants, and matrix inverses.
-                                </p>
-
-                                <div class="mt-5 space-y-2 text-xs text-slate-800 font-extrabold bg-white p-3.5 rounded-2xl border-2 border-sky-200 shadow-inner">
-                                    <div class="flex items-center gap-2 text-sky-800">
-                                        <i class="fa-solid fa-circle-check text-[#0284c7]"></i>
-                                        <span>Addition, Subtraction & Multiplication</span>
-                                    </div>
-                                    <div class="flex items-center gap-2 text-sky-800">
-                                        <i class="fa-solid fa-circle-check text-[#0284c7]"></i>
-                                        <span>Determinants & Inverse Matrices (A⁻¹)</span>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Enter Button -->
-                            <div class="p-6 pt-0">
-                                <button @click="enterBasicMatrix()" class="w-full py-3.5 px-5 bg-gradient-to-r from-[#0284c7] to-[#1d4ed8] hover:from-[#0369a1] hover:to-[#1e40af] text-white font-extrabold text-sm rounded-2xl border-2 border-white shadow-lg flex items-center justify-center gap-2.5 transition active:scale-95">
-                                    <span>ENTER BASIC MATRIX PAGE</span>
-                                    <i class="fa-solid fa-arrow-right-long"></i>
-                                </button>
-                            </div>
-                        </div>
-
-                        <!-- CARD 2: ADVANCED MATRIX -->
-                        <div class="bg-[#f0fdf4] border-4 border-[#16a34a] rounded-3xl overflow-hidden shadow-xl flex flex-col justify-between transition-all duration-300 transform hover:-translate-y-1">
-                            <!-- Green Header Strip -->
-                            <div class="bg-[#16a34a] p-4 text-white flex items-center justify-between border-b-4 border-green-300">
-                                <div class="flex items-center gap-3">
-                                    <div class="w-10 h-10 rounded-xl bg-white text-[#16a34a] flex items-center justify-center text-xl font-black shadow">
-                                        <i class="fa-solid fa-square-root-variable"></i>
-                                    </div>
-                                    <h2 class="text-xl font-black tracking-wide">ADVANCED MATRIX</h2>
-                                </div>
-                            </div>
-
-                            <div class="p-6">
-                                <p class="text-slate-700 text-sm font-semibold leading-relaxed mb-4">
-                                    Step-by-step 3×3 linear equation system solver (Ax = b) with full matrix factorizations and row operations.
-                                </p>
-
-                                <div class="space-y-2.5">
-                                    <div class="text-[11px] font-black text-[#15803d] uppercase tracking-wider">
-                                        Select Solver Method:
-                                    </div>
-
-                                    <!-- Button 1: Gaussian (Blue Pill) -->
-                                    <button @click="enterAdvanceMethod('gaussian')" class="w-full py-2.5 px-4 bg-[#0284c7] hover:bg-[#0369a1] text-white font-black rounded-xl border-2 border-white flex items-center justify-between transition shadow group">
-                                        <span class="flex items-center gap-2 text-xs sm:text-sm">
-                                            <span class="w-5 h-5 rounded-full bg-amber-400 text-slate-900 flex items-center justify-center text-xs font-black">1</span>
-                                            <span>Gaussian Elimination</span>
-                                        </span>
-                                        <i class="fa-solid fa-chevron-right text-xs group-hover:translate-x-1 transition-all"></i>
-                                    </button>
-
-                                    <!-- Button 2: Doolittle LU (Green Pill) -->
-                                    <button @click="enterAdvanceMethod('doolittle')" class="w-full py-2.5 px-4 bg-[#16a34a] hover:bg-[#15803d] text-white font-black rounded-xl border-2 border-white flex items-center justify-between transition shadow group">
-                                        <span class="flex items-center gap-2 text-xs sm:text-sm">
-                                            <span class="w-5 h-5 rounded-full bg-amber-400 text-slate-900 flex items-center justify-center text-xs font-black">2</span>
-                                            <span>Doolittle LU Method</span>
-                                        </span>
-                                        <i class="fa-solid fa-chevron-right text-xs group-hover:translate-x-1 transition-all"></i>
-                                    </button>
-
-                                    <!-- Button 3: Crout LU (Red Pill) -->
-                                    <button @click="enterAdvanceMethod('crout')" class="w-full py-2.5 px-4 bg-[#dc2626] hover:bg-[#b91c1c] text-white font-black rounded-xl border-2 border-white flex items-center justify-between transition shadow group">
-                                        <span class="flex items-center gap-2 text-xs sm:text-sm">
-                                            <span class="w-5 h-5 rounded-full bg-amber-400 text-slate-900 flex items-center justify-center text-xs font-black">3</span>
-                                            <span>Crout LU Method</span>
-                                        </span>
-                                        <i class="fa-solid fa-chevron-right text-xs group-hover:translate-x-1 transition-all"></i>
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-
-                    </div>
-
-                    <!-- Bottom Notice Bar -->
-                    <div class="mt-8 bg-[#fef08a] border-3 border-[#f59e0b] rounded-2xl p-3.5 flex items-center gap-3 shadow max-w-4xl mx-auto text-xs sm:text-sm font-extrabold text-amber-950">
-                        <div class="w-9 h-9 rounded-full bg-[#ef4444] text-white flex items-center justify-center text-lg flex-shrink-0 shadow border-2 border-white">
-                            <i class="fa-solid fa-exclamation"></i>
-                        </div>
-                        <p class="flex-1">
-                            <span class="text-[#dc2626] uppercase font-black mr-1">IMPORTANT NOTE:</span>
-                            All numerical operations automatically record step-by-step user activity into the access analytics log!
-                        </p>
-                    </div>
-                </div>
-            </main>
-        </template>
-
-        <!-- ================= VIEW 2: BASIC MATRIX PAGE ================= -->
-        <template x-if="currentView === 'basic'">
-            <main class="max-w-6xl mx-auto w-full my-2">
-                <header class="bg-white border-4 border-[#0284c7] rounded-2xl p-3.5 sm:p-4 mb-4 shadow-xl flex flex-wrap items-center justify-between gap-4">
-                    <div class="flex items-center gap-3">
-                        <div class="w-11 h-11 rounded-xl bg-[#0284c7] text-white flex items-center justify-center text-xl shadow">
-                            <i class="fa-solid fa-calculator"></i>
-                        </div>
-                        <div>
-                            <div class="flex items-center gap-2 flex-wrap">
-                                <h1 class="text-base sm:text-lg font-black text-slate-900 leading-tight">Basic Matrix Operations</h1>
-                                <span class="text-[11px] font-extrabold px-2.5 py-0.5 rounded-full bg-[#0284c7] text-white">Fundamental Module</span>
-                            </div>
-                            <p class="text-xs font-semibold text-slate-600">Matrix arithmetic, transpose, determinant & inversion</p>
-                        </div>
-                    </div>
-
-                    <div class="flex items-center gap-2 flex-wrap">
-                        <button @click="goHome()" class="px-4 py-2 rounded-xl bg-[#dc2626] hover:bg-[#b91c1c] text-white text-xs font-extrabold flex items-center gap-1.5 transition shadow active:scale-95">
-                            <i class="fa-solid fa-house"></i> Home
+                    <!-- Footer Action Button -->
+                    <div class="p-6 pt-0">
+                        <button @click="navigateToModule('Basic Matrix', basicMatrixUrl)" class="w-full py-4 btn-basic hover:brightness-110 text-white font-extrabold rounded-xl transition text-sm tracking-wide uppercase flex items-center justify-center space-x-2">
+                            <span>ENTER BASIC MATRIX PAGE</span>
+                            <i class="fa-solid fa-arrow-right"></i>
                         </button>
-                    </div>
-                </header>
-
-                <!-- NOTEBOOK PAPER -->
-                <div class="notebook-paper p-4 sm:p-8 min-h-[580px] relative overflow-hidden">
-                    <div class="hidden md:flex flex-col justify-between absolute left-3.5 top-12 bottom-12 z-20 pointer-events-none">
-                        <div class="binder-hole"></div>
-                        <div class="binder-hole"></div>
-                        <div class="binder-hole"></div>
-                    </div>
-
-                    <div class="notebook-margin ml-0 md:ml-6">
-                        
-                        <div class="mb-6">
-                            <span class="font-handwriting text-3xl sm:text-4xl text-[#1d4ed8] block tracking-wide font-bold">
-                                Basic Matrix Operations
-                            </span>
-                            <div class="flex flex-wrap items-center justify-between border-b-4 border-[#0284c7] pb-2.5 gap-2">
-                                <h2 class="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">
-                                    3×3 Matrix Calculator
-                                </h2>
-                                <span class="text-xs font-black px-3 py-1 rounded-full bg-[#fef08a] text-amber-950 border-2 border-[#f59e0b]">Basic Operations</span>
-                            </div>
-                        </div>
-
-                        <!-- OPERATION SELECTOR BUTTONS -->
-                        <div class="bg-[#f0f9ff] p-2 rounded-2xl border-2 border-[#0284c7] mb-6 flex flex-wrap gap-2 text-xs">
-                            <button @click="setBasicOp('add')" :class="basicOp === 'add' ? 'bg-[#0284c7] text-white font-black' : 'bg-white text-slate-700 hover:bg-sky-100 font-bold'" class="flex-1 py-2 px-3 rounded-xl transition shadow-xs">
-                                A + B (Addition)
-                            </button>
-                            <button @click="setBasicOp('sub')" :class="basicOp === 'sub' ? 'bg-[#0284c7] text-white font-black' : 'bg-white text-slate-700 hover:bg-sky-100 font-bold'" class="flex-1 py-2 px-3 rounded-xl transition shadow-xs">
-                                A - B (Subtraction)
-                            </button>
-                            <button @click="setBasicOp('mul')" :class="basicOp === 'mul' ? 'bg-[#0284c7] text-white font-black' : 'bg-white text-slate-700 hover:bg-sky-100 font-bold'" class="flex-1 py-2 px-3 rounded-xl transition shadow-xs">
-                                A × B (Multiplication)
-                            </button>
-                            <button @click="setBasicOp('det')" :class="basicOp === 'det' ? 'bg-[#dc2626] text-white font-black' : 'bg-white text-slate-700 hover:bg-sky-100 font-bold'" class="flex-1 py-2 px-3 rounded-xl transition shadow-xs">
-                                det(A) (Determinant)
-                            </button>
-                            <button @click="setBasicOp('trans')" :class="basicOp === 'trans' ? 'bg-[#16a34a] text-white font-black' : 'bg-white text-slate-700 hover:bg-sky-100 font-bold'" class="flex-1 py-2 px-3 rounded-xl transition shadow-xs">
-                                Aᵀ (Transpose)
-                            </button>
-                        </div>
-
-                        <!-- INPUT MATRICES -->
-                        <div class="grid md:grid-cols-2 gap-6 mb-6">
-                            <!-- Matrix A -->
-                            <div class="bg-white p-4 rounded-2xl border-3 border-[#0284c7] shadow-sm">
-                                <h3 class="text-xs font-black text-[#0284c7] uppercase tracking-wider mb-3 flex items-center justify-between">
-                                    <span>Matrix A (3×3)</span>
-                                    <button @click="fillSampleBasicA()" class="text-[10px] text-[#dc2626] underline font-extrabold">Sample Values</button>
-                                </h3>
-                                <div class="grid grid-cols-3 gap-2">
-                                    <template x-for="(r, ri) in [0,1,2]" :key="ri">
-                                        <template x-for="(c, ci) in [0,1,2]" :key="ci">
-                                            <input type="number" x-model.number="basicA[ri][ci]" @input="calculateBasic()" class="w-full text-center py-2 font-mono font-extrabold bg-[#f0f9ff] border-2 border-sky-300 rounded-xl focus:ring-2 focus:ring-[#0284c7] focus:outline-none">
-                                        </template>
-                                    </template>
-                                </div>
-                            </div>
-
-                            <!-- Matrix B -->
-                            <div class="bg-white p-4 rounded-2xl border-3 border-[#16a34a] shadow-sm" x-show="['add','sub','mul'].includes(basicOp)">
-                                <h3 class="text-xs font-black text-[#16a34a] uppercase tracking-wider mb-3 flex items-center justify-between">
-                                    <span>Matrix B (3×3)</span>
-                                    <button @click="fillSampleBasicB()" class="text-[10px] text-[#16a34a] underline font-extrabold">Sample Values</button>
-                                </h3>
-                                <div class="grid grid-cols-3 gap-2">
-                                    <template x-for="(r, ri) in [0,1,2]" :key="ri">
-                                        <template x-for="(c, ci) in [0,1,2]" :key="ci">
-                                            <input type="number" x-model.number="basicB[ri][ci]" @input="calculateBasic()" class="w-full text-center py-2 font-mono font-extrabold bg-[#f0fdf4] border-2 border-green-300 rounded-xl focus:ring-2 focus:ring-[#16a34a] focus:outline-none">
-                                        </template>
-                                    </template>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- RESULT DISPLAY -->
-                        <div class="bg-[#f0fdf4] border-3 border-[#16a34a] rounded-2xl p-6 text-center shadow-sm">
-                            <h3 class="text-xs font-black text-[#15803d] uppercase tracking-widest mb-3">
-                                Result Matrix / Output:
-                            </h3>
-                            
-                            <template x-if="typeof basicResult === 'number'">
-                                <div class="font-mono text-3xl font-black text-slate-900 py-4">
-                                    Determinant = <span x-text="formatNum(basicResult)"></span>
-                                </div>
-                            </template>
-
-                            <template x-if="Array.isArray(basicResult)">
-                                <div class="inline-block matrix-bracket bg-white border-2 border-slate-700 p-4 rounded-xl shadow-sm font-mono text-base font-extrabold text-slate-900">
-                                    <template x-for="(row, ri) in basicResult" :key="ri">
-                                        <div class="flex gap-4 justify-center py-1">
-                                            <template x-for="(val, ci) in row" :key="ci">
-                                                <span class="w-16 text-right" x-text="formatNum(val)"></span>
-                                            </template>
-                                        </div>
-                                    </template>
-                                </div>
-                            </template>
-                        </div>
-
-                    </div>
-                </div>
-            </main>
-        </template>
-
-        <!-- ================= VIEW 3: ADVANCED MATRIX PAGE ================= -->
-        <template x-if="currentView === 'advance'">
-            <main class="max-w-6xl mx-auto w-full my-2">
-                <header class="bg-white border-4 border-[#16a34a] rounded-2xl p-3.5 sm:p-4 mb-4 shadow-xl flex flex-wrap items-center justify-between gap-4">
-                    <div class="flex items-center gap-3">
-                        <div class="w-11 h-11 rounded-xl bg-[#16a34a] text-white flex items-center justify-center text-xl shadow">
-                            <i class="fa-solid fa-calculator"></i>
-                        </div>
-                        <div>
-                            <div class="flex items-center gap-2 flex-wrap">
-                                <h1 class="text-base sm:text-lg font-black text-slate-900 leading-tight" x-text="getMethodTitle() + ' Simulator'"></h1>
-                                <span class="text-[11px] font-extrabold px-2.5 py-0.5 rounded-full bg-amber-400 text-slate-900" x-text="getMethodBadge()"></span>
-                            </div>
-                            <p class="text-xs font-semibold text-slate-600">Step-by-Step Linear System Solver (3×3 Matrix)</p>
-                        </div>
-                    </div>
-
-                    <div class="flex items-center gap-2 flex-wrap">
-                        <button @click="goHome()" class="px-4 py-2 rounded-xl bg-[#0284c7] hover:bg-[#0369a1] text-white text-xs font-extrabold flex items-center gap-1.5 transition shadow active:scale-95">
-                            <i class="fa-solid fa-house"></i> Home
-                        </button>
-                        <button @click="loadExample()" class="px-4 py-2 rounded-xl bg-[#f59e0b] hover:bg-[#d97706] text-white text-xs font-extrabold flex items-center gap-1.5 transition shadow active:scale-95">
-                            <i class="fa-regular fa-lightbulb"></i> Load Example
-                        </button>
-                        <button @click="showManual = true" class="px-4 py-2 rounded-xl bg-[#dc2626] hover:bg-[#b91c1c] text-white text-xs font-extrabold flex items-center gap-1.5 transition shadow active:scale-95">
-                            <i class="fa-solid fa-book"></i> User Manual
-                        </button>
-                    </div>
-                </header>
-
-                <!-- METHOD TAB SELECTOR - LOCKED / READ-ONLY INSIDE SOLVER VIEW -->
-                <div class="bg-[#0284c7] p-2 rounded-2xl shadow-lg mb-4 border-2 border-white flex flex-wrap sm:flex-nowrap gap-1.5 items-center justify-between">
-                    <div class="flex items-center gap-2 px-3 py-1.5 bg-white/20 rounded-xl text-white text-xs font-black">
-                        <i class="fa-solid fa-lock text-amber-300"></i>
-                        <span>Active Method Locked:</span>
-                        <span class="bg-amber-400 text-slate-900 px-2 py-0.5 rounded-md uppercase font-black" x-text="getMethodTitle()"></span>
-                    </div>
-
-                    <div class="text-[11px] font-bold text-sky-100 flex items-center gap-1">
-                        <i class="fa-solid fa-circle-info text-amber-300"></i>
-                        <span>To switch methods, click <span class="underline font-black text-white">Home</span> to select from main cover.</span>
                     </div>
                 </div>
 
-                <!-- NOTEBOOK PAPER -->
-                <div class="notebook-paper p-4 sm:p-8 min-h-[580px] relative overflow-hidden">
-                    <div class="hidden md:flex flex-col justify-between absolute left-3.5 top-12 bottom-12 z-20 pointer-events-none">
-                        <div class="binder-hole"></div>
-                        <div class="binder-hole"></div>
-                        <div class="binder-hole"></div>
-                    </div>
-
-                    <div class="notebook-margin ml-0 md:ml-6">
-                        
-                        <div class="mb-6">
-                            <span class="font-handwriting text-3xl sm:text-4xl text-[#dc2626] block tracking-wide font-bold" x-text="getMethodFullSubtitle()">
-                            </span>
-                            <div class="flex flex-wrap items-center justify-between border-b-4 border-[#16a34a] pb-2.5 gap-2">
-                                <h2 class="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">
-                                    Solve 3×3 Linear Equation System
-                                </h2>
-                                <span class="text-xs font-black px-3 py-1 rounded-full bg-[#f0fdf4] text-[#16a34a] border-2 border-[#16a34a]" x-text="getMethodTagline()"></span>
+                <!-- RIGHT CARD: ADVANCED MATRIX -->
+                <div class="bg-white rounded-2xl border-2 border-emerald-500 overflow-hidden shadow-md flex flex-col justify-between">
+                    <div>
+                        <!-- Header -->
+                        <div class="bg-emerald-600 text-white p-4 flex items-center space-x-3">
+                            <div class="w-9 h-9 bg-white/20 rounded-lg flex items-center justify-center text-white font-bold">
+                                <i class="fa-solid fa-square-root-variable"></i>
                             </div>
+                            <h3 class="font-heading font-extrabold text-xl tracking-wide uppercase">ADVANCED MATRIX</h3>
                         </div>
 
-                        <!-- COEFFICIENTS INPUT FORM -->
-                        <div class="bg-white rounded-2xl p-4 sm:p-6 border-3 border-slate-700 shadow-sm mb-6">
-                            <div class="flex items-center justify-between mb-4">
-                                <h3 class="text-xs sm:text-sm font-black text-slate-900 uppercase tracking-wider flex items-center gap-2">
-                                    <i class="fa-solid fa-pen-to-square text-[#0284c7]"></i> Enter Equation Coefficients (Matrix A & Vector B):
-                                </h3>
-                                <span class="text-xs font-mono text-slate-600 font-bold">Format: ax + by + cz = d</span>
+                        <!-- Body -->
+                        <div class="p-6 space-y-4">
+                            <p class="text-slate-600 text-sm leading-relaxed">
+                                Step-by-step 3×3 linear equation system solver (Ax = b) with full matrix factorizations and row operations.
+                            </p>
+
+                            <div class="text-xs font-bold uppercase tracking-wider text-emerald-800 pt-1">
+                                SELECT SOLVER METHOD:
                             </div>
 
+                            <!-- 3 Solver Buttons -->
                             <div class="space-y-3">
-                                <!-- EQUATION 1 (Blue Row) -->
-                                <div class="bg-[#f0f9ff] border-2 border-[#0284c7] rounded-2xl p-3 sm:p-4 flex flex-wrap items-center justify-between gap-2 shadow-xs">
-                                    <span class="font-black text-[#0284c7] text-sm w-24">Equation 1:</span>
-                                    <div class="flex items-center gap-2 flex-wrap sm:flex-nowrap flex-1 justify-end">
-                                        <input type="number" step="any" x-model.number="eq[0][0]" class="w-16 sm:w-20 px-2 py-1.5 text-center font-extrabold text-slate-900 bg-white border-2 border-sky-300 rounded-xl focus:ring-2 focus:ring-[#0284c7] focus:outline-none">
-                                        <span class="font-mono text-sky-950 font-bold text-sm">x +</span>
-                                        <input type="number" step="any" x-model.number="eq[0][1]" class="w-16 sm:w-20 px-2 py-1.5 text-center font-extrabold text-slate-900 bg-white border-2 border-sky-300 rounded-xl focus:ring-2 focus:ring-[#0284c7] focus:outline-none">
-                                        <span class="font-mono text-sky-950 font-bold text-sm">y +</span>
-                                        <input type="number" step="any" x-model.number="eq[0][2]" class="w-16 sm:w-20 px-2 py-1.5 text-center font-extrabold text-slate-900 bg-white border-2 border-sky-300 rounded-xl focus:ring-2 focus:ring-[#0284c7] focus:outline-none">
-                                        <span class="font-mono text-sky-950 font-bold text-sm">z =</span>
-                                        <input type="number" step="any" x-model.number="eq[0][3]" class="w-16 sm:w-20 px-2 py-1.5 text-center font-extrabold text-amber-950 bg-[#fef08a] border-2 border-amber-400 rounded-xl focus:ring-2 focus:ring-amber-500 focus:outline-none">
-                                    </div>
-                                </div>
-
-                                <!-- EQUATION 2 (Green Row) -->
-                                <div class="bg-[#f0fdf4] border-2 border-[#16a34a] rounded-2xl p-3 sm:p-4 flex flex-wrap items-center justify-between gap-2 shadow-xs">
-                                    <span class="font-black text-[#16a34a] text-sm w-24">Equation 2:</span>
-                                    <div class="flex items-center gap-2 flex-wrap sm:flex-nowrap flex-1 justify-end">
-                                        <input type="number" step="any" x-model.number="eq[1][0]" class="w-16 sm:w-20 px-2 py-1.5 text-center font-extrabold text-slate-900 bg-white border-2 border-green-300 rounded-xl focus:ring-2 focus:ring-[#16a34a] focus:outline-none">
-                                        <span class="font-mono text-green-950 font-bold text-sm">x +</span>
-                                        <input type="number" step="any" x-model.number="eq[1][1]" class="w-16 sm:w-20 px-2 py-1.5 text-center font-extrabold text-slate-900 bg-white border-2 border-green-300 rounded-xl focus:ring-2 focus:ring-[#16a34a] focus:outline-none">
-                                        <span class="font-mono text-green-950 font-bold text-sm">y +</span>
-                                        <input type="number" step="any" x-model.number="eq[1][2]" class="w-16 sm:w-20 px-2 py-1.5 text-center font-extrabold text-slate-900 bg-white border-2 border-green-300 rounded-xl focus:ring-2 focus:ring-[#16a34a] focus:outline-none">
-                                        <span class="font-mono text-green-950 font-bold text-sm">z =</span>
-                                        <input type="number" step="any" x-model.number="eq[1][3]" class="w-16 sm:w-20 px-2 py-1.5 text-center font-extrabold text-amber-950 bg-[#fef08a] border-2 border-amber-400 rounded-xl focus:ring-2 focus:ring-amber-500 focus:outline-none">
-                                    </div>
-                                </div>
-
-                                <!-- EQUATION 3 (Red Row) -->
-                                <div class="bg-[#fef2f2] border-2 border-[#dc2626] rounded-2xl p-3 sm:p-4 flex flex-wrap items-center justify-between gap-2 shadow-xs">
-                                    <span class="font-black text-[#dc2626] text-sm w-24">Equation 3:</span>
-                                    <div class="flex items-center gap-2 flex-wrap sm:flex-nowrap flex-1 justify-end">
-                                        <input type="number" step="any" x-model.number="eq[2][0]" class="w-16 sm:w-20 px-2 py-1.5 text-center font-extrabold text-slate-900 bg-white border-2 border-red-300 rounded-xl focus:ring-2 focus:ring-[#dc2626] focus:outline-none">
-                                        <span class="font-mono text-red-950 font-bold text-sm">x +</span>
-                                        <input type="number" step="any" x-model.number="eq[2][1]" class="w-16 sm:w-20 px-2 py-1.5 text-center font-extrabold text-slate-900 bg-white border-2 border-red-300 rounded-xl focus:ring-2 focus:ring-[#dc2626] focus:outline-none">
-                                        <span class="font-mono text-red-950 font-bold text-sm">y +</span>
-                                        <input type="number" step="any" x-model.number="eq[2][2]" class="w-16 sm:w-20 px-2 py-1.5 text-center font-extrabold text-slate-900 bg-white border-2 border-red-300 rounded-xl focus:ring-2 focus:ring-[#dc2626] focus:outline-none">
-                                        <span class="font-mono text-red-950 font-bold text-sm">z =</span>
-                                        <input type="number" step="any" x-model.number="eq[2][3]" class="w-16 sm:w-20 px-2 py-1.5 text-center font-extrabold text-amber-950 bg-[#fef08a] border-2 border-amber-400 rounded-xl focus:ring-2 focus:ring-amber-500 focus:outline-none">
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Calculate & Reset Action Buttons -->
-                            <div class="mt-5 flex flex-wrap items-center justify-center gap-3">
-                                <button @click="calculateSolution()" class="px-7 py-3 bg-[#16a34a] hover:bg-[#15803d] text-white font-black text-sm rounded-xl border-2 border-white shadow flex items-center gap-2 transition active:scale-95">
-                                    <i class="fa-solid fa-play text-xs"></i> Calculate Step-by-Step
-                                </button>
-                                <button @click="resetInputs()" class="px-5 py-3 bg-slate-100 hover:bg-slate-200 text-slate-900 font-extrabold text-sm rounded-xl border-2 border-slate-300 shadow-xs flex items-center gap-2 transition active:scale-95">
-                                    <i class="fa-solid fa-rotate-left text-slate-600"></i> Reset
-                                </button>
-                            </div>
-                        </div>
-
-                        <!-- SOLUTION DISPLAY CONTAINER -->
-                        <div class="bg-[#f0f9ff] border-3 border-[#0284c7] rounded-2xl p-4 sm:p-6 shadow-sm">
-                            
-                            <!-- Header & Mode Switcher -->
-                            <div class="flex flex-wrap items-center justify-between border-b-2 border-sky-200 pb-3 mb-5 gap-2">
-                                <h3 class="text-base font-black text-[#0284c7] flex items-center gap-2">
-                                    <i class="fa-solid fa-list-check text-[#0284c7]"></i> Solution Display:
-                                </h3>
-
-                                <div class="bg-white p-1 rounded-xl border-2 border-[#0284c7] flex items-center text-xs font-extrabold">
-                                    <button @click="solutionTab = 'all'" :class="solutionTab === 'all' ? 'bg-[#0284c7] text-white' : 'text-slate-800 hover:bg-sky-100'" class="px-3 py-1.5 rounded-lg transition">
-                                        All Steps
-                                    </button>
-                                    <button @click="solutionTab = 'interactive'" :class="solutionTab === 'interactive' ? 'bg-[#0284c7] text-white' : 'text-slate-800 hover:bg-sky-100'" class="px-3 py-1.5 rounded-lg transition">
-                                        Interactive Steps
-                                    </button>
-                                </div>
-                            </div>
-
-                            <!-- EMPTY STATE -->
-                            <template x-if="!hasCalculated">
-                                <div class="border-3 border-dashed border-sky-300 rounded-2xl p-8 sm:p-12 text-center bg-white">
-                                    <div class="w-12 h-12 rounded-2xl bg-[#0284c7] text-white flex items-center justify-center mx-auto mb-3 text-xl shadow">
-                                        <i class="fa-solid fa-calculator"></i>
-                                    </div>
-                                    <h4 class="font-black text-slate-900 text-base">No solution generated yet</h4>
-                                    <p class="text-xs sm:text-sm text-slate-600 font-medium mt-1 max-w-md mx-auto">
-                                        Enter your equation coefficients above and click <span class="font-black text-[#16a34a]">"Calculate Step-by-Step"</span> to display the full <span x-text="getMethodTitle()"></span> solution.
-                                    </p>
-                                </div>
-                            </template>
-
-                            <!-- CALCULATION RESULTS DISPLAY -->
-                            <template x-if="hasCalculated">
-                                <div>
-                                    <!-- Error state -->
-                                    <template x-if="errorMessage">
-                                        <div class="p-4 bg-red-100 border-2 border-[#dc2626] text-red-900 rounded-xl text-sm font-extrabold mb-4 shadow-sm">
-                                            <i class="fa-solid fa-triangle-exclamation mr-2 text-red-600"></i>
-                                            <span x-text="errorMessage"></span>
-                                        </div>
-                                    </template>
-
-                                    <!-- Success state steps -->
-                                    <template x-if="!errorMessage">
-                                        <div>
-                                            
-                                            <!-- INTERACTIVE STEP CONTROLLER -->
-                                            <template x-if="solutionTab === 'interactive'">
-                                                <div class="mb-5 p-3.5 bg-white rounded-xl border-2 border-[#0284c7] shadow-sm flex items-center justify-between gap-4">
-                                                    <button @click="currentStepIndex = Math.max(0, currentStepIndex - 1)" :disabled="currentStepIndex === 0" class="px-3 py-1.5 rounded-lg bg-[#0284c7] text-white text-xs font-black disabled:opacity-40 disabled:cursor-not-allowed">
-                                                        <i class="fa-solid fa-chevron-left mr-1"></i> Prev Step
-                                                    </button>
-
-                                                    <div class="text-xs font-black text-slate-900">
-                                                        Step <span x-text="currentStepIndex + 1"></span> of <span x-text="stepsList.length"></span>
-                                                    </div>
-
-                                                    <button @click="currentStepIndex = Math.min(stepsList.length - 1, currentStepIndex + 1)" :disabled="currentStepIndex === stepsList.length - 1" class="px-3 py-1.5 rounded-lg bg-[#16a34a] text-white text-xs font-black disabled:opacity-40 disabled:cursor-not-allowed">
-                                                        Next Step <i class="fa-solid fa-chevron-right ml-1"></i>
-                                                    </button>
-                                                </div>
-                                            </template>
-
-                                            <!-- STEPS RENDERER -->
-                                            <div class="space-y-5">
-                                                <template x-for="(step, idx) in visibleSteps" :key="idx">
-                                                    <div class="bg-white rounded-2xl p-5 border-2 border-sky-200 shadow-sm transition-all">
-                                                        <div class="flex items-center gap-3 mb-2.5">
-                                                            <span class="w-7 h-7 rounded-full bg-[#0284c7] text-white font-black text-xs flex items-center justify-center" x-text="step.stepNumber"></span>
-                                                            <h4 class="font-black text-slate-900 text-sm sm:text-base" x-text="step.title"></h4>
-                                                        </div>
-
-                                                        <p class="text-xs sm:text-sm font-medium text-slate-700 mb-3 leading-relaxed" x-html="step.description"></p>
-
-                                                        <!-- Step matrices -->
-                                                        <template x-if="step.matrices">
-                                                            <div class="flex flex-wrap items-center justify-center gap-6 my-3 p-4 bg-[#f0f9ff] rounded-xl border-2 border-sky-200 font-mono text-xs sm:text-sm overflow-x-auto">
-                                                                <template x-for="(mObj, mIdx) in step.matrices" :key="mIdx">
-                                                                    <div class="text-center">
-                                                                        <div class="text-xs font-black text-[#0284c7] mb-1.5" x-text="mObj.label"></div>
-                                                                        <div class="matrix-bracket inline-block bg-white p-2 rounded border border-slate-700 shadow-sm">
-                                                                            <template x-for="(row, rIdx) in mObj.data" :key="rIdx">
-                                                                                <div class="flex gap-3 justify-center py-0.5">
-                                                                                    <template x-for="(val, cIdx) in row" :key="cIdx">
-                                                                                        <span class="w-12 text-right font-extrabold text-slate-900" x-text="formatNum(val)"></span>
-                                                                                    </template>
-                                                                                </div>
-                                                                            </template>
-                                                                        </div>
-                                                                    </div>
-                                                                </template>
-                                                            </div>
-                                                        </template>
-
-                                                        <!-- Step Details / ERO / Equations -->
-                                                        <template x-if="step.details">
-                                                            <div class="p-3 bg-[#fef08a] rounded-xl border border-amber-300 font-mono text-xs space-y-1 text-amber-950 font-bold">
-                                                                <template x-for="(detail, dIdx) in step.details" :key="dIdx">
-                                                                    <div x-html="detail"></div>
-                                                                </template>
-                                                            </div>
-                                                        </template>
-                                                    </div>
-                                                </template>
-                                            </div>
-
-                                            <!-- FINAL SYSTEM SOLUTION HIGHLIGHT CARD -->
-                                            <div class="mt-6 bg-[#16a34a] border-3 border-white text-white rounded-2xl p-5 shadow-lg text-center">
-                                                <div class="text-xs font-black uppercase tracking-widest text-emerald-100 mb-1">
-                                                    <i class="fa-solid fa-square-check"></i> Final System Solution
-                                                </div>
-                                                <div class="flex flex-wrap justify-center items-center gap-4 sm:gap-8 font-mono text-lg sm:text-2xl font-black mt-3">
-                                                    <div class="bg-white text-slate-900 px-4 py-2.5 rounded-xl border-2 border-amber-400 shadow">
-                                                        x = <span class="text-[#dc2626]" x-text="formatNum(finalResult.x)"></span>
-                                                    </div>
-                                                    <div class="bg-white text-slate-900 px-4 py-2.5 rounded-xl border-2 border-amber-400 shadow">
-                                                        y = <span class="text-[#dc2626]" x-text="formatNum(finalResult.y)"></span>
-                                                    </div>
-                                                    <div class="bg-white text-slate-900 px-4 py-2.5 rounded-xl border-2 border-amber-400 shadow">
-                                                        z = <span class="text-[#dc2626]" x-text="formatNum(finalResult.z)"></span>
-                                                    </div>
-                                                </div>
-                                            </div>
-
-                                        </div>
-                                    </template>
-
-                                </div>
-                            </template>
-
-                        </div>
-
-                    </div>
-                </div>
-
-            </main>
-        </template>
-
-        <!-- ================= VIEW 4: ADMIN DASHBOARD MODAL ================= -->
-        <div x-show="showAdminModal" x-transition.opacity class="fixed inset-0 z-50 bg-slate-900/80 backdrop-blur-md flex items-center justify-center p-3 sm:p-6">
-            <div @click.away="showAdminModal = false" class="bg-white border-4 border-[#0284c7] rounded-3xl max-w-5xl w-full p-4 sm:p-8 text-slate-900 shadow-2xl relative max-h-[92vh] overflow-y-auto">
-                
-                <button @click="showAdminModal = false" class="absolute top-4 right-4 w-9 h-9 rounded-full bg-slate-100 hover:bg-slate-200 border-2 border-slate-700 text-slate-900 flex items-center justify-center transition font-black">
-                    <i class="fa-solid fa-xmark"></i>
-                </button>
-
-                <!-- Dashboard Header -->
-                <div class="flex flex-wrap items-center justify-between gap-4 border-b-4 border-[#0284c7] pb-4 mb-6">
-                    <div class="flex items-center gap-3">
-                        <div class="w-12 h-12 rounded-2xl bg-[#dc2626] text-white flex items-center justify-center text-2xl shadow border-2 border-white">
-                            <i class="fa-solid fa-chart-line"></i>
-                        </div>
-                        <div>
-                            <h2 class="text-xl sm:text-2xl font-black text-slate-900">Matrix Learning Hub – User Analytics</h2>
-                            <p class="text-xs font-bold text-slate-600">Public Engagement, Institution Demographics & Access Impact</p>
-                        </div>
-                    </div>
-
-                    <div class="flex items-center gap-2 flex-wrap">
-                        <button @click="exportToCSV()" class="px-3.5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-xs rounded-xl border-2 border-white shadow transition flex items-center gap-1.5">
-                            <i class="fa-solid fa-file-excel text-amber-300"></i>
-                            <span>Export to Excel (CSV)</span>
-                        </button>
-                        <button @click="lockAdminSession()" class="px-3.5 py-2 bg-slate-800 hover:bg-slate-900 text-white font-extrabold text-xs rounded-xl border border-slate-700 transition">
-                            <i class="fa-solid fa-key mr-1 text-amber-400"></i> Lock Admin Access
-                        </button>
-                        <button @click="clearLogs()" class="px-3.5 py-2 bg-red-100 hover:bg-red-200 text-red-700 font-extrabold text-xs rounded-xl border border-red-300 transition">
-                            <i class="fa-solid fa-trash-can mr-1"></i> Reset Logs
-                        </button>
-                    </div>
-                </div>
-
-                <!-- GOOGLE SHEETS LIVE SYNC SETTING BOX -->
-                <div class="bg-amber-50 border-2 border-amber-300 p-3.5 rounded-2xl mb-6 shadow-xs flex flex-wrap items-center justify-between gap-3">
-                    <div class="flex items-center gap-2.5">
-                        <div class="w-8 h-8 rounded-xl bg-emerald-600 text-white flex items-center justify-center text-sm font-black shadow">
-                            <i class="fa-solid fa-file-csv"></i>
-                        </div>
-                        <div>
-                            <div class="text-xs font-black text-amber-950 uppercase">Live Google Sheets Web App Sync</div>
-                            <div class="text-[11px] font-bold text-amber-800">Paste your Google Apps Script Web App URL below to sync all user logs automatically:</div>
-                        </div>
-                    </div>
-                    <div class="flex items-center gap-2 w-full sm:w-auto flex-1 max-w-md">
-                        <input type="text" x-model="googleSheetsUrl" placeholder="https://script.google.com/macros/s/AKfycbx.../exec" class="w-full px-3 py-1.5 font-mono text-xs bg-white border border-amber-300 rounded-xl focus:ring-2 focus:ring-amber-500 focus:outline-none">
-                        <button @click="saveGoogleSheetsUrl()" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-black rounded-xl border border-white whitespace-nowrap shadow-xs">
-                            Save Link
-                        </button>
-                    </div>
-                </div>
-
-                <!-- METRICS GRID OVERVIEW -->
-                <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-6">
-                    <!-- Total Users -->
-                    <div class="bg-[#f0f9ff] border-3 border-[#0284c7] rounded-2xl p-4 text-slate-900 shadow-xs">
-                        <div class="flex items-center justify-between text-[#0284c7] mb-1">
-                            <span class="text-xs font-extrabold uppercase">Total Users</span>
-                            <i class="fa-solid fa-users text-lg"></i>
-                        </div>
-                        <div class="text-2xl sm:text-3xl font-black" x-text="stats ? stats.totalUsers : 1"></div>
-                        <div class="text-[10px] font-bold text-slate-500 mt-1">Unique Profile Entries</div>
-                    </div>
-
-                    <!-- Students Count -->
-                    <div class="bg-[#f0fdf4] border-3 border-[#16a34a] rounded-2xl p-4 text-slate-900 shadow-xs">
-                        <div class="flex items-center justify-between text-[#16a34a] mb-1">
-                            <span class="text-xs font-extrabold uppercase">🎓 Students</span>
-                            <i class="fa-solid fa-graduation-cap text-lg"></i>
-                        </div>
-                        <div class="text-2xl sm:text-3xl font-black" x-text="stats ? stats.studentsCount : 0"></div>
-                        <div class="text-[10px] font-bold text-slate-500 mt-1">Student Learners</div>
-                    </div>
-
-                    <!-- Teachers Count -->
-                    <div class="bg-amber-50 border-3 border-amber-400 rounded-2xl p-4 text-slate-900 shadow-xs">
-                        <div class="flex items-center justify-between text-amber-700 mb-1">
-                            <span class="text-xs font-extrabold uppercase">👨‍🏫 Educators</span>
-                            <i class="fa-solid fa-chalkboard-user text-lg"></i>
-                        </div>
-                        <div class="text-2xl sm:text-3xl font-black" x-text="stats ? stats.teachersCount : 0"></div>
-                        <div class="text-[10px] font-bold text-slate-500 mt-1">Teachers & Lecturers</div>
-                    </div>
-
-                    <!-- Total Accesses / Activity -->
-                    <div class="bg-[#fef2f2] border-3 border-[#dc2626] rounded-2xl p-4 text-slate-900 shadow-xs">
-                        <div class="flex items-center justify-between text-[#dc2626] mb-1">
-                            <span class="text-xs font-extrabold uppercase">Total Accesses</span>
-                            <i class="fa-solid fa-bolt text-lg"></i>
-                        </div>
-                        <div class="text-2xl sm:text-3xl font-black" x-text="stats ? stats.totalAccess : 0"></div>
-                        <div class="text-[10px] font-bold text-slate-500 mt-1">Calculations & Visits</div>
-                    </div>
-                </div>
-
-                <!-- TOP INSTITUTIONS & DISCOVERY SOURCES BREAKDOWN -->
-                <div class="grid md:grid-cols-2 gap-4 mb-6">
-                    <!-- Top Institutions Card -->
-                    <div class="bg-slate-50 border-2 border-slate-300 p-4 rounded-2xl text-slate-900">
-                        <h4 class="text-xs font-black uppercase text-slate-700 mb-3 flex items-center justify-between border-b pb-2">
-                            <span>🏫 Top Institutions</span>
-                            <span class="text-sky-600 font-mono">User Count</span>
-                        </h4>
-                        <div class="space-y-2 text-xs font-bold">
-                            <template x-for="(inst, i) in (stats ? stats.topInstitutions : [])" :key="i">
-                                <div class="flex items-center justify-between bg-white p-2.5 rounded-xl border border-slate-200">
-                                    <span class="flex items-center gap-2 truncate">
-                                        <span class="w-5 h-5 rounded-full bg-sky-100 text-[#0284c7] text-[10px] flex items-center justify-center font-black" x-text="i+1"></span>
-                                        <span x-text="inst.name" class="truncate"></span>
+                                <button @click="navigateToModule('Gaussian Elimination', gaussianUrl)" class="w-full py-3.5 px-4 btn-gaussian hover:brightness-110 text-white font-extrabold rounded-xl transition flex items-center justify-between text-sm shadow-sm group">
+                                    <span class="flex items-center space-x-3">
+                                        <span class="w-6 h-6 bg-amber-500 text-white rounded-full flex items-center justify-center font-bold text-xs">1</span>
+                                        <span>Gaussian Elimination</span>
                                     </span>
-                                    <span class="px-2.5 py-0.5 rounded-full bg-sky-100 text-[#0284c7] font-black" x-text="inst.count"></span>
-                                </div>
-                            </template>
-                        </div>
-                    </div>
+                                    <i class="fa-solid fa-chevron-right text-white/80 group-hover:translate-x-1 transition"></i>
+                                </button>
 
-                    <!-- Discovery Channels Card -->
-                    <div class="bg-amber-50/60 border-2 border-amber-300 p-4 rounded-2xl text-slate-900">
-                        <h4 class="text-xs font-black uppercase text-amber-900 mb-3 flex items-center justify-between border-b border-amber-200 pb-2">
-                            <span>🔥 Discovery Channels (How users found us)</span>
-                        </h4>
-                        <div class="space-y-2 text-xs font-bold">
-                            <template x-for="(source, i) in (stats ? stats.discoveryBreakdown : [])" :key="i">
-                                <div class="flex items-center justify-between bg-white p-2.5 rounded-xl border border-amber-200">
-                                    <span class="truncate" x-text="source.channel"></span>
-                                    <span class="px-2.5 py-0.5 rounded-full bg-amber-100 text-amber-800 font-black" x-text="source.count + ' users'"></span>
-                                </div>
-                            </template>
+                                <button @click="navigateToModule('Doolittle LU Method', doolittleUrl)" class="w-full py-3.5 px-4 btn-doolittle hover:brightness-110 text-white font-extrabold rounded-xl transition flex items-center justify-between text-sm shadow-sm group">
+                                    <span class="flex items-center space-x-3">
+                                        <span class="w-6 h-6 bg-amber-500 text-white rounded-full flex items-center justify-center font-bold text-xs">2</span>
+                                        <span>Doolittle LU Method</span>
+                                    </span>
+                                    <i class="fa-solid fa-chevron-right text-white/80 group-hover:translate-x-1 transition"></i>
+                                </button>
+
+                                <button @click="navigateToModule('Crout LU Method', croutUrl)" class="w-full py-3.5 px-4 btn-crout hover:brightness-110 text-white font-extrabold rounded-xl transition flex items-center justify-between text-sm shadow-sm group">
+                                    <span class="flex items-center space-x-3">
+                                        <span class="w-6 h-6 bg-amber-500 text-white rounded-full flex items-center justify-center font-bold text-xs">3</span>
+                                        <span>Crout LU Method</span>
+                                    </span>
+                                    <i class="fa-solid fa-chevron-right text-white/80 group-hover:translate-x-1 transition"></i>
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- TOOL USAGE & LAST ACCESS ROW -->
-                <div class="grid md:grid-cols-3 gap-4 mb-6">
-                    <div class="bg-sky-50 border-2 border-sky-300 p-4 rounded-2xl text-sky-950 flex items-center justify-between">
-                        <div>
-                            <div class="text-xs font-black uppercase">Basic Matrix Accesses</div>
-                            <div class="text-2xl font-black mt-0.5" x-text="stats ? stats.basicAccess : 0"></div>
-                        </div>
-                        <i class="fa-solid fa-calculator text-3xl opacity-30 text-[#0284c7]"></i>
-                    </div>
+            </div>
 
-                    <div class="bg-[#f0fdf4] border-2 border-green-300 p-4 rounded-2xl text-emerald-950 flex items-center justify-between">
-                        <div>
-                            <div class="text-xs font-black uppercase">Most Popular Module</div>
-                            <div class="text-base font-black mt-0.5" x-text="stats ? stats.mostUsedModule : 'N/A'"></div>
-                        </div>
-                        <i class="fa-solid fa-star text-3xl opacity-30 text-[#16a34a]"></i>
-                    </div>
-
-                    <div class="bg-purple-50 border-2 border-purple-300 p-4 rounded-2xl text-purple-950 flex items-center justify-between">
-                        <div>
-                            <div class="text-xs font-black uppercase">Last Logged Activity</div>
-                            <div class="text-xs font-extrabold mt-1" x-text="stats ? stats.lastAccessTime : 'N/A'"></div>
-                        </div>
-                        <i class="fa-solid fa-clock text-3xl opacity-30 text-purple-700"></i>
-                    </div>
+            <!-- YELLOW IMPORTANT NOTE BANNER -->
+            <div class="bg-amber-100/90 border border-amber-300 rounded-2xl p-4 flex items-center space-x-4 shadow-sm">
+                <div class="w-10 h-10 bg-red-500 rounded-full flex-shrink-0 flex items-center justify-center text-white font-black text-xl shadow-sm">
+                    !
                 </div>
-
-                <!-- USER ACCESS LOGS TABLE -->
-                <div class="bg-white border-2 border-slate-700 rounded-2xl overflow-hidden shadow-xs">
-                    <div class="p-4 bg-slate-900 text-white flex flex-wrap items-center justify-between gap-2">
-                        <h3 class="text-sm font-black flex items-center gap-2">
-                            <i class="fa-solid fa-list text-amber-400"></i> Student Activity Trail Log
-                        </h3>
-                        <input type="text" x-model="searchLog" placeholder="Search by name, institution or module..." class="px-3 py-1 rounded-lg bg-slate-800 text-white text-xs font-bold border border-slate-700 focus:outline-none">
-                    </div>
-
-                    <div class="overflow-x-auto max-h-80">
-                        <table class="w-full text-left border-collapse text-xs">
-                            <thead class="bg-slate-100 text-slate-700 uppercase font-black sticky top-0 border-b border-slate-300">
-                                <tr>
-                                    <th class="p-3">Time</th>
-                                    <th class="p-3">User Name</th>
-                                    <th class="p-3">Role</th>
-                                    <th class="p-3">Institution</th>
-                                    <th class="p-3">Purpose</th>
-                                    <th class="p-3">Module Accessed</th>
-                                </tr>
-                            </thead>
-                            <tbody class="divide-y divide-slate-200 font-semibold text-slate-800">
-                                <template x-for="(log, idx) in filteredLogs" :key="idx">
-                                    <tr class="hover:bg-sky-50">
-                                        <td class="p-3 font-mono text-[11px] text-slate-500 whitespace-nowrap" x-text="log.formattedTime"></td>
-                                        <td class="p-3 font-extrabold text-slate-900" x-text="log.studentName"></td>
-                                        <td class="p-3">
-                                            <span :class="log.userType === 'Student' ? 'bg-sky-100 text-[#0284c7]' : log.userType === 'Teacher / Lecturer' ? 'bg-amber-100 text-amber-900' : 'bg-slate-200 text-slate-800'" class="px-2 py-0.5 rounded-full font-black text-[10px]" x-text="log.userType"></span>
-                                        </td>
-                                        <td class="p-3 font-bold" x-text="log.institution"></td>
-                                        <td class="p-3">
-                                            <span class="px-2 py-0.5 rounded bg-slate-200 font-bold" x-text="log.purpose"></span>
-                                        </td>
-                                        <td class="p-3 font-bold text-slate-900" x-text="log.module"></td>
-                                    </tr>
-                                </template>
-
-                                <template x-if="filteredLogs.length === 0">
-                                    <tr>
-                                        <td colspan="6" class="p-8 text-center text-slate-500 font-bold">
-                                            No activity logs found.
-                                        </td>
-                                    </tr>
-                                </template>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-
-                <div class="mt-6 text-right">
-                    <button @click="showAdminModal = false" class="px-6 py-2.5 bg-[#0284c7] text-white font-black text-xs rounded-xl hover:bg-[#0369a1] transition shadow">
-                        Close Admin Portal
-                    </button>
+                <div class="text-xs md:text-sm text-amber-950 font-medium">
+                    <strong class="font-extrabold uppercase text-amber-900">IMPORTANT NOTE:</strong> All numerical operations automatically record step-by-step user activity into the access analytics log!
                 </div>
             </div>
-        </div>
 
-        <!-- ================= VIEW 5: ADMIN PASSWORD GATE MODAL ================= -->
-        <div x-show="showAdminPinModal" x-transition.opacity class="fixed inset-0 z-50 bg-slate-900/85 backdrop-blur-md flex items-center justify-center p-4">
-            <div @click.away="showAdminPinModal = false" class="bg-white border-4 border-[#dc2626] rounded-3xl max-w-md w-full p-6 text-slate-900 shadow-2xl relative my-auto">
-                <button @click="showAdminPinModal = false" class="absolute top-4 right-4 w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 border-2 border-slate-700 text-slate-900 flex items-center justify-center transition font-black">
-                    <i class="fa-solid fa-xmark"></i>
-                </button>
-
-                <div class="text-center mb-5">
-                    <div class="w-14 h-14 rounded-2xl bg-[#dc2626] text-white flex items-center justify-center mx-auto mb-2 text-2xl shadow-lg border-2 border-white">
-                        <i class="fa-solid fa-shield-halved text-amber-300"></i>
-                    </div>
-                    <h3 class="text-xl font-black text-slate-900">ADMIN ACCESS CONTROL</h3>
-                    <p class="text-xs font-bold text-slate-500 mt-1">Authorized Developer & Lecturer Access Only</p>
-                </div>
-
-                <form @submit.prevent="verifyAdminPin()" class="space-y-4">
-                    <div>
-                        <label class="block text-xs font-extrabold text-slate-700 uppercase tracking-wider mb-1">
-                            <i class="fa-solid fa-key text-[#dc2626] mr-1"></i> Enter Admin Password / PIN
-                        </label>
-                        <input type="password" x-model="adminInputPin" placeholder="Enter Password" autocomplete="current-password" required class="w-full px-4 py-2.5 font-bold text-base text-center bg-red-50 border-2 border-red-300 rounded-xl focus:ring-2 focus:ring-[#dc2626] focus:outline-none">
-                    </div>
-
-                    <template x-if="pinError">
-                        <div class="p-2.5 bg-red-100 border border-red-400 text-red-800 rounded-xl text-xs font-extrabold text-center">
-                            <i class="fa-solid fa-circle-xmark text-red-600 mr-1"></i> Incorrect Password! Access Denied.
-                        </div>
-                    </template>
-
-                    <button type="submit" class="w-full py-3 bg-[#dc2626] hover:bg-[#b91c1c] text-white font-black text-sm rounded-xl border-2 border-white shadow-md flex items-center justify-center gap-2 transition active:scale-95">
-                        <i class="fa-solid fa-unlock"></i>
-                        <span>VERIFY & ACCESS DASHBOARD</span>
-                    </button>
-                </form>
-
-                <div class="mt-4 p-2.5 bg-amber-50 border border-amber-300 rounded-xl text-[11px] font-bold text-amber-900 text-center">
-                    <i class="fa-solid fa-lightbulb text-amber-600 mr-1"></i> Demo Password: <code class="bg-amber-200 px-1.5 py-0.5 rounded font-mono font-black">admin123</code>
-                </div>
-            </div>
-        </div>
-
-        <!-- ================= MODAL: USER MANUAL ================= -->
-        <div x-show="showManual" x-transition.opacity class="fixed inset-0 z-50 bg-slate-900/70 backdrop-blur-xs flex items-center justify-center p-4">
-            <div @click.away="showManual = false" class="bg-white border-4 border-[#0284c7] rounded-3xl max-w-2xl w-full p-6 sm:p-8 text-slate-900 shadow-2xl relative max-h-[90vh] overflow-y-auto">
-                <button @click="showManual = false" class="absolute top-4 right-4 w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 border-2 border-slate-700 text-slate-900 flex items-center justify-center transition font-bold">
-                    <i class="fa-solid fa-xmark"></i>
-                </button>
-
-                <div class="flex items-center gap-3 mb-6">
-                    <div class="w-10 h-10 rounded-xl bg-[#0284c7] text-white flex items-center justify-center text-lg shadow">
-                        <i class="fa-solid fa-book-open"></i>
-                    </div>
-                    <div>
-                        <h3 class="text-xl font-black text-slate-900">User Manual & Method Overview</h3>
-                        <p class="text-xs font-semibold text-slate-600">3x3 Matrix Linear Equation Solver Guide</p>
-                    </div>
-                </div>
-
-                <div class="space-y-3.5 text-xs sm:text-sm text-slate-800 leading-relaxed font-medium">
-                    <div class="p-4 bg-[#f0f9ff] border-2 border-[#0284c7] rounded-2xl">
-                        <h4 class="font-black text-[#0284c7] text-sm mb-1"><i class="fa-solid fa-sliders mr-1"></i> 1. Gaussian Elimination Method</h4>
-                        <p>Converts the augmented coefficient matrix [A | B] into Upper Triangular Matrix form via Elementary Row Operations (ERO), then applies Back Substitution to solve for variables x, y, z.</p>
-                    </div>
-
-                    <div class="p-4 bg-[#f0fdf4] border-2 border-[#16a34a] rounded-2xl">
-                        <h4 class="font-black text-[#16a34a] text-sm mb-1"><i class="fa-solid fa-layer-group mr-1"></i> 2. Doolittle LU Decomposition Method</h4>
-                        <p>Decomposes matrix A = L · U where lower matrix L has unit diagonal elements (L<sub>ii</sub> = 1). Solves L · y = B (forward substitution) and subsequently U · x = y (back substitution).</p>
-                    </div>
-
-                    <div class="p-4 bg-[#fef2f2] border-2 border-[#dc2626] rounded-2xl">
-                        <h4 class="font-black text-[#dc2626] text-sm mb-1"><i class="fa-solid fa-cubes mr-1"></i> 3. Crout LU Decomposition Method</h4>
-                        <p>Decomposes matrix A = L · U where upper matrix U has unit diagonal elements (U<sub>ii</sub> = 1). Solves L · y = B and subsequently U · x = y.</p>
-                    </div>
-                </div>
-
-                <div class="mt-6 text-right">
-                    <button @click="showManual = false" class="px-6 py-2.5 bg-[#0284c7] text-white font-black text-xs rounded-xl hover:bg-[#0369a1] transition shadow">
-                        Understood & Close
-                    </button>
-                </div>
-            </div>
-        </div>
-
-        <!-- GLOBAL TOAST NOTIFICATION CONTAINER -->
-        <div x-show="toastMessage" x-transition class="fixed bottom-6 right-6 z-50 bg-slate-900 text-white px-5 py-3 rounded-2xl shadow-2xl border-2 border-amber-400 flex items-center gap-3 text-xs font-black">
-            <i class="fa-solid fa-circle-info text-amber-400 text-base"></i>
-            <span x-text="toastMessage"></span>
-        </div>
-
-        <!-- FOOTER COPYRIGHT -->
-        <footer class="mt-6 text-center text-xs font-bold text-white">
-            <p class="bg-[#0284c7]/80 backdrop-blur inline-block px-4 py-1.5 rounded-full border border-white/40 shadow">Interactive Numerical Methods Simulator &copy; 2026. Politeknik Poster Palette Edition.</p>
-        </footer>
-
+        </main>
     </div>
 
-    <!-- Firebase Modular Imports -->
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, collection, addDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+    <!-- FOOTER SECTION -->
+    <footer class="w-full max-w-5xl mx-auto mb-4">
+        <div class="bg-[#e8f4f9] rounded-2xl px-6 py-3 flex flex-wrap justify-between items-center text-xs font-semibold text-slate-600 shadow-sm border border-white/50">
+            <!-- Left: Code Icon & Name -->
+            <div class="flex items-center space-x-2 text-[#2563eb] font-bold tracking-wide">
+                <svg class="w-4 h-4 stroke-[2.5]" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M17.25 6.75L22.5 12l-5.25 5.25m-10.5 0L1.5 12l5.25-5.25m7.5-3l-4.5 16.5"></path>
+                </svg>
+                <span>MOHDSAIFULPAHRUDIN</span>
+            </div>
 
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'matrix-learning-hub';
-        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {
-            apiKey: "demo-api-key",
-            authDomain: "demo-app.firebaseapp.com",
-            projectId: "demo-app",
-            storageBucket: "demo-app.appspot.com",
-            messagingSenderId: "123456789",
-            appId: "1:123456789:web:abcdef"
-        };
+            <!-- Right: Copyright -->
+            <div class="text-slate-500 font-medium">
+                © 2026 All Rights Reserved
+            </div>
+        </div>
+    </footer>
 
-        let app, db, auth;
-        try {
-            app = initializeApp(firebaseConfig);
-            db = getFirestore(app);
-            auth = getAuth(app);
+    <!-- PROFILING / USER LOGIN MODAL -->
+    <div x-show="showProfileModal" x-transition.opacity class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl max-w-md w-full p-6 main-card border border-sky-100 relative shadow-2xl">
+            <div class="text-center mb-6">
+                <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center text-blue-600 text-2xl mx-auto mb-3 shadow-inner">
+                    <i class="fa-solid fa-user-graduate"></i>
+                </div>
+                <h3 class="text-xl font-bold text-slate-800">User Profile</h3>
+                <p class="text-xs text-slate-500">Please complete your information to access the Hub.</p>
+            </div>
 
-            if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                await signInWithCustomToken(auth, __initial_auth_token);
-            } else {
-                await signInAnonymously(auth);
-            }
+            <form @submit.prevent="saveProfile()" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">User Role</label>
+                    <select x-model="profileForm.userType" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-blue-500" required>
+                        <option value="Student">🎓 Student</option>
+                        <option value="Teacher / Lecturer">👨‍🏫 Teacher / Lecturer</option>
+                        <option value="Other">👤 Other</option>
+                    </select>
+                </div>
 
-            const logsRef = collection(db, 'artifacts', appId, 'public', 'data', 'access_logs');
-            onSnapshot(logsRef, (snapshot) => {
-                const liveLogs = [];
-                snapshot.forEach(doc => {
-                    liveLogs.push(doc.data());
-                });
-                liveLogs.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
-                if (window.matrixAlpineInstance && liveLogs.length > 0) {
-                    window.matrixAlpineInstance.logs = liveLogs;
-                }
-            }, (error) => {
-                console.log("Firestore listener fallback mode:", error);
-            });
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Full Name</label>
+                    <input type="text" x-model="profileForm.name" placeholder="e.g. Ahmad Hakimi" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-blue-500" required>
+                </div>
 
-        } catch (e) {
-            console.log("Firebase setup operating in local memory mode.");
-        }
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Institution / School</label>
+                    <input type="text" x-model="profileForm.institution" placeholder="e.g. Politeknik Port Dickson" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-blue-500" required>
+                </div>
 
-        window.db = db;
-        window.appId = appId;
-    </script>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Purpose</label>
+                        <select x-model="profileForm.purpose" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-blue-500">
+                            <option value="Learning">Learning</option>
+                            <option value="Teaching">Teaching</option>
+                            <option value="Research / Project">Research / Project</option>
+                            <option value="Self-learning">Self-learning</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Discovery Source</label>
+                        <select x-model="profileForm.discoverySource" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-blue-500">
+                            <option value="Lecturer / Teacher">Lecturer / Teacher</option>
+                            <option value="QR Code">QR Code</option>
+                            <option value="Google Search">Google Search</option>
+                            <option value="Friend / Student">Friend / Student</option>
+                            <option value="Social Media">Social Media</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+                </div>
 
+                <button type="submit" class="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl shadow-lg hover:shadow-blue-500/30 transition text-sm uppercase">
+                    ENTER MATRIX LEARNING HUB
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- ADMIN AUTHENTICATION MODAL -->
+    <div x-show="showAdminModal" x-transition.opacity class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl max-w-md w-full p-6 main-card border border-slate-200 shadow-2xl">
+            <div class="flex justify-between items-center mb-6 pb-4 border-b">
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 bg-slate-900 rounded-xl flex items-center justify-center text-amber-400 font-bold">
+                        <i class="fa-solid fa-shield-halved"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-bold text-slate-800">Admin Authentication</h3>
+                        <p class="text-xs text-slate-500">Administrator Access</p>
+                    </div>
+                </div>
+                <button @click="showAdminModal = false" class="text-slate-400 hover:text-slate-600">
+                    <i class="fa-solid fa-xmark text-xl"></i>
+                </button>
+            </div>
+
+            <form @submit.prevent="authenticateAdmin()" class="py-4 text-center space-y-4">
+                <i class="fa-solid fa-lock text-4xl text-blue-600"></i>
+                <h4 class="font-bold text-slate-800">Restricted Admin Portal</h4>
+                <p class="text-xs text-slate-500">Enter Admin PIN to open your Google Sheets analytics dashboard.</p>
+                <input type="password" x-model="adminPinInput" placeholder="Enter Admin PIN" class="w-full px-3 py-2 border rounded-xl text-center font-bold tracking-widest focus:outline-none focus:border-blue-500" required>
+                <button type="submit" class="w-full py-2.5 bg-slate-900 text-white font-bold rounded-xl text-sm uppercase">Open Google Sheets Admin</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- JAVASCRIPT LOGIC -->
     <script>
-        function registerMatrixApp() {
-            Alpine.data('matrixApp', function() {
-                return {
-                    currentView: 'cover',
-                    activeMethod: 'gaussian',
-                    showLoginModal: true,
-                    showManual: false,
-                    showAdminModal: false,
-                    showAdminPinModal: false,
-                    adminInputPin: '',
-                    adminSecretPin: 'admin123',
-                    isAdminAuthenticated: false,
-                    pinError: false,
-                    searchLog: '',
-                    // Default configured Google Apps Script Web App URL
-                    googleSheetsUrl: 'https://script.google.com/macros/s/AKfycbzutvwuVpb3lZ0WRmcweuEztkJ3s03xaJ5NNz5L7mSAmdnpRUq5GvYHi9umKNcw3jYg/exec',
-                    toastMessage: '',
+        function hubApp() {
+            return {
+                // Target HTML links
+                basicMatrixUrl: 'Basic Matrix_calc.html',
+                gaussianUrl: 'gaussian_sim.html',
+                doolittleUrl: 'doolittle_sim.html',
+                croutUrl: 'crout_sim.html',
 
-                    // Navigation URLs (Linked directly to your target HTML pages)
-                    basicMatrixUrl: 'Basic Matrix_calc.html',
-                    gaussianUrl: 'gaussian_sim.html',
-                    doolittleUrl: 'doolittle_sim.html',
-                    croutUrl: 'crout_sim.html',
+                // Google Apps Script Web App URL
+                googleAppsScriptUrl: 'https://script.google.com/macros/s/AKfycbzutvwuVpb3lZ0WRmcweuEztkJ3s03xaJ5NNz5L7mSAmdnpRUq5GvYHi9umKNcw3jYg/exec',
+                
+                // Admin Secret PIN
+                adminSecretPin: 'admin123',
+                adminPinInput: '',
 
-                    // Active Session Logging Cache to prevent duplicate counts per session
-                    sessionLoggedModules: [],
+                // Modals & User Profile
+                showProfileModal: false,
+                showAdminModal: false,
+                userProfile: {
+                    registered: false,
+                    userType: 'Student',
+                    name: '',
+                    institution: '',
+                    purpose: 'Learning',
+                    discoverySource: 'Lecturer / Teacher'
+                },
+                profileForm: {
+                    userType: 'Student',
+                    name: '',
+                    institution: '',
+                    purpose: 'Learning',
+                    discoverySource: 'Lecturer / Teacher'
+                },
 
-                    // Basic Matrix State
-                    basicOp: 'add',
-                    basicA: [
-                        [3, 2, 1],
-                        [0, 1, 4],
-                        [2, 1, 0]
-                    ],
-                    basicB: [
-                        [1, 2, 0],
-                        [2, 0, 1],
-                        [1, 1, 3]
-                    ],
-                    basicResult: [
-                        [0, 0, 0],
-                        [0, 0, 0],
-                        [0, 0, 0]
-                    ],
+                // Session Tracking
+                sessionLoggedModules: [],
 
-                    // Advanced Solver System Equations [a, b, c, d]
-                    eq: [
-                        [2, 1, -1, 8],
-                        [-3, -1, 2, -11],
-                        [-2, 1, 2, -3]
-                    ],
-
-                    // Solver Execution State
-                    solutionTab: 'all',
-                    currentStepIndex: 0,
-                    hasCalculated: false,
-                    errorMessage: '',
-                    stepsList: [],
-                    finalResult: { x: 0, y: 0, z: 0 },
-
-                    // Current Active User Profile
-                    currentUser: {
-                        userType: 'Student',
-                        name: '',
-                        institution: '',
-                        country: 'Malaysia',
-                        purpose: 'Learning',
-                        discoverySource: 'Lecturer / Teacher',
-                        isLoggedIn: false
-                    },
-
-                    loginForm: {
-                        userType: 'Student',
-                        name: '',
-                        institution: '',
-                        country: 'Malaysia',
-                        purpose: 'Learning',
-                        discoverySource: 'Lecturer / Teacher'
-                    },
-
-                    // Access Activity Logs
-                    logs: [
-                        {
-                            studentName: 'Ahmad Hakimi',
-                            userType: 'Student',
-                            institution: 'Politeknik Port Dickson',
-                            country: 'Malaysia',
-                            purpose: 'Learning',
-                            discoverySource: 'Lecturer / Teacher',
-                            module: 'Basic Matrix',
-                            timestamp: Date.now() - 3600000,
-                            formattedTime: new Date(Date.now() - 3600000).toLocaleString()
-                        },
-                        {
-                            studentName: 'Dr. Siti Nurhaliza',
-                            userType: 'Teacher / Lecturer',
-                            institution: 'UTM Skudai',
-                            country: 'Malaysia',
-                            purpose: 'Teaching',
-                            discoverySource: 'Google Search',
-                            module: 'Gaussian Elimination',
-                            timestamp: Date.now() - 1800000,
-                            formattedTime: new Date(Date.now() - 1800000).toLocaleString()
-                        }
-                    ],
-
-                    init() {
-                        window.matrixAlpineInstance = this;
-                        
-                        // Check local storage for existing logged-in session
-                        const savedProfile = localStorage.getItem('matrix_user_profile');
-                        if (savedProfile) {
-                            try {
-                                const parsed = JSON.parse(savedProfile);
-                                if (parsed && parsed.name && parsed.institution) {
-                                    this.currentUser = { ...parsed, isLoggedIn: true };
-                                    this.showLoginModal = false;
-                                }
-                            } catch(e) {
-                                console.log("Error restoring user session:", e);
-                            }
-                        }
-
-                        this.calculateBasic();
-                    },
-
-                    notify(msg) {
-                        this.toastMessage = msg;
-                        setTimeout(() => {
-                            this.toastMessage = '';
-                        }, 3500);
-                    },
-
-                    saveGoogleSheetsUrl() {
-                        if (this.googleSheetsUrl && this.googleSheetsUrl.trim().startsWith('http')) {
-                            this.notify("Google Sheets Web App URL saved! Logs will sync automatically.");
-                        } else {
-                            this.notify("Please enter a valid Web App URL (starting with http:// or https://)");
-                        }
-                    },
-
-                    handleLogin() {
-                        if (!this.loginForm.name || !this.loginForm.institution) return;
-                        this.currentUser = {
-                            userType: this.loginForm.userType || 'Student',
-                            name: this.loginForm.name,
-                            institution: this.loginForm.institution,
-                            country: this.loginForm.country || 'Malaysia',
-                            purpose: this.loginForm.purpose || 'Learning',
-                            discoverySource: this.loginForm.discoverySource || 'Lecturer / Teacher',
-                            isLoggedIn: true
-                        };
-
-                        // Persist session to localStorage so reloading or returning to home keeps user logged in
+                initApp() {
+                    const saved = localStorage.getItem('matrix_hub_user_profile');
+                    if (saved) {
                         try {
-                            localStorage.setItem('matrix_user_profile', JSON.stringify(this.currentUser));
-                        } catch(e) {
-                            console.log("LocalStorage access error:", e);
+                            this.userProfile = JSON.parse(saved);
+                            this.userProfile.registered = true;
+                        } catch (e) {
+                            this.showProfileModal = true;
                         }
-
-                        this.showLoginModal = false;
-                        // Reset session log tracker on fresh user profiling
-                        this.sessionLoggedModules = [];
-                        this.recordActivity('Access Hub Entry');
-                    },
-
-                    logout() {
-                        // Clear persistent session
-                        try {
-                            localStorage.removeItem('matrix_user_profile');
-                        } catch(e) {
-                            console.log("LocalStorage clear error:", e);
-                        }
-
-                        this.currentUser.isLoggedIn = false;
-                        this.showLoginModal = true;
-                    },
-
-                    // Single Record Activity Handler with One-Time Logging per Session Check
-                    recordActivity(moduleName) {
-                        if (!moduleName) return;
-
-                        // Check if module has already been recorded in the current active session
-                        if (this.sessionLoggedModules.includes(moduleName) && moduleName !== 'Access Hub Entry') {
-                            console.log(`Module "${moduleName}" already logged for this session. Skipping duplicate count.`);
-                            return;
-                        }
-
-                        if (moduleName !== 'Access Hub Entry') {
-                            this.sessionLoggedModules.push(moduleName);
-                        }
-
-                        const logItem = {
-                            studentName: this.currentUser.isLoggedIn ? this.currentUser.name : 'Anonymous Guest',
-                            userType: this.currentUser.isLoggedIn ? this.currentUser.userType : 'Guest',
-                            institution: this.currentUser.isLoggedIn ? this.currentUser.institution : 'Public Access',
-                            country: this.currentUser.isLoggedIn ? this.currentUser.country : 'Malaysia',
-                            purpose: this.currentUser.isLoggedIn ? this.currentUser.purpose : 'Self-learning',
-                            discoverySource: this.currentUser.isLoggedIn ? this.currentUser.discoverySource : 'Direct',
-                            module: moduleName,
-                            timestamp: Date.now(),
-                            formattedTime: new Date().toLocaleString()
-                        };
-
-                        this.logs.unshift(logItem);
-
-                        // Real-time Sync to Google Sheets Web App URL
-                        const targetSheetsUrl = (this.googleSheetsUrl || '').trim();
-                        if (targetSheetsUrl && targetSheetsUrl.startsWith('http')) {
-                            try {
-                                fetch(targetSheetsUrl, {
-                                    method: "POST",
-                                    mode: "no-cors",
-                                    headers: { "Content-Type": "text/plain;charset=utf-8" },
-                                    body: JSON.stringify(logItem)
-                                }).catch(e => console.log("Google Sheets sync notice:", e));
-                            } catch(e) {
-                                console.log("Fetch execution error:", e);
-                            }
-                        }
-                    },
-
-                    get stats() {
-                        const totalAccess = this.logs.length;
-                        const uniqueUsers = new Set(this.logs.map(l => l.studentName + l.institution)).size;
-                        
-                        const studentsCount = new Set(this.logs.filter(l => l.userType === 'Student').map(l => l.studentName)).size;
-                        const teachersCount = new Set(this.logs.filter(l => l.userType === 'Teacher / Lecturer').map(l => l.studentName)).size;
-                        const othersCount = uniqueUsers - (studentsCount + teachersCount);
-
-                        const basicAccess = this.logs.filter(l => (l.module || '').includes('Basic Matrix')).length;
-                        const advancedAccess = totalAccess - basicAccess;
-
-                        const instCounts = {};
-                        this.logs.forEach(l => {
-                            if (l.institution && l.institution !== 'Public Access') {
-                                instCounts[l.institution] = (instCounts[l.institution] || 0) + 1;
-                            }
-                        });
-                        const topInstitutions = Object.entries(instCounts)
-                            .map(([name, count]) => ({ name, count }))
-                            .sort((a,b) => b.count - a.count)
-                            .slice(0, 5);
-
-                        const sourceCounts = {};
-                        this.logs.forEach(l => {
-                            if (l.discoverySource) {
-                                sourceCounts[l.discoverySource] = (sourceCounts[l.discoverySource] || 0) + 1;
-                            }
-                        });
-                        const discoveryBreakdown = Object.entries(sourceCounts)
-                            .map(([channel, count]) => ({ channel, count }))
-                            .sort((a,b) => b.count - a.count);
-
-                        const moduleCounts = {};
-                        this.logs.forEach(l => {
-                            if (l.module && l.module !== 'Access Hub Entry') {
-                                moduleCounts[l.module] = (moduleCounts[l.module] || 0) + 1;
-                            }
-                        });
-                        let mostUsed = 'Basic Matrix';
-                        let maxCount = 0;
-                        for (const [mod, count] of Object.entries(moduleCounts)) {
-                            if (count > maxCount) {
-                                maxCount = count;
-                                mostUsed = mod;
-                            }
-                        }
-
-                        const lastLog = this.logs[0];
-                        const lastAccessTime = lastLog ? lastLog.formattedTime : 'N/A';
-
-                        return {
-                            totalUsers: uniqueUsers || 1,
-                            studentsCount,
-                            teachersCount,
-                            othersCount: Math.max(0, othersCount),
-                            totalAccess,
-                            basicAccess,
-                            advancedAccess,
-                            topInstitutions: topInstitutions.length > 0 ? topInstitutions : [{ name: 'Politeknik Port Dickson', count: 1 }],
-                            discoveryBreakdown,
-                            mostUsedModule: mostUsed,
-                            lastAccessTime
-                        };
-                    },
-
-                    get filteredLogs() {
-                        if (!this.searchLog) return this.logs;
-                        const q = this.searchLog.toLowerCase();
-                        return this.logs.filter(l => 
-                            (l.studentName || '').toLowerCase().includes(q) ||
-                            (l.institution || '').toLowerCase().includes(q) ||
-                            (l.userType || '').toLowerCase().includes(q) ||
-                            (l.module || '').toLowerCase().includes(q)
-                        );
-                    },
-
-                    clearLogs() {
-                        this.logs = [];
-                        this.notify("Logs reset successfully!");
-                    },
-
-                    exportToCSV() {
-                        if (!this.logs || this.logs.length === 0) {
-                            this.notify("No access logs available to export.");
-                            return;
-                        }
-
-                        const headers = ["Timestamp", "Formatted Time", "Name", "User Type", "Institution", "Country", "Purpose", "Discovery Source", "Module"];
-                        const csvRows = [];
-                        csvRows.push(headers.join(","));
-
-                        this.logs.forEach(log => {
-                            const row = [
-                                `"${log.timestamp || ''}"`,
-                                `"${(log.formattedTime || '').replace(/"/g, '""')}"`,
-                                `"${(log.studentName || '').replace(/"/g, '""')}"`,
-                                `"${(log.userType || '').replace(/"/g, '""')}"`,
-                                `"${(log.institution || '').replace(/"/g, '""')}"`,
-                                `"${(log.country || '').replace(/"/g, '""')}"`,
-                                `"${(log.purpose || '').replace(/"/g, '""')}"`,
-                                `"${(log.discoverySource || '').replace(/"/g, '""')}"`,
-                                `"${(log.module || '').replace(/"/g, '""')}"`
-                            ];
-                            csvRows.push(row.join(","));
-                        });
-
-                        const csvContent = "\uFEFF" + csvRows.join("\n");
-                        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-                        const url = URL.createObjectURL(blob);
-                        
-                        const link = document.createElement("a");
-                        link.setAttribute("href", url);
-                        link.setAttribute("download", `Matrix_Hub_Access_Logs_${new Date().toISOString().slice(0,10)}.csv`);
-                        document.body.appendChild(link);
-                        link.click();
-                        document.body.removeChild(link);
-                        this.notify("Exported activity log to CSV successfully!");
-                    },
-
-                    handleAdminClick() {
-                        if (this.isAdminAuthenticated) {
-                            this.showAdminModal = true;
-                        } else {
-                            this.adminInputPin = '';
-                            this.pinError = false;
-                            this.showAdminPinModal = true;
-                        }
-                    },
-
-                    verifyAdminPin() {
-                        if (this.adminInputPin === this.adminSecretPin) {
-                            this.isAdminAuthenticated = true;
-                            this.showAdminPinModal = false;
-                            this.showAdminModal = true;
-                            this.pinError = false;
-                        } else {
-                            this.pinError = true;
-                        }
-                    },
-
-                    lockAdminSession() {
-                        this.isAdminAuthenticated = false;
-                        this.showAdminModal = false;
-                        this.notify("Admin session locked.");
-                    },
-
-                    goHome() {
-                        this.currentView = 'cover';
-                    },
-
-                    // Safe Navigation Helper that guards against empty/invalid URL location errors
-                    safeNavigate(targetUrl, fallbackFn) {
-                        const cleanUrl = (targetUrl || '').trim();
-                        
-                        // Check if we are running in an unhosted / iframe sandbox environment
-                        const isIframeSandbox = !window.location.origin || 
-                                                window.location.origin === 'null' || 
-                                                window.location.protocol === 'about:' || 
-                                                window.location.protocol === 'blob:';
-
-                        if (cleanUrl && cleanUrl !== '#' && cleanUrl !== '' && !isIframeSandbox) {
-                            try {
-                                window.location.href = cleanUrl;
-                                return;
-                            } catch (err) {
-                                console.warn("External location setter unavailable. Falling back to in-app view:", err);
-                            }
-                        }
-
-                        // Run fallback in-app view rendering
-                        if (typeof fallbackFn === 'function') {
-                            fallbackFn();
-                        }
-                    },
-
-                    enterBasicMatrix() {
-                        this.recordActivity('Basic Matrix');
-                        this.safeNavigate(this.basicMatrixUrl, () => {
-                            this.currentView = 'basic';
-                            this.calculateBasic();
-                        });
-                    },
-
-                    enterAdvanceMethod(method) {
-                        this.activeMethod = method;
-                        const methodNames = {
-                            gaussian: 'Gaussian Elimination',
-                            doolittle: 'Doolittle LU Method',
-                            crout: 'Crout LU Method'
-                        };
-                        const methodUrls = {
-                            gaussian: this.gaussianUrl,
-                            doolittle: this.doolittleUrl,
-                            crout: this.croutUrl
-                        };
-
-                        const selectedModuleName = methodNames[method] || 'Advanced Matrix';
-                        this.recordActivity(selectedModuleName);
-
-                        const targetUrl = methodUrls[method];
-                        this.safeNavigate(targetUrl, () => {
-                            this.currentView = 'advance';
-                            this.loadExample();
-                            this.calculateSolution();
-                        });
-                    },
-
-                    setBasicOp(op) {
-                        this.basicOp = op;
-                        this.calculateBasic();
-                    },
-
-                    fillSampleBasicA() {
-                        this.basicA = [[3, 2, 1], [0, 1, 4], [2, 1, 0]];
-                        this.calculateBasic();
-                    },
-
-                    fillSampleBasicB() {
-                        this.basicB = [[1, 2, 0], [2, 0, 1], [1, 1, 3]];
-                        this.calculateBasic();
-                    },
-
-                    calculateBasic() {
-                        const A = this.basicA;
-                        const B = this.basicB;
-
-                        if (this.basicOp === 'add') {
-                            this.basicResult = A.map((row, r) => row.map((val, c) => (Number(val)||0) + (Number(B[r][c])||0)));
-                        } else if (this.basicOp === 'sub') {
-                            this.basicResult = A.map((row, r) => row.map((val, c) => (Number(val)||0) - (Number(B[r][c])||0)));
-                        } else if (this.basicOp === 'mul') {
-                            let res = [[0,0,0],[0,0,0],[0,0,0]];
-                            for (let i = 0; i < 3; i++) {
-                                for (let j = 0; j < 3; j++) {
-                                    for (let k = 0; k < 3; k++) {
-                                        res[i][j] += (Number(A[i][k])||0) * (Number(B[k][j])||0);
-                                    }
-                                }
-                            }
-                            this.basicResult = res;
-                        } else if (this.basicOp === 'det') {
-                            const det = A[0][0]*(A[1][1]*A[2][2] - A[1][2]*A[2][1])
-                                      - A[0][1]*(A[1][0]*A[2][2] - A[1][2]*A[2][0])
-                                      + A[0][2]*(A[1][0]*A[2][1] - A[1][1]*A[2][0]);
-                            this.basicResult = det;
-                        } else if (this.basicOp === 'trans') {
-                            this.basicResult = [
-                                [A[0][0], A[1][0], A[2][0]],
-                                [A[0][1], A[1][1], A[2][1]],
-                                [A[0][2], A[1][2], A[2][2]]
-                            ];
-                        }
-                    },
-
-                    getMethodTitle() {
-                        if (this.activeMethod === 'gaussian') return 'Gaussian Method';
-                        if (this.activeMethod === 'doolittle') return 'Doolittle LU Method';
-                        if (this.activeMethod === 'crout') return 'Crout LU Method';
-                        return '';
-                    },
-
-                    getMethodBadge() {
-                        if (this.activeMethod === 'gaussian') return 'Gaussian Elimination';
-                        if (this.activeMethod === 'doolittle') return 'Doolittle Decomposition';
-                        if (this.activeMethod === 'crout') return 'Crout Decomposition';
-                        return '';
-                    },
-
-                    getMethodFullSubtitle() {
-                        if (this.activeMethod === 'gaussian') return 'Gaussian Elimination Method';
-                        if (this.activeMethod === 'doolittle') return 'Doolittle LU Decomposition';
-                        if (this.activeMethod === 'crout') return 'Crout LU Decomposition';
-                        return '';
-                    },
-
-                    getMethodTagline() {
-                        if (this.activeMethod === 'gaussian') return 'Upper Triangular Matrix • Back Substitution';
-                        if (this.activeMethod === 'doolittle') return 'A = L·U Matrix Factorization (Lii = 1)';
-                        if (this.activeMethod === 'crout') return 'A = L·U Matrix Factorization (Uii = 1)';
-                        return '';
-                    },
-
-                    loadExample() {
-                        if (this.activeMethod === 'gaussian') {
-                            this.eq = [
-                                [2, 1, -1, 8],
-                                [-3, -1, 2, -11],
-                                [-2, 1, 2, -3]
-                            ];
-                        } else if (this.activeMethod === 'doolittle') {
-                            this.eq = [
-                                [2, 3, 1, 9],
-                                [4, 7, 5, 25],
-                                [6, 18, 19, 67]
-                            ];
-                        } else {
-                            this.eq = [
-                                [1, 1, 1, 6],
-                                [2, 4, 2, 16],
-                                [-1, 5, -4, -3]
-                            ];
-                        }
-                        if (this.currentView === 'advance') {
-                            this.calculateSolution();
-                        }
-                    },
-
-                    resetInputs() {
-                        this.eq = [
-                            [0, 0, 0, 0],
-                            [0, 0, 0, 0],
-                            [0, 0, 0, 0]
-                        ];
-                        this.hasCalculated = false;
-                        this.stepsList = [];
-                        this.errorMessage = '';
-                    },
-
-                    formatNum(num) {
-                        if (num === undefined || num === null || isNaN(num)) return '0';
-                        const val = Math.round(num * 10000) / 10000;
-                        return val.toString();
-                    },
-
-                    get visibleSteps() {
-                        if (this.solutionTab === 'interactive') {
-                            return this.stepsList.length > 0 ? [this.stepsList[this.currentStepIndex]] : [];
-                        }
-                        return this.stepsList;
-                    },
-
-                    // ================= MATHEMATICAL SOLVERS =================
-                    calculateSolution() {
-                        this.hasCalculated = true;
-                        this.errorMessage = '';
-                        this.stepsList = [];
-                        this.currentStepIndex = 0;
-
-                        const A = [
-                            [Number(this.eq[0][0])||0, Number(this.eq[0][1])||0, Number(this.eq[0][2])||0],
-                            [Number(this.eq[1][0])||0, Number(this.eq[1][1])||0, Number(this.eq[1][2])||0],
-                            [Number(this.eq[2][0])||0, Number(this.eq[2][1])||0, Number(this.eq[2][2])||0]
-                        ];
-                        const B = [Number(this.eq[0][3])||0, Number(this.eq[1][3])||0, Number(this.eq[2][3])||0];
-
-                        const isAllZero = A.every(row => row.every(val => val === 0));
-                        if (isAllZero) {
-                            this.errorMessage = 'Please enter valid numerical coefficients for the matrix.';
-                            return;
-                        }
-
-                        try {
-                            if (this.activeMethod === 'gaussian') {
-                                this.solveGaussian(A, B);
-                            } else if (this.activeMethod === 'doolittle') {
-                                this.solveDoolittle(A, B);
-                            } else if (this.activeMethod === 'crout') {
-                                this.solveCrout(A, B);
-                            }
-                        } catch (err) {
-                            this.errorMessage = err.message || 'Calculation error occurred (Possible division by zero / no unique solution).';
-                        }
-                    },
-
-                    solveGaussian(A, B) {
-                        let aug = [
-                            [...A[0], B[0]],
-                            [...A[1], B[1]],
-                            [...A[2], B[2]]
-                        ];
-
-                        this.stepsList.push({
-                            stepNumber: 1,
-                            title: 'Augmented Matrix Formation [A | B]',
-                            description: 'Construct the system of linear equations into Augmented Matrix form [A | B]:',
-                            matrices: [
-                                { label: 'Augmented Matrix [A | B]', data: aug }
-                            ]
-                        });
-
-                        if (Math.abs(aug[0][0]) < 1e-9) {
-                            throw new Error("First pivot A[0][0] is zero. Please swap rows (Pivoting) or enter a non-zero coefficient.");
-                        }
-
-                        const m21 = aug[1][0] / aug[0][0];
-                        const m31 = aug[2][0] / aug[0][0];
-
-                        for (let j = 0; j < 4; j++) {
-                            aug[1][j] -= m21 * aug[0][j];
-                            aug[2][j] -= m31 * aug[0][j];
-                        }
-
-                        this.stepsList.push({
-                            stepNumber: 2,
-                            title: 'Eliminating Column 1',
-                            description: 'Perform Elementary Row Operations (ERO) to eliminate variable x in Row 2 and Row 3:',
-                            details: [
-                                `Multiplier m<sub>21</sub> = A<sub>21</sub> / A<sub>11</sub> = ${this.formatNum(m21)}`,
-                                `New Row 2 = R<sub>2</sub> - (${this.formatNum(m21)}) × R<sub>1</sub>`,
-                                `Multiplier m<sub>31</sub> = A<sub>31</sub> / A<sub>11</sub> = ${this.formatNum(m31)}`,
-                                `New Row 3 = R<sub>3</sub> - (${this.formatNum(m31)}) × R<sub>1</sub>`
-                            ],
-                            matrices: [
-                                { label: 'Matrix After Step 1 ERO', data: aug }
-                            ]
-                        });
-
-                        if (Math.abs(aug[1][1]) < 1e-9) {
-                            throw new Error("Second pivot A[1][1] is zero.");
-                        }
-
-                        const m32 = aug[2][1] / aug[1][1];
-                        for (let j = 0; j < 4; j++) {
-                            aug[2][j] -= m32 * aug[1][j];
-                        }
-
-                        this.stepsList.push({
-                            stepNumber: 3,
-                            title: 'Eliminating Column 2 -> Upper Triangular Matrix (U)',
-                            description: 'Perform ERO to eliminate variable y in Row 3 and yield Upper Triangular Matrix U:',
-                            details: [
-                                `Multiplier m<sub>32</sub> = A<sub>32</sub> / A<sub>22</sub> = ${this.formatNum(m32)}`,
-                                `New Row 3 = R<sub>3</sub> - (${this.formatNum(m32)}) × R<sub>2</sub>`
-                            ],
-                            matrices: [
-                                { label: 'Upper Triangular Matrix [U | B\']', data: aug }
-                            ]
-                        });
-
-                        if (Math.abs(aug[2][2]) < 1e-9) {
-                            throw new Error("Matrix system has no unique solution (Singular matrix).");
-                        }
-
-                        const z = aug[2][3] / aug[2][2];
-                        const y = (aug[1][3] - aug[1][2] * z) / aug[1][1];
-                        const x = (aug[0][3] - aug[0][1] * y - aug[0][2] * z) / aug[0][0];
-
-                        this.stepsList.push({
-                            stepNumber: 4,
-                            title: 'Back Substitution',
-                            description: 'Solve variables sequentially from the bottom row upwards:',
-                            details: [
-                                `z = (${this.formatNum(aug[2][3])}) / (${this.formatNum(aug[2][2])}) = ${this.formatNum(z)}`,
-                                `y = (${this.formatNum(aug[1][3])} - (${this.formatNum(aug[1][2])} × ${this.formatNum(z)})) / (${this.formatNum(aug[1][1])}) = ${this.formatNum(y)}`,
-                                `x = (${this.formatNum(aug[0][3])} - (${this.formatNum(aug[0][1])} × ${this.formatNum(y)}) - (${this.formatNum(aug[0][2])} × ${this.formatNum(z)})) / (${this.formatNum(aug[0][0])}) = ${this.formatNum(x)}`
-                            ]
-                        });
-
-                        this.finalResult = { x, y, z };
-                    },
-
-                    solveDoolittle(A, B) {
-                        const L = [
-                            [1, 0, 0],
-                            [0, 1, 0],
-                            [0, 0, 1]
-                        ];
-                        const U = [
-                            [0, 0, 0],
-                            [0, 0, 0],
-                            [0, 0, 0]
-                        ];
-
-                        U[0][0] = A[0][0];
-                        U[0][1] = A[0][1];
-                        U[0][2] = A[0][2];
-
-                        if (Math.abs(U[0][0]) < 1e-9) throw new Error("U[0][0] is zero.");
-                        L[1][0] = A[1][0] / U[0][0];
-                        L[2][0] = A[2][0] / U[0][0];
-
-                        U[1][1] = A[1][1] - L[1][0] * U[0][1];
-                        U[1][2] = A[1][2] - L[1][0] * U[0][2];
-
-                        if (Math.abs(U[1][1]) < 1e-9) throw new Error("U[1][1] is zero.");
-                        L[2][1] = (A[2][1] - L[2][0] * U[0][1]) / U[1][1];
-
-                        U[2][2] = A[2][2] - (L[2][0] * U[0][2] + L[2][1] * U[1][2]);
-
-                        this.stepsList.push({
-                            stepNumber: 1,
-                            title: 'Doolittle LU Factorization (A = L · U)',
-                            description: 'Decompose matrix A into Lower Triangular Matrix L (with unit diagonal L<sub>ii</sub> = 1) and Upper Triangular Matrix U:',
-                            matrices: [
-                                { label: 'Matrix L (Lii = 1)', data: L },
-                                { label: 'Matrix U', data: U }
-                            ]
-                        });
-
-                        const y1 = B[0];
-                        const y2 = B[1] - L[1][0] * y1;
-                        const y3 = B[2] - (L[2][0] * y1 + L[2][1] * y2);
-
-                        this.stepsList.push({
-                            stepNumber: 2,
-                            title: 'Forward Substitution (L · y = B)',
-                            description: 'Solve for intermediate vector y = [y<sub>1</sub>, y<sub>2</sub>, y<sub>3</sub>]<sup>T</sup>:',
-                            details: [
-                                `y<sub>1</sub> = B<sub>1</sub> = ${this.formatNum(y1)}`,
-                                `y<sub>2</sub> = B<sub>2</sub> - L<sub>21</sub> · y<sub>1</sub> = ${this.formatNum(B[1])} - (${this.formatNum(L[1][0])} × ${this.formatNum(y1)}) = ${this.formatNum(y2)}`,
-                                `y<sub>3</sub> = B<sub>3</sub> - L<sub>31</sub> · y<sub>1</sub> - L<sub>32</sub> · y<sub>2</sub> = ${this.formatNum(y3)}`
-                            ]
-                        });
-
-                        if (Math.abs(U[2][2]) < 1e-9) throw new Error("Matrix U is singular (U[2][2] = 0).");
-                        const x3 = y3 / U[2][2];
-                        const x2 = (y2 - U[1][2] * x3) / U[1][1];
-                        const x1 = (y1 - U[0][1] * x2 - U[0][2] * x3) / U[0][0];
-
-                        this.stepsList.push({
-                            stepNumber: 3,
-                            title: 'Back Substitution (U · x = y)',
-                            description: 'Solve target variables x = [x, y, z]<sup>T</sup> using U and y:',
-                            details: [
-                                `z = x<sub>3</sub> = y<sub>3</sub> / U<sub>33</sub> = ${this.formatNum(x3)}`,
-                                `y = x<sub>2</sub> = (y<sub>2</sub> - U<sub>23</sub> · x<sub>3</sub>) / U<sub>22</sub> = ${this.formatNum(x2)}`,
-                                `x = x<sub>1</sub> = (y<sub>1</sub> - U<sub>12</sub> · x<sub>2</sub> - U<sub>13</sub> · x<sub>3</sub>) / U<sub>11</sub> = ${this.formatNum(x1)}`
-                            ]
-                        });
-
-                        this.finalResult = { x: x1, y: x2, z: x3 };
-                    },
-
-                    solveCrout(A, B) {
-                        const L = [
-                            [0, 0, 0],
-                            [0, 0, 0],
-                            [0, 0, 0]
-                        ];
-                        const U = [
-                            [1, 0, 0],
-                            [0, 1, 0],
-                            [0, 0, 1]
-                        ];
-
-                        L[0][0] = A[0][0];
-                        L[1][0] = A[1][0];
-                        L[2][0] = A[2][0];
-
-                        if (Math.abs(L[0][0]) < 1e-9) throw new Error("L[0][0] is zero.");
-                        U[0][1] = A[0][1] / L[0][0];
-                        U[0][2] = A[0][2] / L[0][0];
-
-                        L[1][1] = A[1][1] - L[1][0] * U[0][1];
-                        L[2][1] = A[2][1] - L[2][0] * U[0][1];
-
-                        if (Math.abs(L[1][1]) < 1e-9) throw new Error("L[1][1] is zero.");
-                        U[1][2] = (A[1][2] - L[1][0] * U[0][2]) / L[1][1];
-
-                        L[2][2] = A[2][2] - (L[2][0] * U[0][2] + L[2][1] * U[1][2]);
-
-                        this.stepsList.push({
-                            stepNumber: 1,
-                            title: 'Crout LU Factorization (A = L · U)',
-                            description: 'Decompose matrix A into Lower Triangular Matrix L and Upper Triangular Matrix U (with unit diagonal U<sub>ii</sub> = 1):',
-                            matrices: [
-                                { label: 'Matrix L', data: L },
-                                { label: 'Matrix U (Uii = 1)', data: U }
-                            ]
-                        });
-
-                        const y1 = B[0] / L[0][0];
-                        const y2 = (B[1] - L[1][0] * y1) / L[1][1];
-                        const y3 = (B[2] - (L[2][0] * y1 + L[2][1] * y2)) / L[2][2];
-
-                        this.stepsList.push({
-                            stepNumber: 2,
-                            title: 'Forward Substitution (L · y = B)',
-                            description: 'Solve for intermediate vector y = [y<sub>1</sub>, y<sub>2</sub>, y<sub>3</sub>]<sup>T</sup>:',
-                            details: [
-                                `y<sub>1</sub> = B<sub>1</sub> / L<sub>11</sub> = ${this.formatNum(y1)}`,
-                                `y<sub>2</sub> = (B<sub>2</sub> - L<sub>21</sub> · y<sub>1</sub>) / L<sub>22</sub> = ${this.formatNum(y2)}`,
-                                `y<sub>3</sub> = (B<sub>3</sub> - L<sub>31</sub> · y<sub>1</sub> - L<sub>32</sub> · y<sub>2</sub>) / L<sub>33</sub> = ${this.formatNum(y3)}`
-                            ]
-                        });
-
-                        const x3 = y3;
-                        const x2 = y2 - U[1][2] * x3;
-                        const x1 = y1 - U[0][1] * x2 - U[0][2] * x3;
-
-                        this.stepsList.push({
-                            stepNumber: 3,
-                            title: 'Back Substitution (U · x = y)',
-                            description: 'Solve target variables x = [x, y, z]<sup>T</sup> using matrix U (U<sub>ii</sub> = 1):',
-                            details: [
-                                `z = x<sub>3</sub> = y<sub>3</sub> = ${this.formatNum(x3)}`,
-                                `y = x<sub>2</sub> = y<sub>2</sub> - U<sub>23</sub> · x<sub>3</sub> = ${this.formatNum(x2)}`,
-                                `x = x<sub>1</sub> = y<sub>1</sub> - U<sub>12</sub> · x<sub>2</sub> - U<sub>13</sub> · x<sub>3</sub> = ${this.formatNum(x1)}`
-                            ]
-                        });
-
-                        this.finalResult = { x: x1, y: x2, z: x3 };
+                    } else {
+                        this.showProfileModal = true;
                     }
-                };
-            });
-        }
+                },
 
-        if (window.Alpine) {
-            registerMatrixApp();
-        } else {
-            document.addEventListener('alpine:init', registerMatrixApp);
+                openProfileModal() {
+                    if (this.userProfile.registered) {
+                        this.profileForm = { ...this.userProfile };
+                    }
+                    this.showProfileModal = true;
+                },
+
+                saveProfile() {
+                    if (!this.profileForm.name.trim() || !this.profileForm.institution.trim()) {
+                        alert('Please fill in your Name and Institution.');
+                        return;
+                    }
+                    this.userProfile = {
+                        ...this.profileForm,
+                        registered: true
+                    };
+                    localStorage.setItem('matrix_hub_user_profile', JSON.stringify(this.userProfile));
+                    this.showProfileModal = false;
+                },
+
+                logout() {
+                    localStorage.removeItem('matrix_hub_user_profile');
+                    this.userProfile.registered = false;
+                    this.showProfileModal = true;
+                },
+
+                navigateToModule(moduleName, targetUrl) {
+                    if (!this.userProfile.registered) {
+                        this.showProfileModal = true;
+                        return;
+                    }
+
+                    // Record access once per session per module
+                    if (!this.sessionLoggedModules.includes(moduleName)) {
+                        this.recordActivity(moduleName);
+                        this.sessionLoggedModules.push(moduleName);
+                    }
+
+                    // Direct redirect to target HTML file
+                    if (targetUrl) {
+                        window.location.href = targetUrl;
+                    }
+                },
+
+                recordActivity(moduleName) {
+                    const now = new Date();
+                    const logItem = {
+                        id: Date.now().toString(),
+                        timestamp: now.toISOString(),
+                        formattedTime: now.toLocaleString('ms-MY'),
+                        studentName: this.userProfile.name,
+                        userType: this.userProfile.userType,
+                        institution: this.userProfile.institution,
+                        purpose: this.userProfile.purpose,
+                        discoverySource: this.userProfile.discoverySource,
+                        module: moduleName
+                    };
+
+                    // Send to Google Sheets
+                    if (this.googleAppsScriptUrl) {
+                        fetch(this.googleAppsScriptUrl, {
+                            method: "POST",
+                            mode: "no-cors",
+                            headers: { "Content-Type": "application/json" },
+                            body: JSON.stringify(logItem)
+                        }).catch(err => console.log('Google Sheets sync note:', err));
+                    }
+                },
+
+                openAdminModal() {
+                    this.showAdminModal = true;
+                },
+
+                authenticateAdmin() {
+                    if (this.adminPinInput === this.adminSecretPin) {
+                        this.showAdminModal = false;
+                        this.adminPinInput = '';
+                        window.open(this.googleAppsScriptUrl, '_blank');
+                    } else {
+                        alert('Invalid Admin PIN!');
+                    }
+                }
+            };
         }
     </script>
 </body>
