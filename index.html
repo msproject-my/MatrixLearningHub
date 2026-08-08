@@ -1129,6 +1129,11 @@
                 // Pautan URL / Fail HTML untuk Basic Matrix
                 basicMatrixUrl: 'basic_matrix.html', // 👈 Tukar kepada nama fail .html anda (cth: 'basic_matrix.html' atau URL penuh)
 
+                // Pautan URL / Fail HTML untuk 3 Method Advanced Matrix
+                gaussianUrl: 'gaussian_sim.html',   // 👈 Tukar kepada nama fail .html Gaussian anda
+                doolittleUrl: 'doolittle_sim.html', // 👈 Tukar kepada nama fail .html Doolittle anda
+                croutUrl: 'crout_sim.html',         // 👈 Tukar kepada nama fail .html Crout anda
+
                 // Current User Session Profile
                 currentUser: {
                     userType: 'Student',
@@ -1372,10 +1377,32 @@
 
                 enterAdvanceMethod(method) {
                     this.activeMethod = method;
-                    this.currentView = 'advance';
-                    this.loadExample();
-                    this.recordActivity('advanced', this.getMethodTitle());
-                    this.calculateSolution();
+                    
+                    const methodNames = {
+                        gaussian: 'Gaussian Elimination',
+                        doolittle: 'Doolittle LU Method',
+                        crout: 'Crout LU Method'
+                    };
+
+                    const methodUrls = {
+                        gaussian: this.gaussianUrl,
+                        doolittle: this.doolittleUrl,
+                        crout: this.croutUrl
+                    };
+
+                    // Rekod profil dan aktiviti pengguna bagi method pilihan
+                    this.recordActivity('advanced', methodNames[method] || 'Advanced Matrix Method');
+
+                    // Lencongkan ke fail HTML masing-masing
+                    const targetUrl = methodUrls[method];
+                    if (targetUrl && targetUrl !== '#') {
+                        window.location.href = targetUrl;
+                    } else {
+                        // Mod sandaran (fallback) jika fail HTML belum diisi
+                        this.currentView = 'advance';
+                        this.loadExample();
+                        this.calculateSolution();
+                    }
                 },
 
                 selectMethod(method) {
