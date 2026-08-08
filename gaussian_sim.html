@@ -112,9 +112,9 @@
 
             <!-- Top Header Buttons -->
             <div class="flex items-center gap-2 w-full md:w-auto justify-end">
-                <button onclick="handleHome()" class="flex-1 md:flex-none px-4 py-2 bg-sky-50 hover:bg-sky-100 text-sky-700 rounded-xl font-medium text-sm border border-sky-200 transition flex items-center justify-center gap-2 shadow-sm">
+                <a href="index.html" class="flex-1 md:flex-none px-4 py-2 bg-sky-50 hover:bg-sky-100 text-sky-700 rounded-xl font-medium text-sm border border-sky-200 transition flex items-center justify-center gap-2 shadow-sm">
                     <i class="fa-solid fa-house"></i> Home
-                </button>
+                </a>
                 <button onclick="loadExample()" class="flex-1 md:flex-none px-4 py-2 bg-amber-50 hover:bg-amber-100 text-amber-700 rounded-xl font-medium text-sm border border-amber-200 transition flex items-center justify-center gap-2 shadow-sm">
                     <i class="fa-solid fa-lightbulb"></i> Load Example
                 </button>
@@ -778,7 +778,7 @@
         }
 
         function handleHome() {
-            document.getElementById('homeModal').classList.remove('hidden');
+            window.location.href = 'index.html';
         }
 
         function closeHome() {
@@ -786,8 +786,7 @@
         }
 
         function resetAndCloseHome() {
-            clearInputs();
-            closeHome();
+            window.location.href = 'index.html';
         }
     </script>
 </body>
