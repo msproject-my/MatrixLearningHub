@@ -275,7 +275,7 @@
 
                     <div class="grid md:grid-cols-2 gap-6 lg:gap-8 max-w-4xl mx-auto relative z-10">
                         
-                        <!-- CARD 1: BASIC MATRIX (FRP Blue Theme) -->
+                        <!-- CARD 1: BASIC MATRIX -->
                         <div class="bg-[#f0f9ff] border-4 border-[#0284c7] rounded-3xl overflow-hidden shadow-xl flex flex-col justify-between transition-all duration-300 transform hover:-translate-y-1">
                             <!-- Blue Header Strip -->
                             <div class="bg-[#0284c7] p-4 text-white flex items-center justify-between border-b-4 border-sky-300">
@@ -313,7 +313,7 @@
                             </div>
                         </div>
 
-                        <!-- CARD 2: ADVANCED MATRIX (FPK Green Theme) -->
+                        <!-- CARD 2: ADVANCED MATRIX -->
                         <div class="bg-[#f0fdf4] border-4 border-[#16a34a] rounded-3xl overflow-hidden shadow-xl flex flex-col justify-between transition-all duration-300 transform hover:-translate-y-1">
                             <!-- Green Header Strip -->
                             <div class="bg-[#16a34a] p-4 text-white flex items-center justify-between border-b-4 border-green-300">
@@ -348,7 +348,7 @@
                                     <button @click="enterAdvanceMethod('doolittle')" class="w-full py-2.5 px-4 bg-[#16a34a] hover:bg-[#15803d] text-white font-black rounded-xl border-2 border-white flex items-center justify-between transition shadow group">
                                         <span class="flex items-center gap-2 text-xs sm:text-sm">
                                             <span class="w-5 h-5 rounded-full bg-amber-400 text-slate-900 flex items-center justify-center text-xs font-black">2</span>
-                                            <span>doolittle_sim.html</span>
+                                            <span>Doolittle LU Method</span>
                                         </span>
                                         <i class="fa-solid fa-chevron-right text-xs group-hover:translate-x-1 transition-all"></i>
                                     </button>
@@ -539,28 +539,18 @@
                     </div>
                 </header>
 
-                <!-- METHOD TAB SELECTOR -->
-                <div class="bg-[#0284c7] p-1.5 rounded-2xl shadow-lg mb-4 border-2 border-white flex flex-wrap sm:flex-nowrap gap-1.5">
-                    <button @click="selectMethod('gaussian')" 
-                        :class="activeMethod === 'gaussian' ? 'bg-white text-[#0284c7] font-black shadow' : 'text-white hover:bg-sky-600 font-bold'"
-                        class="flex-1 py-2 px-3 rounded-xl text-xs sm:text-sm flex items-center justify-center gap-2 transition-all">
-                        <i class="fa-solid fa-sliders"></i>
-                        <span>1. Gaussian Elimination</span>
-                    </button>
+                <!-- METHOD TAB SELECTOR - LOCKED / READ-ONLY INSIDE SOLVER VIEW -->
+                <div class="bg-[#0284c7] p-2 rounded-2xl shadow-lg mb-4 border-2 border-white flex flex-wrap sm:flex-nowrap gap-1.5 items-center justify-between">
+                    <div class="flex items-center gap-2 px-3 py-1.5 bg-white/20 rounded-xl text-white text-xs font-black">
+                        <i class="fa-solid fa-lock text-amber-300"></i>
+                        <span>Active Method Locked:</span>
+                        <span class="bg-amber-400 text-slate-900 px-2 py-0.5 rounded-md uppercase font-black" x-text="getMethodTitle()"></span>
+                    </div>
 
-                    <button @click="selectMethod('doolittle')" 
-                        :class="activeMethod === 'doolittle' ? 'bg-white text-[#16a34a] font-black shadow' : 'text-white hover:bg-sky-600 font-bold'"
-                        class="flex-1 py-2 px-3 rounded-xl text-xs sm:text-sm flex items-center justify-center gap-2 transition-all">
-                        <i class="fa-solid fa-layer-group"></i>
-                        <span>2. Doolittle LU</span>
-                    </button>
-
-                    <button @click="selectMethod('crout')" 
-                        :class="activeMethod === 'crout' ? 'bg-white text-[#dc2626] font-black shadow' : 'text-white hover:bg-sky-600 font-bold'"
-                        class="flex-1 py-2 px-3 rounded-xl text-xs sm:text-sm flex items-center justify-center gap-2 transition-all">
-                        <i class="fa-solid fa-cubes"></i>
-                        <span>3. Crout LU</span>
-                    </button>
+                    <div class="text-[11px] font-bold text-sky-100 flex items-center gap-1">
+                        <i class="fa-solid fa-circle-info text-amber-300"></i>
+                        <span>To switch methods, click <span class="underline font-black text-white">Home</span> to select from main cover.</span>
+                    </div>
                 </div>
 
                 <!-- NOTEBOOK PAPER -->
@@ -1106,7 +1096,6 @@
         import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, collection, addDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // Firebase Initialization with standard environment fallbacks
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'matrix-learning-hub';
         const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {
             apiKey: "demo-api-key",
@@ -1123,14 +1112,12 @@
             db = getFirestore(app);
             auth = getAuth(app);
 
-            // Auth flow
             if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
                 await signInWithCustomToken(auth, __initial_auth_token);
             } else {
                 await signInAnonymously(auth);
             }
 
-            // Real-time Cloud Listener for access logs
             const logsRef = collection(db, 'artifacts', appId, 'public', 'data', 'access_logs');
             onSnapshot(logsRef, (snapshot) => {
                 const liveLogs = [];
@@ -1168,16 +1155,20 @@
                     isAdminAuthenticated: false,
                     pinError: false,
                     searchLog: '',
+                    // Default configured Google Apps Script Web App URL
                     googleSheetsUrl: 'https://script.google.com/macros/s/AKfycbzutvwuVpb3lZ0WRmcweuEztkJ3s03xaJ5NNz5L7mSAmdnpRUq5GvYHi9umKNcw3jYg/exec',
                     toastMessage: '',
 
-                    // File Links Configuration (e.g. 'basic_matrix.html' or '#')
-                    basicMatrixUrl: '#',
-                    gaussianUrl: '#',
-                    doolittleUrl: '#',
-                    croutUrl: '#',
+                    // Navigation URLs (Can be updated to custom .html pages or URLs)
+                    basicMatrixUrl: 'Basic Matrix_calc.html',
+                    gaussianUrl: 'gaussian_sim.html',
+                    doolittleUrl: 'doolittle_sim.html',
+                    croutUrl: 'crout_sim.html',
 
-                    // Basic Matrix Reactive Variables
+                    // Active Session Logging Cache to prevent duplicate counts per session
+                    sessionLoggedModules: [],
+
+                    // Basic Matrix State
                     basicOp: 'add',
                     basicA: [
                         [3, 2, 1],
@@ -1195,7 +1186,7 @@
                         [0, 0, 0]
                     ],
 
-                    // Advanced Solver Equations Array [a, b, c, d]
+                    // Advanced Solver System Equations [a, b, c, d]
                     eq: [
                         [2, 1, -1, 8],
                         [-3, -1, 2, -11],
@@ -1230,7 +1221,7 @@
                         discoverySource: 'Lecturer / Teacher'
                     },
 
-                    // User Activity Logs Data
+                    // Access Activity Logs
                     logs: [
                         {
                             studentName: 'Ahmad Hakimi',
@@ -1288,6 +1279,8 @@
                             isLoggedIn: true
                         };
                         this.showLoginModal = false;
+                        // Reset session log tracker on fresh user profiling
+                        this.sessionLoggedModules = [];
                         this.recordActivity('Access Hub Entry');
                     },
 
@@ -1295,7 +1288,20 @@
                         this.showLoginModal = true;
                     },
 
-                    recordActivity(module) {
+                    // Single Record Activity Handler with One-Time Logging per Session Check
+                    recordActivity(moduleName) {
+                        if (!moduleName) return;
+
+                        // Check if module has already been recorded in the current active session
+                        if (this.sessionLoggedModules.includes(moduleName) && moduleName !== 'Access Hub Entry') {
+                            console.log(`Module "${moduleName}" already logged for this session. Skipping duplicate count.`);
+                            return;
+                        }
+
+                        if (moduleName !== 'Access Hub Entry') {
+                            this.sessionLoggedModules.push(moduleName);
+                        }
+
                         const logItem = {
                             studentName: this.currentUser.isLoggedIn ? this.currentUser.name : 'Anonymous Guest',
                             userType: this.currentUser.isLoggedIn ? this.currentUser.userType : 'Guest',
@@ -1303,28 +1309,26 @@
                             country: this.currentUser.isLoggedIn ? this.currentUser.country : 'Malaysia',
                             purpose: this.currentUser.isLoggedIn ? this.currentUser.purpose : 'Self-learning',
                             discoverySource: this.currentUser.isLoggedIn ? this.currentUser.discoverySource : 'Direct',
-                            module: module,
+                            module: moduleName,
                             timestamp: Date.now(),
                             formattedTime: new Date().toLocaleString()
                         };
 
                         this.logs.unshift(logItem);
 
-                        if (window.db && window.appId) {
+                        // Real-time Sync to Google Sheets Web App URL
+                        const targetSheetsUrl = (this.googleSheetsUrl || '').trim();
+                        if (targetSheetsUrl && targetSheetsUrl.startsWith('http')) {
                             try {
-                                const logsRef = window.db.collection ? window.db.collection('artifacts/' + window.appId + '/public/data/access_logs') : null;
-                            } catch(e) {}
-                        }
-
-                        if (this.googleSheetsUrl && this.googleSheetsUrl.trim().startsWith('http')) {
-                            try {
-                                fetch(this.googleSheetsUrl.trim(), {
+                                fetch(targetSheetsUrl, {
                                     method: "POST",
                                     mode: "no-cors",
                                     headers: { "Content-Type": "text/plain;charset=utf-8" },
                                     body: JSON.stringify(logItem)
-                                }).catch(e => console.log("Google Sheets sync error:", e));
-                            } catch(e) {}
+                                }).catch(e => console.log("Google Sheets sync notice:", e));
+                            } catch(e) {
+                                console.log("Fetch execution error:", e);
+                            }
                         }
                     },
 
@@ -1478,14 +1482,37 @@
                         this.currentView = 'cover';
                     },
 
+                    // Safe Navigation Helper that guards against empty/invalid URL location errors
+                    safeNavigate(targetUrl, fallbackFn) {
+                        const cleanUrl = (targetUrl || '').trim();
+                        
+                        // Check if we are running in an unhosted / iframe sandbox environment
+                        const isIframeSandbox = !window.location.origin || 
+                                                window.location.origin === 'null' || 
+                                                window.location.protocol === 'about:' || 
+                                                window.location.protocol === 'blob:';
+
+                        if (cleanUrl && cleanUrl !== '#' && cleanUrl !== '' && !isIframeSandbox) {
+                            try {
+                                window.location.href = cleanUrl;
+                                return;
+                            } catch (err) {
+                                console.warn("External location setter unavailable. Falling back to in-app view:", err);
+                            }
+                        }
+
+                        // Run fallback in-app view rendering
+                        if (typeof fallbackFn === 'function') {
+                            fallbackFn();
+                        }
+                    },
+
                     enterBasicMatrix() {
                         this.recordActivity('Basic Matrix');
-                        if (this.basicMatrixUrl && this.basicMatrixUrl !== '#') {
-                            window.location.href = this.basicMatrixUrl;
-                        } else {
+                        this.safeNavigate(this.basicMatrixUrl, () => {
                             this.currentView = 'basic';
                             this.calculateBasic();
-                        }
+                        });
                     },
 
                     enterAdvanceMethod(method) {
@@ -1501,309 +1528,19 @@
                             crout: this.croutUrl
                         };
 
-                        this.recordActivity(methodNames[method] || 'Advanced Matrix');
+                        const selectedModuleName = methodNames[method] || 'Advanced Matrix';
+                        this.recordActivity(selectedModuleName);
+
                         const targetUrl = methodUrls[method];
-                        if (targetUrl && targetUrl !== '#') {
-                            window.location.href = targetUrl;
-                        } else {
+                        this.safeNavigate(targetUrl, () => {
                             this.currentView = 'advance';
                             this.loadExample();
                             this.calculateSolution();
-                        }
-                    },
-
-                    selectMethod(method) {
-                        this.activeMethod = method;
-                        this.recordActivity(this.getMethodTitle());
-                        if (this.hasCalculated) {
-                            this.calculateSolution();
-                        }
+                        });
                     },
 
                     setBasicOp(op) {
                         this.basicOp = op;
-                        const toolNames = {
-                            add: 'Basic Matrix (Addition)',
-                            sub: 'Basic Matrix (Subtraction)',
-                            mul: 'Basic Matrix (Multiplication)',
-                            det: 'Basic Matrix (Determinant)',
-                            trans: 'Basic Matrix (Transpose)'
-                        };
-                        this.recordActivity(toolNames[op] || 'Basic Matrix');
-                        this.calculateBasic();
-                    },
-
-                    notify(msg) {
-                        this.toastMessage = msg;
-                        setTimeout(() => {
-                            this.toastMessage = '';
-                        }, 3500);
-                    },
-
-                    saveGoogleSheetsUrl() {
-                        if (this.googleSheetsUrl && this.googleSheetsUrl.trim().startsWith('http')) {
-                            this.notify("Google Sheets Web App URL saved! Logs will sync automatically.");
-                        } else {
-                            this.notify("Please enter a valid Web App URL (starting with http:// or https://)");
-                        }
-                    },
-
-                    handleLogin() {
-                        if (!this.loginForm.name || !this.loginForm.institution) return;
-                        this.currentUser = {
-                            userType: this.loginForm.userType || 'Student',
-                            name: this.loginForm.name,
-                            institution: this.loginForm.institution,
-                            country: this.loginForm.country || 'Malaysia',
-                            purpose: this.loginForm.purpose || 'Learning',
-                            discoverySource: this.loginForm.discoverySource || 'Lecturer / Teacher',
-                            isLoggedIn: true
-                        };
-                        this.showLoginModal = false;
-                        this.recordActivity('auth', 'Access Hub Entry');
-                    },
-
-                    logout() {
-                        this.showLoginModal = true;
-                    },
-
-                    recordActivity(module, toolUsed) {
-                        const logItem = {
-                            studentName: this.currentUser.isLoggedIn ? this.currentUser.name : 'Anonymous Guest',
-                            userType: this.currentUser.isLoggedIn ? this.currentUser.userType : 'Guest',
-                            institution: this.currentUser.isLoggedIn ? this.currentUser.institution : 'Public Access',
-                            country: this.currentUser.isLoggedIn ? this.currentUser.country : 'Malaysia',
-                            purpose: this.currentUser.isLoggedIn ? this.currentUser.purpose : 'Self-learning',
-                            discoverySource: this.currentUser.isLoggedIn ? this.currentUser.discoverySource : 'Direct',
-                            module: module,
-                            toolUsed: toolUsed,
-                            timestamp: Date.now(),
-                            formattedTime: new Date().toLocaleString()
-                        };
-
-                        this.logs.unshift(logItem);
-
-                        if (window.db && window.appId) {
-                            try {
-                                const logsRef = window.db.collection ? window.db.collection('artifacts/' + window.appId + '/public/data/access_logs') : null;
-                            } catch(e) {}
-                        }
-
-                        if (this.googleSheetsUrl && this.googleSheetsUrl.trim().startsWith('http')) {
-                            try {
-                                fetch(this.googleSheetsUrl.trim(), {
-                                    method: "POST",
-                                    mode: "no-cors",
-                                    headers: { "Content-Type": "application/json" },
-                                    body: JSON.stringify(logItem)
-                                }).catch(e => console.log("Google Sheets sync error:", e));
-                            } catch(e) {}
-                        }
-                    },
-
-                    get stats() {
-                        const totalAccess = this.logs.length;
-                        const uniqueUsers = new Set(this.logs.map(l => l.studentName + l.institution)).size;
-                        
-                        const studentsCount = new Set(this.logs.filter(l => l.userType === 'Student').map(l => l.studentName)).size;
-                        const teachersCount = new Set(this.logs.filter(l => l.userType === 'Teacher / Lecturer').map(l => l.studentName)).size;
-                        const othersCount = uniqueUsers - (studentsCount + teachersCount);
-
-                        const basicAccess = this.logs.filter(l => l.module === 'basic').length;
-                        const advancedAccess = this.logs.filter(l => l.module === 'advanced').length;
-
-                        const instCounts = {};
-                        this.logs.forEach(l => {
-                            if (l.institution && l.institution !== 'Public Access') {
-                                instCounts[l.institution] = (instCounts[l.institution] || 0) + 1;
-                            }
-                        });
-                        const topInstitutions = Object.entries(instCounts)
-                            .map(([name, count]) => ({ name, count }))
-                            .sort((a,b) => b.count - a.count)
-                            .slice(0, 5);
-
-                        const sourceCounts = {};
-                        this.logs.forEach(l => {
-                            if (l.discoverySource) {
-                                sourceCounts[l.discoverySource] = (sourceCounts[l.discoverySource] || 0) + 1;
-                            }
-                        });
-                        const discoveryBreakdown = Object.entries(sourceCounts)
-                            .map(([channel, count]) => ({ channel, count }))
-                            .sort((a,b) => b.count - a.count);
-
-                        const toolCounts = {};
-                        this.logs.forEach(l => {
-                            if (l.toolUsed && l.toolUsed !== 'Access Hub Entry') {
-                                toolCounts[l.toolUsed] = (toolCounts[l.toolUsed] || 0) + 1;
-                            }
-                        });
-                        let mostUsed = 'Matrix Addition';
-                        let maxCount = 0;
-                        for (const [tool, count] of Object.entries(toolCounts)) {
-                            if (count > maxCount) {
-                                maxCount = count;
-                                mostUsed = tool;
-                            }
-                        }
-
-                        const lastLog = this.logs[0];
-                        const lastAccessTime = lastLog ? lastLog.formattedTime : 'N/A';
-
-                        return {
-                            totalUsers: uniqueUsers || 1,
-                            studentsCount,
-                            teachersCount,
-                            othersCount: Math.max(0, othersCount),
-                            totalAccess,
-                            basicAccess,
-                            advancedAccess,
-                            topInstitutions: topInstitutions.length > 0 ? topInstitutions : [{ name: 'Politeknik Port Dickson', count: 1 }],
-                            discoveryBreakdown,
-                            mostUsedTool: mostUsed,
-                            lastAccessTime
-                        };
-                    },
-
-                    get filteredLogs() {
-                        if (!this.searchLog) return this.logs;
-                        const q = this.searchLog.toLowerCase();
-                        return this.logs.filter(l => 
-                            (l.studentName || '').toLowerCase().includes(q) ||
-                            (l.institution || '').toLowerCase().includes(q) ||
-                            (l.userType || '').toLowerCase().includes(q) ||
-                            (l.toolUsed || '').toLowerCase().includes(q)
-                        );
-                    },
-
-                    clearLogs() {
-                        this.logs = [];
-                        this.notify("Logs reset successfully!");
-                    },
-
-                    exportToCSV() {
-                        if (!this.logs || this.logs.length === 0) {
-                            this.notify("No access logs available to export.");
-                            return;
-                        }
-
-                        const headers = ["Timestamp", "Formatted Time", "Name", "User Type", "Institution", "Country", "Purpose", "Discovery Source", "Module", "Tool Used"];
-                        const csvRows = [];
-                        csvRows.push(headers.join(","));
-
-                        this.logs.forEach(log => {
-                            const row = [
-                                `"${log.timestamp || ''}"`,
-                                `"${(log.formattedTime || '').replace(/"/g, '""')}"`,
-                                `"${(log.studentName || '').replace(/"/g, '""')}"`,
-                                `"${(log.userType || '').replace(/"/g, '""')}"`,
-                                `"${(log.institution || '').replace(/"/g, '""')}"`,
-                                `"${(log.country || '').replace(/"/g, '""')}"`,
-                                `"${(log.purpose || '').replace(/"/g, '""')}"`,
-                                `"${(log.discoverySource || '').replace(/"/g, '""')}"`,
-                                `"${(log.module || '').replace(/"/g, '""')}"`,
-                                `"${(log.toolUsed || '').replace(/"/g, '""')}"`
-                            ];
-                            csvRows.push(row.join(","));
-                        });
-
-                        const csvContent = "\uFEFF" + csvRows.join("\n");
-                        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-                        const url = URL.createObjectURL(blob);
-                        
-                        const link = document.createElement("a");
-                        link.setAttribute("href", url);
-                        link.setAttribute("download", `Matrix_Hub_Access_Logs_${new Date().toISOString().slice(0,10)}.csv`);
-                        document.body.appendChild(link);
-                        link.click();
-                        document.body.removeChild(link);
-                        this.notify("Exported activity log to CSV successfully!");
-                    },
-
-                    handleAdminClick() {
-                        if (this.isAdminAuthenticated) {
-                            this.showAdminModal = true;
-                        } else {
-                            this.adminInputPin = '';
-                            this.pinError = false;
-                            this.showAdminPinModal = true;
-                        }
-                    },
-
-                    verifyAdminPin() {
-                        if (this.adminInputPin === this.adminSecretPin) {
-                            this.isAdminAuthenticated = true;
-                            this.showAdminPinModal = false;
-                            this.showAdminModal = true;
-                            this.pinError = false;
-                        } else {
-                            this.pinError = true;
-                        }
-                    },
-
-                    lockAdminSession() {
-                        this.isAdminAuthenticated = false;
-                        this.showAdminModal = false;
-                        this.notify("Admin session locked.");
-                    },
-
-                    goHome() {
-                        this.currentView = 'cover';
-                    },
-
-                    enterBasicMatrix() {
-                        this.recordActivity('basic', 'Basic Matrix Page Access');
-                        if (this.basicMatrixUrl && this.basicMatrixUrl !== '#') {
-                            window.location.href = this.basicMatrixUrl;
-                        } else {
-                            this.currentView = 'basic';
-                            this.calculateBasic();
-                        }
-                    },
-
-                    enterAdvanceMethod(method) {
-                        this.activeMethod = method;
-                        const methodNames = {
-                            gaussian: 'Gaussian Elimination',
-                            doolittle: 'Doolittle LU Method',
-                            crout: 'Crout LU Method'
-                        };
-                        const methodUrls = {
-                            gaussian: this.gaussianUrl,
-                            doolittle: this.doolittleUrl,
-                            crout: this.croutUrl
-                        };
-
-                        this.recordActivity('advanced', methodNames[method] || 'Advanced Matrix Method');
-                        const targetUrl = methodUrls[method];
-                        if (targetUrl && targetUrl !== '#') {
-                            window.location.href = targetUrl;
-                        } else {
-                            this.currentView = 'advance';
-                            this.loadExample();
-                            this.calculateSolution();
-                        }
-                    },
-
-                    selectMethod(method) {
-                        this.activeMethod = method;
-                        this.recordActivity('advanced', this.getMethodTitle());
-                        if (this.hasCalculated) {
-                            this.calculateSolution();
-                        }
-                    },
-
-                    setBasicOp(op) {
-                        this.basicOp = op;
-                        const toolNames = {
-                            add: 'Matrix Addition (A+B)',
-                            sub: 'Matrix Subtraction (A-B)',
-                            mul: 'Matrix Multiplication (A×B)',
-                            det: 'Matrix Determinant det(A)',
-                            trans: 'Matrix Transpose (Aᵀ)'
-                        };
-                        this.recordActivity('basic', toolNames[op] || 'Basic Op');
                         this.calculateBasic();
                     },
 
@@ -1926,6 +1663,7 @@
                         return this.stepsList;
                     },
 
+                    // ================= MATHEMATICAL SOLVERS =================
                     calculateSolution() {
                         this.hasCalculated = true;
                         this.errorMessage = '';
