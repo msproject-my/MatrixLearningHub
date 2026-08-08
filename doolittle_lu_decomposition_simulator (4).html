@@ -1,0 +1,1158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Doolittle LU Decomposition Simulator</title>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- KaTeX for rendering mathematical formulas -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js"></script>
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts: Inter & Caveat -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background-color: #f1f5f9;
+        }
+
+        .font-handwritten {
+            font-family: 'Caveat', cursive;
+        }
+
+        .font-sans-ui {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+
+        /* Paper ruled notebook background */
+        .notebook-paper {
+            background-color: #fdfbf7;
+            background-image: 
+                linear-gradient(90deg, transparent 48px, #fca5a5 48px, #fca5a5 50px, transparent 50px),
+                linear-gradient(#e2e8f0 1px, transparent 1px);
+            background-size: 100% 100%, 100% 2.2rem;
+            line-height: 2.2rem;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.08), 0 8px 10px -6px rgba(0, 0, 0, 0.04);
+        }
+
+        @media (max-width: 640px) {
+            .notebook-paper {
+                background-image: 
+                    linear-gradient(90deg, transparent 24px, #fca5a5 24px, #fca5a5 26px, transparent 26px),
+                    linear-gradient(#e2e8f0 1px, transparent 1px);
+            }
+        }
+
+        /* Ring Binder Holes styling */
+        .binder-holes {
+            position: absolute;
+            left: 18px;
+            top: 0;
+            bottom: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-around;
+            pointer-events: none;
+        }
+
+        .binder-hole {
+            width: 14px;
+            height: 14px;
+            background-color: #cbd5e1;
+            border-radius: 50%;
+            box-shadow: inset 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        /* Custom scrollbars */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+
+        .math-box {
+            background-color: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(4px);
+            border-radius: 12px;
+        }
+
+        /* Active cell glow effect for interactive sub-steps */
+        .active-cell-glow {
+            outline: 3px solid #8b5cf6;
+            background-color: #f3e8ff !important;
+            transform: scale(1.01);
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(139, 92, 246, 0.25);
+        }
+
+        .dimmed-cell {
+            opacity: 0.35;
+            filter: grayscale(40%);
+            transition: all 0.3s ease;
+        }
+    </style>
+</head>
+<body class="min-h-screen text-slate-700 pb-12 font-sans-ui">
+
+    <!-- Top Header Navigation -->
+    <header class="sticky top-0 z-30 bg-white/90 backdrop-blur-md border-b border-slate-200 shadow-xs">
+        <div class="max-w-6xl mx-auto px-4 py-3 flex flex-wrap justify-between items-center gap-3">
+            <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 rounded-2xl bg-amber-100 text-amber-600 flex items-center justify-center font-bold text-xl shadow-xs border border-amber-200">
+                    <i class="fa-solid fa-calculator"></i>
+                </div>
+                <div>
+                    <h1 class="font-sans-ui text-xl md:text-2xl font-bold text-slate-800 tracking-tight flex items-center gap-2">
+                        Doolittle Method Simulator
+                        <span class="text-xs bg-purple-100 text-purple-700 px-2.5 py-0.5 rounded-full font-sans-ui font-semibold">LU Decomposition</span>
+                    </h1>
+                    <p class="text-xs text-slate-500 font-medium">Step-by-Step Linear System Solver (3&times;3 Matrix)</p>
+                </div>
+            </div>
+
+            <!-- Header Action Buttons -->
+            <div class="flex items-center space-x-2">
+                <button onclick="resetToHome()" class="flex items-center space-x-1.5 px-3.5 py-2 bg-sky-100 hover:bg-sky-200 text-sky-800 rounded-xl font-medium text-sm transition-all border border-sky-200 active:scale-95 shadow-xs">
+                    <i class="fa-solid fa-house"></i>
+                    <span>Home</span>
+                </button>
+                <button onclick="loadExample()" class="flex items-center space-x-1.5 px-3.5 py-2 bg-amber-100 hover:bg-amber-200 text-amber-800 rounded-xl font-medium text-sm transition-all border border-amber-200 active:scale-95 shadow-xs">
+                    <i class="fa-solid fa-lightbulb"></i>
+                    <span>Load Example</span>
+                </button>
+                <button onclick="toggleManualModal(true)" class="flex items-center space-x-1.5 px-3.5 py-2 bg-purple-100 hover:bg-purple-200 text-purple-800 rounded-xl font-medium text-sm transition-all border border-purple-200 active:scale-95 shadow-xs">
+                    <i class="fa-solid fa-book-open"></i>
+                    <span>User Manual</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-6xl mx-auto px-4 mt-6">
+
+        <div class="relative notebook-paper rounded-3xl p-6 sm:p-10 border border-amber-200/80 mb-8">
+            <div class="binder-holes hidden sm:flex">
+                <div class="binder-hole"></div>
+                <div class="binder-hole"></div>
+                <div class="binder-hole"></div>
+                <div class="binder-hole"></div>
+                <div class="binder-hole"></div>
+                <div class="binder-hole"></div>
+            </div>
+
+            <div class="sm:pl-10">
+                <div class="border-b-2 border-slate-800 pb-3 mb-6 flex flex-wrap justify-between items-end gap-2">
+                    <div>
+                        <span class="font-handwritten text-2xl text-red-500 font-bold tracking-wide">Chapter 2: LU Decomposition Method (Doolittle)</span>
+                        <h2 class="text-2xl sm:text-3xl font-sans-ui font-bold text-slate-900 tracking-tight">Solve 3&times;3 Linear Equation System</h2>
+                    </div>
+                    <div class="text-right text-xs text-slate-500">
+                        <span class="bg-emerald-100 text-emerald-800 px-3 py-1 rounded-full border border-emerald-200 font-semibold">
+                            <i>L</i> (Diagonal = 1) &bull; <i>U</i> (Upper Triangular)
+                        </span>
+                    </div>
+                </div>
+
+                <!-- Inline Error Alert Box -->
+                <div id="alertBox" class="hidden mb-6 bg-red-50 border-l-4 border-red-500 p-4 rounded-xl shadow-xs">
+                    <div class="flex items-center space-x-3">
+                        <i class="fa-solid fa-circle-exclamation text-red-500 text-xl"></i>
+                        <div class="text-sm font-medium text-red-800" id="alertMessage"></div>
+                    </div>
+                </div>
+
+                <!-- Coefficients Input Form -->
+                <div class="bg-white/90 rounded-2xl p-5 border border-slate-200 shadow-md mb-8 backdrop-blur-xs">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="font-bold text-slate-800 flex items-center gap-2">
+                            <i class="fa-solid fa-pen-to-square text-sky-500"></i>
+                            Enter Equation Coefficients (Matrix A & Vector B):
+                        </h3>
+                        <span class="text-xs text-slate-400 font-medium">Format: ax + by + cz = j</span>
+                    </div>
+
+                    <!-- Input Grid -->
+                    <div class="space-y-3 max-w-3xl mx-auto">
+                        <!-- Equation 1 -->
+                        <div class="flex flex-wrap items-center gap-2 bg-sky-50/70 p-3 rounded-xl border border-sky-100">
+                            <span class="font-bold text-sky-800 w-28 text-sm">Equation 1:</span>
+                            <div class="flex items-center space-x-1 flex-1 min-w-[240px]">
+                                <input type="number" step="any" id="a" value="0" class="w-16 sm:w-20 p-2 text-center border border-slate-300 rounded-lg focus:ring-2 focus:ring-sky-400 font-mono font-bold text-slate-800 bg-white">
+                                <span class="text-slate-600 font-medium text-sm">x +</span>
+                                <input type="number" step="any" id="b" value="0" class="w-16 sm:w-20 p-2 text-center border border-slate-300 rounded-lg focus:ring-2 focus:ring-sky-400 font-mono font-bold text-slate-800 bg-white">
+                                <span class="text-slate-600 font-medium text-sm">y +</span>
+                                <input type="number" step="any" id="c" value="0" class="w-16 sm:w-20 p-2 text-center border border-slate-300 rounded-lg focus:ring-2 focus:ring-sky-400 font-mono font-bold text-slate-800 bg-white">
+                                <span class="text-slate-600 font-medium text-sm">z =</span>
+                                <input type="number" step="any" id="j" value="0" class="w-16 sm:w-20 p-2 text-center border border-amber-300 bg-amber-50 rounded-lg focus:ring-2 focus:ring-amber-400 font-mono font-bold text-slate-800">
+                            </div>
+                        </div>
+
+                        <!-- Equation 2 -->
+                        <div class="flex flex-wrap items-center gap-2 bg-pink-50/70 p-3 rounded-xl border border-pink-100">
+                            <span class="font-bold text-pink-800 w-28 text-sm">Equation 2:</span>
+                            <div class="flex items-center space-x-1 flex-1 min-w-[240px]">
+                                <input type="number" step="any" id="d" value="0" class="w-16 sm:w-20 p-2 text-center border border-slate-300 rounded-lg focus:ring-2 focus:ring-pink-400 font-mono font-bold text-slate-800 bg-white">
+                                <span class="text-slate-600 font-medium text-sm">x +</span>
+                                <input type="number" step="any" id="e" value="0" class="w-16 sm:w-20 p-2 text-center border border-slate-300 rounded-lg focus:ring-2 focus:ring-pink-400 font-mono font-bold text-slate-800 bg-white">
+                                <span class="text-slate-600 font-medium text-sm">y +</span>
+                                <input type="number" step="any" id="f" value="0" class="w-16 sm:w-20 p-2 text-center border border-slate-300 rounded-lg focus:ring-2 focus:ring-pink-400 font-mono font-bold text-slate-800 bg-white">
+                                <span class="text-slate-600 font-medium text-sm">z =</span>
+                                <input type="number" step="any" id="k" value="0" class="w-16 sm:w-20 p-2 text-center border border-amber-300 bg-amber-50 rounded-lg focus:ring-2 focus:ring-amber-400 font-mono font-bold text-slate-800">
+                            </div>
+                        </div>
+
+                        <!-- Equation 3 -->
+                        <div class="flex flex-wrap items-center gap-2 bg-emerald-50/70 p-3 rounded-xl border border-emerald-100">
+                            <span class="font-bold text-emerald-800 w-28 text-sm">Equation 3:</span>
+                            <div class="flex items-center space-x-1 flex-1 min-w-[240px]">
+                                <input type="number" step="any" id="g" value="0" class="w-16 sm:w-20 p-2 text-center border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-400 font-mono font-bold text-slate-800 bg-white">
+                                <span class="text-slate-600 font-medium text-sm">x +</span>
+                                <input type="number" step="any" id="h" value="0" class="w-16 sm:w-20 p-2 text-center border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-400 font-mono font-bold text-slate-800 bg-white">
+                                <span class="text-slate-600 font-medium text-sm">y +</span>
+                                <input type="number" step="any" id="i" value="0" class="w-16 sm:w-20 p-2 text-center border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-400 font-mono font-bold text-slate-800 bg-white">
+                                <span class="text-slate-600 font-medium text-sm">z =</span>
+                                <input type="number" step="any" id="l" value="0" class="w-16 sm:w-20 p-2 text-center border border-amber-300 bg-amber-50 rounded-lg focus:ring-2 focus:ring-amber-400 font-mono font-bold text-slate-800">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Primary Action Buttons -->
+                    <div class="flex flex-wrap items-center justify-center gap-3 mt-6">
+                        <button onclick="calculateDoolittle()" class="flex items-center space-x-2 px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-semibold text-base transition-all shadow-md active:scale-95">
+                            <i class="fa-solid fa-play"></i>
+                            <span>Calculate Step-by-Step</span>
+                        </button>
+                        <button onclick="resetFields()" class="flex items-center space-x-2 px-5 py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl font-semibold text-base transition-all border border-slate-200 active:scale-95">
+                            <i class="fa-solid fa-rotate-left"></i>
+                            <span>Reset</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Solution Display Section -->
+                <div id="solutionDisplayCard" class="bg-purple-50/80 rounded-2xl p-5 border border-purple-200 mb-6">
+                    <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
+                        <div class="flex items-center space-x-2 text-purple-900 font-bold text-base">
+                            <i class="fa-solid fa-list-check text-purple-600"></i>
+                            <span>Solution Display:</span>
+                        </div>
+                        <div class="flex items-center bg-purple-100/80 p-1 rounded-xl border border-purple-200">
+                            <button id="btnViewAll" onclick="setSolutionMode('all')" class="px-4 py-2 rounded-xl text-xs font-bold transition-all bg-white text-purple-700 hover:bg-purple-100 border border-purple-200">
+                                All Steps
+                            </button>
+                            <button id="btnViewWizard" onclick="setSolutionMode('wizard')" class="px-4 py-2 rounded-xl text-xs font-bold transition-all bg-purple-600 text-white shadow-xs">
+                                Interactive Steps
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Empty State Placeholder Card -->
+                    <div id="emptyStateCard" class="bg-white/90 border-2 border-dashed border-purple-200 rounded-2xl p-8 text-center shadow-xs">
+                        <div class="w-12 h-12 bg-purple-100 text-purple-600 rounded-full flex items-center justify-center mx-auto mb-3 text-xl">
+                            <i class="fa-solid fa-calculator"></i>
+                        </div>
+                        <h4 class="text-base font-bold text-slate-800 mb-1">No solution generated yet</h4>
+                        <p class="text-xs text-slate-500 max-w-md mx-auto">
+                            Enter your equation coefficients above and click <strong class="text-emerald-700">"Calculate Step-by-Step"</strong> to display the full Doolittle LU decomposition solution.
+                        </p>
+                    </div>
+
+                    <!-- Solution Output Container (Hidden initially until calculated) -->
+                    <div id="solutionContainer" class="hidden space-y-6 mt-4">
+
+                        <!-- Top Navigation Controls -->
+                        <div id="wizardNavTop" class="bg-white rounded-2xl p-3 border border-slate-200 shadow-xs flex items-center justify-between">
+                            <button id="prevStepBtnTop" onclick="navigateStep(-1)" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-bold transition-all disabled:opacity-40 disabled:cursor-not-allowed">
+                                <i class="fa-solid fa-arrow-left mr-1"></i> Previous Step
+                            </button>
+                            <span id="wizardStepLabelTop" class="font-bold text-slate-800 text-sm">Step 1 of 5</span>
+                            <button id="nextStepBtnTop" onclick="navigateStep(1)" class="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-xl text-xs font-bold transition-all disabled:opacity-40 disabled:cursor-not-allowed">
+                                Next Step <i class="fa-solid fa-arrow-right ml-1"></i>
+                            </button>
+                        </div>
+
+                        <!-- Step-by-Step Stepper Header -->
+                        <div id="stepperHeader" class="bg-white rounded-2xl p-4 border border-slate-200 shadow-sm">
+                            <div class="grid grid-cols-2 sm:grid-cols-5 gap-2 text-center text-xs font-semibold">
+                                <button id="stepTab1" onclick="jumpToStep(1)" class="p-2 rounded-xl border transition-all bg-purple-600 text-white border-purple-600">
+                                    1. System Matrix
+                                </button>
+                                <button id="stepTab2" onclick="jumpToStep(2)" class="p-2 rounded-xl border transition-all bg-slate-50 text-slate-500 border-slate-200 hover:bg-purple-50">
+                                    2. LU Decomposition
+                                </button>
+                                <button id="stepTab3" onclick="jumpToStep(3)" class="p-2 rounded-xl border transition-all bg-slate-50 text-slate-500 border-slate-200 hover:bg-purple-50">
+                                    3. Forward Sub (<i>LY = B</i>)
+                                </button>
+                                <button id="stepTab4" onclick="jumpToStep(4)" class="p-2 rounded-xl border transition-all bg-slate-50 text-slate-500 border-slate-200 hover:bg-purple-50">
+                                    4. Back Sub (<i>UX = Y</i>)
+                                </button>
+                                <button id="stepTab5" onclick="jumpToStep(5)" class="p-2 rounded-xl border transition-all bg-slate-50 text-slate-500 border-slate-200 hover:bg-purple-50">
+                                    5. Final Solution
+                                </button>
+                            </div>
+                            <div class="w-full bg-slate-100 h-2 rounded-full mt-3 overflow-hidden">
+                                <div id="wizardProgressBar" class="bg-purple-600 h-full transition-all duration-300 w-1/5"></div>
+                            </div>
+                        </div>
+
+                        <!-- Step 1: Matrix Form -->
+                        <div id="stepCard1" class="pastel-card bg-white rounded-2xl p-6 border border-slate-200 shadow-md">
+                            <div class="flex items-center justify-between border-b border-slate-100 pb-3 mb-4">
+                                <h4 class="font-bold text-slate-800 text-lg flex items-center gap-2">
+                                    <span class="bg-purple-100 text-purple-800 w-7 h-7 rounded-full text-xs flex items-center justify-center font-bold">1</span>
+                                    Step 1: Represent Equation System as Matrix Form <i>AX = B</i>
+                                </h4>
+                            </div>
+                            <div class="math-box p-4 border border-purple-100 shadow-xs text-center overflow-x-auto">
+                                <div id="latexStep1"></div>
+                            </div>
+                        </div>
+
+                        <!-- Step 2: LU Decomposition -->
+                        <div id="stepCard2" class="pastel-card bg-white rounded-2xl p-6 border border-slate-200 shadow-md">
+                            <div class="flex items-center justify-between border-b border-slate-100 pb-3 mb-4">
+                                <h4 class="font-bold text-slate-800 text-lg flex items-center gap-2">
+                                    <span class="bg-purple-100 text-purple-800 w-7 h-7 rounded-full text-xs flex items-center justify-center font-bold">2</span>
+                                    Step 2: Perform Doolittle LU Decomposition (<i>A = LU</i>)
+                                </h4>
+                                <span class="text-xs bg-amber-100 text-amber-800 px-3 py-1 rounded-full font-semibold">
+                                    <i>L</i> (Diagonal = 1) &bull; <i>U</i> (Upper Triangular)
+                                </span>
+                            </div>
+
+                            <p class="text-sm text-slate-600 mb-3">
+                                In Doolittle's method, Matrix <i>L</i> has 1s along its main diagonal, while Matrix <i>U</i> is upper triangular:
+                            </p>
+
+                            <div class="math-box p-4 border border-purple-100 shadow-xs text-center overflow-x-auto mb-6">
+                                <div id="latexDoolittleGeneral"></div>
+                            </div>
+
+                            <!-- Interactive Sub-Step Stepper Bar for 3x3 Grid Cells -->
+                            <div id="subStepBar" class="bg-blue-50/80 rounded-2xl p-4 border border-blue-200 mb-4 flex flex-wrap items-center justify-between gap-3">
+                                <div class="flex items-center space-x-2 text-blue-900 font-bold text-sm">
+                                    <i class="fa-solid fa-list-ol text-blue-600"></i>
+                                    <span id="subStepCounterLabel">Variable 1 of 9 (d)</span>
+                                </div>
+                                <div class="flex items-center space-x-2">
+                                    <button id="btnPrevSubStep" onclick="navigateSubStep(-1)" class="px-3 py-1.5 bg-white hover:bg-blue-100 text-blue-800 rounded-lg text-xs font-bold border border-blue-300 disabled:opacity-40 shadow-xs">
+                                        <i class="fa-solid fa-chevron-left mr-1"></i> Prev Variable
+                                    </button>
+                                    <button id="btnNextSubStep" onclick="navigateSubStep(1)" class="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-bold shadow-xs border border-blue-600 disabled:opacity-40">
+                                        Next Variable <i class="fa-solid fa-chevron-right ml-1"></i>
+                                    </button>
+                                    <button id="btnToggleAllSubSteps" onclick="toggleSubStepsMode()" class="px-3 py-1.5 bg-white hover:bg-blue-100 text-blue-800 rounded-lg text-xs font-bold border border-blue-300 shadow-xs">
+                                        Show All Cells
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- 3x3 Grid Calculation Table -->
+                            <div id="step2GridContainer" class="overflow-x-auto my-4"></div>
+
+                            <div class="mt-6">
+                                <h5 class="font-bold text-slate-800 text-sm mb-2">Resulting <i>L</i> and <i>U</i> Matrices:</h5>
+                                <div class="math-box p-4 border border-emerald-100 shadow-xs text-center overflow-x-auto">
+                                    <div id="latexResultLU"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Step 3: Forward Substitution -->
+                        <div id="stepCard3" class="pastel-card bg-white rounded-2xl p-6 border border-slate-200 shadow-md">
+                            <div class="flex items-center justify-between border-b border-slate-100 pb-3 mb-4">
+                                <h4 class="font-bold text-slate-800 text-lg flex items-center gap-2">
+                                    <span class="bg-purple-100 text-purple-800 w-7 h-7 rounded-full text-xs flex items-center justify-center font-bold">3</span>
+                                    Step 3: Solve Intermediate Vector <i>Y</i> using Forward Substitution (<i>LY = B</i>)
+                                </h4>
+                            </div>
+
+                            <div class="math-box p-4 border border-purple-100 shadow-xs text-center overflow-x-auto mb-4">
+                                <div id="latexStep3Matrix"></div>
+                            </div>
+
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 my-4">
+                                <div class="bg-sky-50/80 p-4 rounded-xl border border-sky-100 text-center">
+                                    <h5 class="font-bold text-sky-900 text-xs uppercase mb-2">Equation 1 (<i>y₁</i>)</h5>
+                                    <div id="latexY1" class="text-sm"></div>
+                                </div>
+                                <div class="bg-pink-50/80 p-4 rounded-xl border border-pink-100 text-center">
+                                    <h5 class="font-bold text-pink-900 text-xs uppercase mb-2">Equation 2 (<i>y₂</i>)</h5>
+                                    <div id="latexY2" class="text-sm"></div>
+                                </div>
+                                <div class="bg-emerald-50/80 p-4 rounded-xl border border-emerald-100 text-center">
+                                    <h5 class="font-bold text-emerald-900 text-xs uppercase mb-2">Equation 3 (<i>y₃</i>)</h5>
+                                    <div id="latexY3" class="text-sm"></div>
+                                </div>
+                            </div>
+
+                            <div class="math-box p-4 border border-emerald-200 bg-emerald-50/30 text-center font-bold">
+                                <div id="latexVectorYResult"></div>
+                            </div>
+                        </div>
+
+                        <!-- Step 4: Back Substitution -->
+                        <div id="stepCard4" class="pastel-card bg-white rounded-2xl p-6 border border-slate-200 shadow-md">
+                            <div class="flex items-center justify-between border-b border-slate-100 pb-3 mb-4">
+                                <h4 class="font-bold text-slate-800 text-lg flex items-center gap-2">
+                                    <span class="bg-purple-100 text-purple-800 w-7 h-7 rounded-full text-xs flex items-center justify-center font-bold">4</span>
+                                    Step 4: Solve Solution Vector <i>X</i> using Back Substitution (<i>UX = Y</i>)
+                                </h4>
+                            </div>
+
+                            <div class="math-box p-4 border border-purple-100 shadow-xs text-center overflow-x-auto mb-4">
+                                <div id="latexStep4Matrix"></div>
+                            </div>
+
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 my-4">
+                                <div class="bg-emerald-50/80 p-4 rounded-xl border border-emerald-100 text-center">
+                                    <h5 class="font-bold text-emerald-900 text-xs uppercase mb-2">1. Solve <i>z</i> (Row 3)</h5>
+                                    <div id="latexZ" class="text-sm"></div>
+                                </div>
+                                <div class="bg-pink-50/80 p-4 rounded-xl border border-pink-100 text-center">
+                                    <h5 class="font-bold text-pink-900 text-xs uppercase mb-2">2. Solve <i>y</i> (Row 2)</h5>
+                                    <div id="latexY" class="text-sm"></div>
+                                </div>
+                                <div class="bg-sky-50/80 p-4 rounded-xl border border-sky-100 text-center">
+                                    <h5 class="font-bold text-sky-900 text-xs uppercase mb-2">3. Solve <i>x</i> (Row 1)</h5>
+                                    <div id="latexX" class="text-sm"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Step 5: Final Solution -->
+                        <div id="stepCard5" class="pastel-card bg-white rounded-2xl p-6 border border-slate-200 shadow-md">
+                            <div class="flex items-center justify-between border-b border-slate-100 pb-3 mb-4">
+                                <h4 class="font-bold text-purple-900 text-lg flex items-center gap-2">
+                                    <span class="bg-purple-600 text-white w-7 h-7 rounded-full text-xs flex items-center justify-center font-bold">5</span>
+                                    Step 5: Final Solution Vector <i>X</i>
+                                </h4>
+                            </div>
+
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 my-4">
+                                <div class="bg-purple-50/80 p-6 rounded-2xl border border-purple-200 text-center shadow-xs">
+                                    <h5 class="font-bold text-purple-900 text-sm mb-3">Exact Fraction Form</h5>
+                                    <div id="latexFinalFraction"></div>
+                                </div>
+                                <div class="bg-blue-50/80 p-6 rounded-2xl border border-blue-200 text-center shadow-xs">
+                                    <h5 class="font-bold text-blue-900 text-sm mb-3">Decimal Approximation (4 d.p.)</h5>
+                                    <div id="latexFinalDecimal"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Bottom Navigation Controls -->
+                        <div id="wizardNav" class="bg-white rounded-2xl p-4 border border-slate-200 shadow-xs flex items-center justify-between">
+                            <button id="prevStepBtn" onclick="navigateStep(-1)" class="px-5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-bold transition-all disabled:opacity-40 disabled:cursor-not-allowed">
+                                <i class="fa-solid fa-arrow-left mr-1.5"></i> Previous Step
+                            </button>
+                            <span id="wizardStepLabelBottom" class="font-bold text-slate-800 text-sm">Step 1 of 5</span>
+                            <button id="nextStepBtn" onclick="navigateStep(1)" class="px-5 py-2.5 bg-purple-600 hover:bg-purple-700 text-white rounded-xl text-xs font-bold transition-all disabled:opacity-40 disabled:cursor-not-allowed">
+                                Next Step <i class="fa-solid fa-arrow-right ml-1.5"></i>
+                            </button>
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+
+    </main>
+
+    <!-- User Manual Modal -->
+    <div id="manualModal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 hidden">
+        <div class="bg-white rounded-3xl max-w-2xl w-full max-h-[90vh] overflow-hidden shadow-2xl flex flex-col">
+            <div class="bg-purple-600 p-5 text-white flex justify-between items-center">
+                <div class="flex items-center space-x-3">
+                    <i class="fa-solid fa-book-open text-2xl text-purple-200"></i>
+                    <div>
+                        <h4 class="font-bold text-lg">User Manual & Method Guide</h4>
+                        <p class="text-xs text-purple-200">Doolittle LU Decomposition Method</p>
+                    </div>
+                </div>
+                <button onclick="toggleManualModal(false)" class="text-purple-200 hover:text-white text-xl">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <div class="p-6 overflow-y-auto space-y-4 text-sm text-slate-700">
+                <h5 class="font-bold text-purple-900 text-base border-b pb-1">What is Doolittle LU Decomposition?</h5>
+                <p>
+                    The <strong>Doolittle Method</strong> factors a square matrix <i>A</i> into the product of a lower triangular matrix <i>L</i> and an upper triangular matrix <i>U</i>:
+                </p>
+                <div id="manualMathFormula1" class="text-center bg-slate-50 p-2 rounded-xl font-bold border border-slate-200"></div>
+                <p>
+                    In Doolittle's variation, matrix <i>L</i> has diagonal elements equal to 1:
+                </p>
+                <div id="manualMathFormula2" class="text-center bg-slate-50 p-2 rounded-xl border border-slate-200 overflow-x-auto"></div>
+
+                <h5 class="font-bold text-purple-900 text-base border-b pb-1">Solving Steps:</h5>
+                <ol class="list-decimal list-inside space-y-2">
+                    <li><strong>Step 1:</strong> Formulate the linear system into matrix form <i>AX = B</i>.</li>
+                    <li><strong>Step 2 (Decomposition):</strong> Equate <i>LU = A</i> to solve for variables <i>d, e, f, a, g, h, b, c, i</i>.</li>
+                    <li><strong>Step 3 (Forward Substitution):</strong> Solve <i>LY = B</i> for intermediate vector <i>Y = (y₁, y₂, y₃)ᵀ</i>.</li>
+                    <li><strong>Step 4 (Back Substitution):</strong> Solve <i>UX = Y</i> for solution vector <i>X = (x, y, z)ᵀ</i>.</li>
+                </ol>
+
+                <div class="bg-amber-50 rounded-2xl p-4 border border-amber-200 text-xs space-y-2">
+                    <h5 class="font-bold text-amber-900 text-sm">Interactive Features:</h5>
+                    <ul class="list-disc list-inside space-y-1 text-slate-600">
+                        <li>Switch between <strong>"Interactive Steps"</strong> and <strong>"All Steps"</strong>.</li>
+                        <li>In Step 2, use <strong>"Next Variable"</strong> to reveal each variable <i>d, e, f, a, g, h, b, c, i</i> one by one.</li>
+                        <li>Use Keyboard Arrow Keys (&larr; / &rarr;) to navigate through steps easily.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="bg-slate-50 p-4 border-t border-slate-100 text-right">
+                <button onclick="toggleManualModal(false)" class="px-5 py-2 bg-slate-700 hover:bg-slate-800 text-white rounded-xl text-sm font-semibold transition-all">
+                    Got it & Close
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // KaTeX String Rendering Helper (Zero dollar signs)
+        function tex(math, displayMode = false) {
+            try {
+                if (typeof katex !== 'undefined') {
+                    return katex.renderToString(math, { displayMode: displayMode, throwOnError: false });
+                }
+            } catch(e) {
+                console.error(e);
+            }
+            return math;
+        }
+
+        // Exact Fraction Arithmetic Class
+        class Fraction {
+            constructor(num, den = 1) {
+                if (den === 0) throw new Error("Denominator cannot be zero!");
+                if (den < 0) {
+                    num = -num;
+                    den = -den;
+                }
+                const gcdVal = Fraction.gcd(Math.abs(num), Math.abs(den));
+                this.num = num / gcdVal;
+                this.den = den / gcdVal;
+            }
+
+            static gcd(a, b) {
+                return b === 0 ? a : Fraction.gcd(b, a % b);
+            }
+
+            add(other) {
+                other = Fraction.from(other);
+                return new Fraction(this.num * other.den + other.num * this.den, this.den * other.den);
+            }
+
+            sub(other) {
+                other = Fraction.from(other);
+                return new Fraction(this.num * other.den - other.num * this.den, this.den * other.den);
+            }
+
+            mul(other) {
+                other = Fraction.from(other);
+                return new Fraction(this.num * other.num, this.den * other.den);
+            }
+
+            div(other) {
+                other = Fraction.from(other);
+                if (other.num === 0) throw new Error("Division by zero!");
+                return new Fraction(this.num * other.den, this.den * other.num);
+            }
+
+            static from(val) {
+                if (val instanceof Fraction) return val;
+                if (Number.isInteger(val)) return new Fraction(val, 1);
+                const str = val.toString();
+                if (!str.includes('.')) return new Fraction(parseInt(str, 10), 1);
+                const decPlaces = str.split('.')[1].length;
+                const den = Math.pow(10, decPlaces);
+                const num = Math.round(val * den);
+                return new Fraction(num, den);
+            }
+
+            toTex() {
+                if (this.den === 1) return `${this.num}`;
+                if (this.num < 0) {
+                    return `-\\frac{${Math.abs(this.num)}}{${this.den}}`;
+                }
+                return `\\frac{${this.num}}{${this.den}}`;
+            }
+
+            toDecimal(precision = 4) {
+                return (this.num / this.den).toFixed(precision);
+            }
+
+            valueOf() {
+                return this.num / this.den;
+            }
+        }
+
+        // Global State Variables
+        let currentStep = 1;
+        let totalSteps = 5;
+        let solutionMode = 'wizard'; // 'wizard' or 'all'
+        let currentSubStep = 9; // 1 to 9 for Step 2 cells
+        let showAllSubSteps = true;
+
+        // Custom Inline Alert Helpers
+        function showAlert(msg) {
+            const box = document.getElementById('alertBox');
+            const txt = document.getElementById('alertMessage');
+            if (txt) txt.textContent = msg;
+            if (box) box.classList.remove('hidden');
+        }
+
+        function hideAlert() {
+            const box = document.getElementById('alertBox');
+            if (box) box.classList.add('hidden');
+        }
+
+        function loadExample() {
+            document.getElementById('a').value = 4;
+            document.getElementById('b').value = 1;
+            document.getElementById('c').value = 2;
+            document.getElementById('j').value = 1;
+
+            document.getElementById('d').value = 0;
+            document.getElementById('e').value = 3;
+            document.getElementById('f').value = 1;
+            document.getElementById('k').value = 2;
+
+            document.getElementById('g').value = 5;
+            document.getElementById('h').value = 1;
+            document.getElementById('i').value = -3;
+            document.getElementById('l').value = 5;
+
+            hideAlert();
+            calculateDoolittle();
+        }
+
+        function resetFields() {
+            const ids = ['a','b','c','j','d','e','f','k','g','h','i','l'];
+            ids.forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.value = '0';
+            });
+            
+            // Hide solution and show empty state card
+            document.getElementById('solutionContainer').classList.add('hidden');
+            document.getElementById('emptyStateCard').classList.remove('hidden');
+            hideAlert();
+        }
+
+        function resetToHome() {
+            resetFields();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function toggleManualModal(show) {
+            const modal = document.getElementById('manualModal');
+            if (show) {
+                modal.classList.remove('hidden');
+                document.getElementById('manualMathFormula1').innerHTML = tex('A = L \\cdot U', true);
+                document.getElementById('manualMathFormula2').innerHTML = tex('L = \\begin{pmatrix} 1 & 0 & 0 \\\\ a & 1 & 0 \\\\ b & c & 1 \\end{pmatrix}, \\quad U = \\begin{pmatrix} d & e & f \\\\ 0 & g & h \\\\ 0 & 0 & i \\end{pmatrix}', true);
+            } else {
+                modal.classList.add('hidden');
+            }
+        }
+
+        function calculateDoolittle() {
+            hideAlert();
+            try {
+                const a11 = Fraction.from(parseFloat(document.getElementById('a').value || 0));
+                const a12 = Fraction.from(parseFloat(document.getElementById('b').value || 0));
+                const a13 = Fraction.from(parseFloat(document.getElementById('c').value || 0));
+                const b1  = Fraction.from(parseFloat(document.getElementById('j').value || 0));
+
+                const a21 = Fraction.from(parseFloat(document.getElementById('d').value || 0));
+                const a22 = Fraction.from(parseFloat(document.getElementById('e').value || 0));
+                const a23 = Fraction.from(parseFloat(document.getElementById('f').value || 0));
+                const b2  = Fraction.from(parseFloat(document.getElementById('k').value || 0));
+
+                const a31 = Fraction.from(parseFloat(document.getElementById('g').value || 0));
+                const a32 = Fraction.from(parseFloat(document.getElementById('h').value || 0));
+                const a33 = Fraction.from(parseFloat(document.getElementById('i').value || 0));
+                const b3  = Fraction.from(parseFloat(document.getElementById('l').value || 0));
+
+                // Row 1 of U (d, e, f)
+                const val_d = a11;
+                const val_e = a12;
+                const val_f = a13;
+
+                if (val_d.num === 0) {
+                    showAlert("Error: Pivot value 'd' is zero. Doolittle's method requires non-zero pivot.");
+                    return;
+                }
+
+                // Row 2 (a in L; g, h in U)
+                const val_a = a21.div(val_d);
+                const val_g = a22.sub(val_a.mul(val_e));
+                const val_h = a23.sub(val_a.mul(val_f));
+
+                if (val_g.num === 0) {
+                    showAlert("Error: Intermediate pivot 'g' is zero. System cannot be solved directly without pivoting.");
+                    return;
+                }
+
+                // Row 3 (b, c in L; i in U)
+                const val_b = a31.div(val_d);
+                const val_c = (a32.sub(val_b.mul(val_e))).div(val_g);
+                const val_i = a33.sub(val_b.mul(val_f)).sub(val_c.mul(val_h));
+
+                // Forward substitution (L Y = B)
+                const y1 = b1;
+                const y2 = b2.sub(val_a.mul(y1));
+                const y3 = b3.sub(val_b.mul(y1)).sub(val_c.mul(y2));
+
+                // Back substitution (U X = Y)
+                if (val_i.num === 0) {
+                    showAlert("Error: Value 'i' is zero. The coefficient matrix is singular.");
+                    return;
+                }
+                const z = y3.div(val_i);
+                const y_var = (y2.sub(val_h.mul(z))).div(val_g);
+                const x = (y1.sub(val_e.mul(y_var)).sub(val_f.mul(z))).div(val_d);
+
+                renderStep1(a11, a12, a13, a21, a22, a23, a31, a32, a33, b1, b2, b3);
+                renderStep2(a11, a12, a13, a21, a22, a23, a31, a32, a33, val_a, val_b, val_c, val_d, val_e, val_f, val_g, val_h, val_i);
+                renderStep3(val_a, val_b, val_c, b1, b2, b3, y1, y2, y3);
+                renderStep4(val_d, val_e, val_f, val_g, val_h, val_i, y1, y2, y3, z, y_var, x);
+                renderStep5(x, y_var, z);
+
+                // Display solution container and hide empty state
+                document.getElementById('emptyStateCard').classList.add('hidden');
+                document.getElementById('solutionContainer').classList.remove('hidden');
+
+                setSolutionMode(solutionMode);
+
+            } catch (err) {
+                console.error(err);
+                showAlert("Please ensure all input fields contain valid numbers.");
+            }
+        }
+
+        function renderStep1(a11, a12, a13, a21, a22, a23, a31, a32, a33, b1, b2, b3) {
+            const math = `
+                \\begin{pmatrix} 
+                ${a11.toTex()} & ${a12.toTex()} & ${a13.toTex()} \\\\ 
+                ${a21.toTex()} & ${a22.toTex()} & ${a23.toTex()} \\\\ 
+                ${a31.toTex()} & ${a32.toTex()} & ${a33.toTex()} 
+                \\end{pmatrix}
+                \\begin{pmatrix} x \\\\ y \\\\ z \\end{pmatrix}
+                =
+                \\begin{pmatrix} ${b1.toTex()} \\\\ ${b2.toTex()} \\\\ ${b3.toTex()} \\end{pmatrix}
+            `;
+            document.getElementById('latexStep1').innerHTML = tex(math, true);
+        }
+
+        function renderStep2(a11, a12, a13, a21, a22, a23, a31, a32, a33, a, b, c, d, e, f, g, h, i) {
+            const generalHtml = `
+                <div class="mb-2">${tex('LU = A', true)}</div>
+                <div class="mb-2">${tex(`\\begin{pmatrix} 1 & 0 & 0 \\\\ a & 1 & 0 \\\\ b & c & 1 \\end{pmatrix} \\begin{pmatrix} d & e & f \\\\ 0 & g & h \\\\ 0 & 0 & i \\end{pmatrix} = \\begin{pmatrix} ${a11.toTex()} & ${a12.toTex()} & ${a13.toTex()} \\\\ ${a21.toTex()} & ${a22.toTex()} & ${a23.toTex()} \\\\ ${a31.toTex()} & ${a32.toTex()} & ${a33.toTex()} \\end{pmatrix}`, true)}</div>
+                <div>${tex(`\\begin{pmatrix} d & e & f \\\\ ad & ae + g & af + h \\\\ bd & be + cg & bf + ch + i \\end{pmatrix} = \\begin{pmatrix} ${a11.toTex()} & ${a12.toTex()} & ${a13.toTex()} \\\\ ${a21.toTex()} & ${a22.toTex()} & ${a23.toTex()} \\\\ ${a31.toTex()} & ${a32.toTex()} & ${a33.toTex()} \\end{pmatrix}`, true)}</div>
+            `;
+            document.getElementById('latexDoolittleGeneral').innerHTML = generalHtml;
+
+            const gridBoxHtml = `
+                <div class="border-2 border-blue-600 rounded-2xl overflow-x-auto shadow-md bg-white my-4 w-full">
+                    <div class="min-w-[960px] grid grid-cols-3 divide-x-2 divide-blue-500 text-slate-800">
+                        <!-- Column 1 -->
+                        <div class="p-6 sm:p-8 space-y-6 bg-blue-50/10 text-center flex flex-col justify-between">
+                            <!-- Cell 1: d -->
+                            <div id="subCell1" class="border-b-2 border-blue-200 pb-6 pt-2 rounded-xl transition-all p-2">
+                                <div class="text-xs font-bold text-blue-600 uppercase tracking-wider mb-2 flex items-center justify-center gap-1">
+                                    <span class="bg-blue-100 text-blue-800 w-5 h-5 rounded-full text-[10px] flex items-center justify-center font-bold">1</span>
+                                    Row 1, Column 1
+                                </div>
+                                <div class="font-bold text-blue-900 text-xl md:text-2xl">${tex('d = ' + d.toTex())}</div>
+                            </div>
+
+                            <!-- Cell 4: a -->
+                            <div id="subCell4" class="border-b-2 border-blue-200 py-6 rounded-xl transition-all p-2">
+                                <div class="text-xs font-bold text-blue-600 uppercase tracking-wider mb-2 flex items-center justify-center gap-1">
+                                    <span class="bg-blue-100 text-blue-800 w-5 h-5 rounded-full text-[10px] flex items-center justify-center font-bold">4</span>
+                                    Row 2, Column 1
+                                </div>
+                                <div class="text-lg py-1">${tex('ad = ' + a21.toTex())}</div>
+                                <div class="text-lg py-1">${tex('a(' + d.toTex() + ') = ' + a21.toTex())}</div>
+                                <div class="font-bold text-blue-900 text-xl md:text-2xl mt-3 bg-blue-100/80 py-2 px-4 rounded-xl inline-block border border-blue-300 shadow-xs">${tex('a = ' + a.toTex())}</div>
+                            </div>
+
+                            <!-- Cell 7: b -->
+                            <div id="subCell7" class="pt-6 pb-2 rounded-xl transition-all p-2">
+                                <div class="text-xs font-bold text-blue-600 uppercase tracking-wider mb-2 flex items-center justify-center gap-1">
+                                    <span class="bg-blue-100 text-blue-800 w-5 h-5 rounded-full text-[10px] flex items-center justify-center font-bold">7</span>
+                                    Row 3, Column 1
+                                </div>
+                                <div class="text-lg py-1">${tex('bd = ' + a31.toTex())}</div>
+                                <div class="text-lg py-1">${tex('b(' + d.toTex() + ') = ' + a31.toTex())}</div>
+                                <div class="font-bold text-blue-900 text-xl md:text-2xl mt-3 bg-blue-100/80 py-2 px-4 rounded-xl inline-block border border-blue-300 shadow-xs">${tex('b = ' + b.toTex())}</div>
+                            </div>
+                        </div>
+
+                        <!-- Column 2 -->
+                        <div class="p-6 sm:p-8 space-y-6 bg-blue-50/10 text-center flex flex-col justify-between">
+                            <!-- Cell 2: e -->
+                            <div id="subCell2" class="border-b-2 border-blue-200 pb-6 pt-2 rounded-xl transition-all p-2">
+                                <div class="text-xs font-bold text-blue-600 uppercase tracking-wider mb-2 flex items-center justify-center gap-1">
+                                    <span class="bg-blue-100 text-blue-800 w-5 h-5 rounded-full text-[10px] flex items-center justify-center font-bold">2</span>
+                                    Row 1, Column 2
+                                </div>
+                                <div class="font-bold text-blue-900 text-xl md:text-2xl">${tex('e = ' + e.toTex())}</div>
+                            </div>
+
+                            <!-- Cell 5: g -->
+                            <div id="subCell5" class="border-b-2 border-blue-200 py-6 rounded-xl transition-all p-2">
+                                <div class="text-xs font-bold text-blue-600 uppercase tracking-wider mb-2 flex items-center justify-center gap-1">
+                                    <span class="bg-blue-100 text-blue-800 w-5 h-5 rounded-full text-[10px] flex items-center justify-center font-bold">5</span>
+                                    Row 2, Column 2
+                                </div>
+                                <div class="text-lg py-1">${tex('ae + g = ' + a22.toTex())}</div>
+                                <div class="text-lg py-1 me-1">${tex('(' + a.toTex() + ')(' + e.toTex() + ') + g = ' + a22.toTex())}</div>
+                                <div class="font-bold text-blue-900 text-xl md:text-2xl mt-3 bg-blue-100/80 py-2 px-4 rounded-xl inline-block border border-blue-300 shadow-xs">${tex('g = ' + g.toTex())}</div>
+                            </div>
+
+                            <!-- Cell 8: c -->
+                            <div id="subCell8" class="pt-6 pb-2 rounded-xl transition-all p-2">
+                                <div class="text-xs font-bold text-blue-600 uppercase tracking-wider mb-2 flex items-center justify-center gap-1">
+                                    <span class="bg-blue-100 text-blue-800 w-5 h-5 rounded-full text-[10px] flex items-center justify-center font-bold">8</span>
+                                    Row 3, Column 2
+                                </div>
+                                <div class="text-lg py-1">${tex('be + cg = ' + a32.toTex())}</div>
+                                <div class="text-lg py-1">${tex('(' + b.toTex() + ')(' + e.toTex() + ') + c(' + g.toTex() + ') = ' + a32.toTex())}</div>
+                                <div class="font-bold text-blue-900 text-xl md:text-2xl mt-3 bg-blue-100/80 py-2 px-4 rounded-xl inline-block border border-blue-300 shadow-xs">${tex('c = ' + c.toTex())}</div>
+                            </div>
+                        </div>
+
+                        <!-- Column 3 -->
+                        <div class="p-6 sm:p-8 space-y-6 bg-blue-50/10 text-center flex flex-col justify-between">
+                            <!-- Cell 3: f -->
+                            <div id="subCell3" class="border-b-2 border-blue-200 pb-6 pt-2 rounded-xl transition-all p-2">
+                                <div class="text-xs font-bold text-blue-600 uppercase tracking-wider mb-2 flex items-center justify-center gap-1">
+                                    <span class="bg-blue-100 text-blue-800 w-5 h-5 rounded-full text-[10px] flex items-center justify-center font-bold">3</span>
+                                    Row 1, Column 3
+                                </div>
+                                <div class="font-bold text-blue-900 text-xl md:text-2xl">${tex('f = ' + f.toTex())}</div>
+                            </div>
+
+                            <!-- Cell 6: h -->
+                            <div id="subCell6" class="border-b-2 border-blue-200 py-6 rounded-xl transition-all p-2">
+                                <div class="text-xs font-bold text-blue-600 uppercase tracking-wider mb-2 flex items-center justify-center gap-1">
+                                    <span class="bg-blue-100 text-blue-800 w-5 h-5 rounded-full text-[10px] flex items-center justify-center font-bold">6</span>
+                                    Row 2, Column 3
+                                </div>
+                                <div class="text-lg py-1">${tex('af + h = ' + a23.toTex())}</div>
+                                <div class="text-lg py-1">${tex('(' + a.toTex() + ')(' + f.toTex() + ') + h = ' + a23.toTex())}</div>
+                                <div class="font-bold text-blue-900 text-xl md:text-2xl mt-3 bg-blue-100/80 py-2 px-4 rounded-xl inline-block border border-blue-300 shadow-xs">${tex('h = ' + h.toTex())}</div>
+                            </div>
+
+                            <!-- Cell 9: i -->
+                            <div id="subCell9" class="pt-6 pb-2 rounded-xl transition-all p-2">
+                                <div class="text-xs font-bold text-blue-600 uppercase tracking-wider mb-2 flex items-center justify-center gap-1">
+                                    <span class="bg-blue-100 text-blue-800 w-5 h-5 rounded-full text-[10px] flex items-center justify-center font-bold">9</span>
+                                    Row 3, Column 3
+                                </div>
+                                <div class="text-lg py-1">${tex('bf + ch + i = ' + a33.toTex())}</div>
+                                <div class="text-lg py-1 me-1">${tex('(' + b.toTex() + ')(' + f.toTex() + ') + (' + c.toTex() + ')(' + h.toTex() + ') + i = ' + a33.toTex())}</div>
+                                <div class="font-bold text-blue-900 text-xl md:text-2xl mt-3 bg-blue-100/80 py-2 px-4 rounded-xl inline-block border border-blue-300 shadow-xs">${tex('i = ' + i.toTex())}</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('step2GridContainer').innerHTML = gridBoxHtml;
+
+            const luResultMath = `
+                L = \\begin{pmatrix} 1 & 0 & 0 \\\\ ${a.toTex()} & 1 & 0 \\\\ ${b.toTex()} & ${c.toTex()} & 1 \\end{pmatrix}, 
+                \\quad 
+                U = \\begin{pmatrix} ${d.toTex()} & ${e.toTex()} & ${f.toTex()} \\\\ 0 & ${g.toTex()} & ${h.toTex()} \\\\ 0 & 0 & ${i.toTex()} \\end{pmatrix}
+            `;
+            document.getElementById('latexResultLU').innerHTML = tex(luResultMath, true);
+
+            updateSubStepUI();
+        }
+
+        function renderStep3(a, b, c, b1, b2, b3, y1, y2, y3) {
+            const matrixMath = `
+                L Y = B \\quad \\Rightarrow \\quad
+                \\begin{pmatrix} 1 & 0 & 0 \\\\ ${a.toTex()} & 1 & 0 \\\\ ${b.toTex()} & ${c.toTex()} & 1 \\end{pmatrix}
+                \\begin{pmatrix} y_1 \\\\ y_2 \\\\ y_3 \\end{pmatrix}
+                =
+                \\begin{pmatrix} ${b1.toTex()} \\\\ ${b2.toTex()} \\\\ ${b3.toTex()} \\end{pmatrix}
+            `;
+            document.getElementById('latexStep3Matrix').innerHTML = tex(matrixMath, true);
+
+            document.getElementById('latexY1').innerHTML = tex(`y_1 = ${y1.toTex()}`, true);
+
+            document.getElementById('latexY2').innerHTML = `
+                <div class="mb-1">${tex(`(${a.toTex()})y_1 + y_2 = ${b2.toTex()}`, true)}</div>
+                <div class="mb-1">${tex(`(${a.toTex()})(${y1.toTex()}) + y_2 = ${b2.toTex()}`, true)}</div>
+                <div>${tex(`y_2 = ${y2.toTex()}`, true)}</div>
+            `;
+
+            document.getElementById('latexY3').innerHTML = `
+                <div class="mb-1">${tex(`(${b.toTex()})y_1 + (${c.toTex()})y_2 + y_3 = ${b3.toTex()}`, true)}</div>
+                <div class="mb-1">${tex(`(${b.toTex()})(${y1.toTex()}) + (${c.toTex()})(${y2.toTex()}) + y_3 = ${b3.toTex()}`, true)}</div>
+                <div>${tex(`y_3 = ${y3.toTex()}`, true)}</div>
+            `;
+
+            document.getElementById('latexVectorYResult').innerHTML = `
+                Thus, Intermediate Vector ${tex(`Y = \\begin{pmatrix} ${y1.toTex()} \\\\ ${y2.toTex()} \\\\ ${y3.toTex()} \\end{pmatrix}`)}
+            `;
+        }
+
+        function renderStep4(d, e, f, g, h, i_val, y1, y2, y3, z, y_var, x) {
+            const matrixMath = `
+                U X = Y \\quad \\Rightarrow \\quad
+                \\begin{pmatrix} ${d.toTex()} & ${e.toTex()} & ${f.toTex()} \\\\ 0 & ${g.toTex()} & ${h.toTex()} \\\\ 0 & 0 & ${i_val.toTex()} \\end{pmatrix}
+                \\begin{pmatrix} x \\\\ y \\\\ z \\end{pmatrix}
+                =
+                \\begin{pmatrix} ${y1.toTex()} \\\\ ${y2.toTex()} \\\\ ${y3.toTex()} \\end{pmatrix}
+            `;
+            document.getElementById('latexStep4Matrix').innerHTML = tex(matrixMath, true);
+
+            document.getElementById('latexZ').innerHTML = `
+                <div class="mb-1">${tex(`(${i_val.toTex()})z = ${y3.toTex()}`, true)}</div>
+                <div>${tex(`z = \\frac{${y3.toTex()}}{${i_val.toTex()}} = ${z.toTex()}`, true)}</div>
+            `;
+
+            document.getElementById('latexY').innerHTML = `
+                <div class="mb-1">${tex(`(${g.toTex()})y + (${h.toTex()})z = ${y2.toTex()}`, true)}</div>
+                <div class="mb-1">${tex(`(${g.toTex()})y + (${h.toTex()})(${z.toTex()}) = ${y2.toTex()}`, true)}</div>
+                <div>${tex(`y = ${y_var.toTex()}`, true)}</div>
+            `;
+
+            document.getElementById('latexX').innerHTML = `
+                <div class="mb-1">${tex(`(${d.toTex()})x + (${e.toTex()})y + (${f.toTex()})z = ${y1.toTex()}`, true)}</div>
+                <div class="mb-1">${tex(`(${d.toTex()})x + (${e.toTex()})(${y_var.toTex()}) + (${f.toTex()})(${z.toTex()}) = ${y1.toTex()}`, true)}</div>
+                <div>${tex(`x = ${x.toTex()}`, true)}</div>
+            `;
+        }
+
+        function renderStep5(x, y_var, z) {
+            const fracMath = `
+                X = \\begin{pmatrix} x \\\\ y \\\\ z \\end{pmatrix}
+                =
+                \\begin{pmatrix} 
+                ${x.toTex()} \\\\ 
+                ${y_var.toTex()} \\\\ 
+                ${z.toTex()} 
+                \\end{pmatrix}
+            `;
+            document.getElementById('latexFinalFraction').innerHTML = tex(fracMath, true);
+
+            const decMath = `
+                X = \\begin{pmatrix} x \\\\ y \\\\ z \\end{pmatrix}
+                =
+                \\begin{pmatrix} 
+                ${x.toDecimal(4)} \\\\ 
+                ${y_var.toDecimal(4)} \\\\ 
+                ${z.toDecimal(4)} 
+                \\end{pmatrix}
+            `;
+            document.getElementById('latexFinalDecimal').innerHTML = tex(decMath, true);
+        }
+
+        function updateSubStepUI() {
+            const varNames = ['d', 'e', 'f', 'a', 'g', 'h', 'b', 'c', 'i'];
+            const label = document.getElementById('subStepCounterLabel');
+            if (label) {
+                if (showAllSubSteps) {
+                    label.textContent = "All 9 Variables Visible";
+                } else {
+                    label.textContent = `Variable ${currentSubStep} of 9 (${varNames[currentSubStep - 1]})`;
+                }
+            }
+
+            const btnPrev = document.getElementById('btnPrevSubStep');
+            const btnNext = document.getElementById('btnNextSubStep');
+            const btnToggle = document.getElementById('btnToggleAllSubSteps');
+
+            if (btnPrev) btnPrev.disabled = showAllSubSteps || (currentSubStep <= 1);
+            if (btnNext) btnNext.disabled = showAllSubSteps || (currentSubStep >= 9);
+            if (btnToggle) {
+                btnToggle.textContent = showAllSubSteps ? "Reveal Step-by-Step" : "Show All Cells";
+            }
+
+            for (let i = 1; i <= 9; i++) {
+                const cell = document.getElementById(`subCell${i}`);
+                if (!cell) continue;
+
+                if (showAllSubSteps) {
+                    cell.classList.remove('dimmed-cell', 'active-cell-glow');
+                    cell.style.opacity = '1';
+                } else {
+                    if (i === currentSubStep) {
+                        cell.classList.remove('dimmed-cell');
+                        cell.classList.add('active-cell-glow');
+                        cell.style.opacity = '1';
+                    } else if (i < currentSubStep) {
+                        cell.classList.remove('dimmed-cell', 'active-cell-glow');
+                        cell.style.opacity = '1';
+                    } else {
+                        cell.classList.remove('active-cell-glow');
+                        cell.classList.add('dimmed-cell');
+                        cell.style.opacity = '0.35';
+                    }
+                }
+            }
+        }
+
+        function navigateSubStep(direction) {
+            if (showAllSubSteps) {
+                showAllSubSteps = false;
+            }
+            currentSubStep += direction;
+            if (currentSubStep < 1) currentSubStep = 1;
+            if (currentSubStep > 9) currentSubStep = 9;
+            updateSubStepUI();
+        }
+
+        function toggleSubStepsMode() {
+            showAllSubSteps = !showAllSubSteps;
+            if (!showAllSubSteps && currentSubStep > 9) {
+                currentSubStep = 1;
+            }
+            updateSubStepUI();
+        }
+
+        function setSolutionMode(mode) {
+            solutionMode = mode;
+            const btnAll = document.getElementById('btnViewAll');
+            const btnWizard = document.getElementById('btnViewWizard');
+            const wizardNav = document.getElementById('wizardNav');
+            const wizardNavTop = document.getElementById('wizardNavTop');
+            const stepperHeader = document.getElementById('stepperHeader');
+
+            if (mode === 'all') {
+                btnAll.className = "px-4 py-2 rounded-xl text-xs font-bold transition-all bg-purple-600 text-white shadow-xs";
+                btnWizard.className = "px-4 py-2 rounded-xl text-xs font-bold transition-all bg-white text-purple-700 hover:bg-purple-100 border border-purple-200";
+                if (wizardNav) wizardNav.classList.add('hidden');
+                if (wizardNavTop) wizardNavTop.classList.add('hidden');
+                if (stepperHeader) stepperHeader.classList.add('hidden');
+                
+                for (let i = 1; i <= totalSteps; i++) {
+                    document.getElementById(`stepCard${i}`).classList.remove('hidden');
+                }
+                
+                showAllSubSteps = true;
+                updateSubStepUI();
+            } else {
+                btnWizard.className = "px-4 py-2 rounded-xl text-xs font-bold transition-all bg-purple-600 text-white shadow-xs";
+                btnAll.className = "px-4 py-2 rounded-xl text-xs font-bold transition-all bg-white text-purple-700 hover:bg-purple-100 border border-purple-200";
+                if (wizardNav) wizardNav.classList.remove('hidden');
+                if (wizardNavTop) wizardNavTop.classList.remove('hidden');
+                if (stepperHeader) stepperHeader.classList.remove('hidden');
+                
+                currentStep = 1;
+                updateWizardUI();
+            }
+        }
+
+        function navigateStep(direction) {
+            currentStep += direction;
+            if (currentStep < 1) currentStep = 1;
+            if (currentStep > totalSteps) currentStep = totalSteps;
+            updateWizardUI();
+        }
+
+        function jumpToStep(stepNum) {
+            currentStep = stepNum;
+            updateWizardUI();
+        }
+
+        function updateWizardUI() {
+            // Update step labels
+            document.getElementById('wizardStepLabelBottom').textContent = `Step ${currentStep} of ${totalSteps}`;
+            if (document.getElementById('wizardStepLabelTop')) {
+                document.getElementById('wizardStepLabelTop').textContent = `Step ${currentStep} of ${totalSteps}`;
+            }
+
+            // Buttons state
+            const prevDisabled = (currentStep === 1);
+            const nextDisabled = (currentStep === totalSteps);
+
+            document.getElementById('prevStepBtn').disabled = prevDisabled;
+            document.getElementById('nextStepBtn').disabled = nextDisabled;
+            if (document.getElementById('prevStepBtnTop')) {
+                document.getElementById('prevStepBtnTop').disabled = prevDisabled;
+            }
+            if (document.getElementById('nextStepBtnTop')) {
+                document.getElementById('nextStepBtnTop').disabled = nextDisabled;
+            }
+
+            // Progress bar
+            const pct = (currentStep / totalSteps) * 100;
+            document.getElementById('wizardProgressBar').style.width = `${pct}%`;
+
+            // Step tab icons
+            for (let i = 1; i <= totalSteps; i++) {
+                const tab = document.getElementById(`stepTab${i}`);
+                if (tab) {
+                    if (i === currentStep) {
+                        tab.className = "p-2 rounded-xl border transition-all flex flex-col items-center justify-center bg-purple-600 text-white border-purple-600 shadow-xs";
+                    } else if (i < currentStep) {
+                        tab.className = "p-2 rounded-xl border transition-all flex flex-col items-center justify-center bg-emerald-50 text-emerald-800 border-emerald-200 hover:bg-emerald-100";
+                    } else {
+                        tab.className = "p-2 rounded-xl border transition-all flex flex-col items-center justify-center bg-slate-50 text-slate-500 border-slate-200 hover:bg-purple-50";
+                    }
+                }
+            }
+
+            // Show active card
+            for (let i = 1; i <= totalSteps; i++) {
+                const card = document.getElementById(`stepCard${i}`);
+                if (card) {
+                    if (i === currentStep) {
+                        card.classList.remove('hidden');
+                    } else {
+                        card.classList.add('hidden');
+                    }
+                }
+            }
+        }
+
+        // Keyboard Shortcut Navigation
+        document.addEventListener('keydown', function(event) {
+            if (document.getElementById('solutionContainer').classList.contains('hidden')) return;
+            if (solutionMode !== 'wizard') return;
+
+            if (event.key === 'ArrowRight') {
+                navigateStep(1);
+            } else if (event.key === 'ArrowLeft') {
+                navigateStep(-1);
+            }
+        });
+
+        // Initialize with default empty state
+        window.onload = function() {
+            resetFields();
+        };
+    </script>
+</body>
+</html>

@@ -1,0 +1,794 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gaussian Method Simulator</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Inter & Caveat -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- KaTeX for Mathematics -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+    
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6;
+        }
+
+        .handwriting {
+            font-family: 'Caveat', cursive;
+        }
+
+        /* Lined Notebook Paper Background */
+        .notebook-paper {
+            background-color: #fdfbf7;
+            background-image: linear-gradient(#e5e7eb 1px, transparent 1px);
+            background-size: 100% 2rem;
+            position: relative;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
+        }
+
+        /* Red margin line on notebook left */
+        .notebook-paper::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            left: 3rem;
+            width: 2px;
+            background-color: #fca5a5;
+            z-index: 10;
+        }
+
+        @media (min-width: 640px) {
+            .notebook-paper::before {
+                left: 4.5rem;
+            }
+        }
+
+        /* Hole punch styling */
+        .binder-hole {
+            width: 16px;
+            height: 16px;
+            background-color: #d1d5db;
+            border-radius: 50%;
+            box-shadow: inset 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+
+        /* Pastel Accents */
+        .pastel-blue { background-color: #e0f2fe; border-color: #bae6fd; color: #0369a1; }
+        .pastel-pink { background-color: #fce7f3; border-color: #fbcfe8; color: #be185d; }
+        .pastel-green { background-color: #dcfce7; border-color: #bbf7d0; color: #15803d; }
+        .pastel-yellow { background-color: #fef9c3; border-color: #fef08a; color: #a16207; }
+        .pastel-purple { background-color: #f3e8ff; border-color: #e9d5ff; color: #6b21a8; }
+
+        .katex {
+            font-size: 1.1em !important;
+        }
+    </style>
+</head>
+<body class="min-h-screen text-slate-800 p-2 sm:p-4 md:p-6">
+
+    <div class="max-w-5xl mx-auto space-y-4">
+        
+        <!-- HEADER NAVBAR -->
+        <header class="bg-white/90 backdrop-blur rounded-2xl p-4 shadow-sm border border-slate-200/80 flex flex-col md:flex-row items-center justify-between gap-4">
+            <div class="flex items-center gap-3 w-full md:w-auto">
+                <div class="w-12 h-12 rounded-xl bg-amber-100 text-amber-600 flex items-center justify-center text-2xl shadow-inner">
+                    <i class="fa-solid fa-calculator"></i>
+                </div>
+                <div>
+                    <div class="flex items-center gap-2">
+                        <h1 class="font-bold text-xl text-slate-800">Gaussian Method Simulator</h1>
+                        <span class="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-pink-100 text-pink-700">Gaussian Elimination</span>
+                    </div>
+                    <p class="text-xs text-slate-500">Step-by-Step Linear System Solver (3x3 Matrix)</p>
+                </div>
+            </div>
+
+            <!-- Top Header Buttons -->
+            <div class="flex items-center gap-2 w-full md:w-auto justify-end">
+                <button onclick="handleHome()" class="flex-1 md:flex-none px-4 py-2 bg-sky-50 hover:bg-sky-100 text-sky-700 rounded-xl font-medium text-sm border border-sky-200 transition flex items-center justify-center gap-2 shadow-sm">
+                    <i class="fa-solid fa-house"></i> Home
+                </button>
+                <button onclick="loadExample()" class="flex-1 md:flex-none px-4 py-2 bg-amber-50 hover:bg-amber-100 text-amber-700 rounded-xl font-medium text-sm border border-amber-200 transition flex items-center justify-center gap-2 shadow-sm">
+                    <i class="fa-solid fa-lightbulb"></i> Load Example
+                </button>
+                <button onclick="openManual()" class="flex-1 md:flex-none px-4 py-2 bg-purple-50 hover:bg-purple-100 text-purple-700 rounded-xl font-medium text-sm border border-purple-200 transition flex items-center justify-center gap-2 shadow-sm">
+                    <i class="fa-solid fa-book-open"></i> User Manual
+                </button>
+            </div>
+        </header>
+
+        <main class="notebook-paper rounded-2xl border border-slate-300 p-4 sm:p-6 md:p-8 min-h-[600px] overflow-hidden">
+            
+            <!-- Left Binder Holes -->
+            <div class="absolute left-3 sm:left-5 top-12 bottom-12 flex flex-col justify-around z-20 pointer-events-none">
+                <div class="binder-hole"></div>
+                <div class="binder-hole"></div>
+                <div class="binder-hole"></div>
+            </div>
+
+            <div class="pl-10 sm:pl-16 space-y-6">
+                
+                <!-- Notebook Header Title -->
+                <div class="border-b-2 border-slate-800 pb-3 flex flex-col md:flex-row md:items-end justify-between gap-2">
+                    <div>
+                        <p class="handwriting text-2xl md:text-3xl text-rose-500 font-bold -mb-1">Chapter 2: Gaussian Elimination Method</p>
+                        <h2 class="text-2xl md:text-3xl font-extrabold text-slate-800 tracking-tight">Solve 3×3 Linear Equation System</h2>
+                    </div>
+                    <div>
+                        <span class="inline-block px-3 py-1 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-800 border border-emerald-200">
+                            Upper Triangular Matrix • Back Substitution
+                        </span>
+                    </div>
+                </div>
+
+                <!-- INPUT SECTION -->
+                <div class="bg-white/80 backdrop-blur rounded-xl p-4 md:p-5 border border-slate-200 shadow-sm space-y-4">
+                    <div class="flex items-center justify-between">
+                        <h3 class="text-sm font-bold text-slate-700 flex items-center gap-2">
+                            <i class="fa-solid fa-pen-to-square text-sky-500"></i> Enter Equation Coefficients (Matrix A & Vector B):
+                        </h3>
+                        <span class="text-xs text-slate-400 font-mono">Format: ax + by + cz = d</span>
+                    </div>
+
+                    <!-- Input Rows -->
+                    <div class="space-y-3">
+                        <!-- Equation 1 -->
+                        <div class="pastel-blue p-3 rounded-xl flex flex-wrap items-center justify-between gap-2 border">
+                            <span class="font-semibold text-sm w-28">Equation 1:</span>
+                            <div class="flex items-center gap-2 flex-1 justify-end flex-wrap">
+                                <input type="number" id="a11" value="0" class="w-16 sm:w-20 px-2 py-1.5 text-center font-bold bg-white border border-sky-300 rounded-lg shadow-sm focus:ring-2 focus:ring-sky-400 outline-none">
+                                <span class="text-xs font-bold">x +</span>
+                                <input type="number" id="a12" value="0" class="w-16 sm:w-20 px-2 py-1.5 text-center font-bold bg-white border border-sky-300 rounded-lg shadow-sm focus:ring-2 focus:ring-sky-400 outline-none">
+                                <span class="text-xs font-bold">y +</span>
+                                <input type="number" id="a13" value="0" class="w-16 sm:w-20 px-2 py-1.5 text-center font-bold bg-white border border-sky-300 rounded-lg shadow-sm focus:ring-2 focus:ring-sky-400 outline-none">
+                                <span class="text-xs font-bold">z =</span>
+                                <input type="number" id="b1" value="0" class="w-16 sm:w-20 px-2 py-1.5 text-center font-bold bg-amber-50 border border-amber-300 text-amber-800 rounded-lg shadow-sm focus:ring-2 focus:ring-amber-400 outline-none">
+                            </div>
+                        </div>
+
+                        <!-- Equation 2 -->
+                        <div class="pastel-pink p-3 rounded-xl flex flex-wrap items-center justify-between gap-2 border">
+                            <span class="font-semibold text-sm w-28">Equation 2:</span>
+                            <div class="flex items-center gap-2 flex-1 justify-end flex-wrap">
+                                <input type="number" id="a21" value="0" class="w-16 sm:w-20 px-2 py-1.5 text-center font-bold bg-white border border-pink-300 rounded-lg shadow-sm focus:ring-2 focus:ring-pink-400 outline-none">
+                                <span class="text-xs font-bold">x +</span>
+                                <input type="number" id="a22" value="0" class="w-16 sm:w-20 px-2 py-1.5 text-center font-bold bg-white border border-pink-300 rounded-lg shadow-sm focus:ring-2 focus:ring-pink-400 outline-none">
+                                <span class="text-xs font-bold">y +</span>
+                                <input type="number" id="a23" value="0" class="w-16 sm:w-20 px-2 py-1.5 text-center font-bold bg-white border border-pink-300 rounded-lg shadow-sm focus:ring-2 focus:ring-pink-400 outline-none">
+                                <span class="text-xs font-bold">z =</span>
+                                <input type="number" id="b2" value="0" class="w-16 sm:w-20 px-2 py-1.5 text-center font-bold bg-amber-50 border border-amber-300 text-amber-800 rounded-lg shadow-sm focus:ring-2 focus:ring-amber-400 outline-none">
+                            </div>
+                        </div>
+
+                        <!-- Equation 3 -->
+                        <div class="pastel-green p-3 rounded-xl flex flex-wrap items-center justify-between gap-2 border">
+                            <span class="font-semibold text-sm w-28">Equation 3:</span>
+                            <div class="flex items-center gap-2 flex-1 justify-end flex-wrap">
+                                <input type="number" id="a31" value="0" class="w-16 sm:w-20 px-2 py-1.5 text-center font-bold bg-white border border-emerald-300 rounded-lg shadow-sm focus:ring-2 focus:ring-emerald-400 outline-none">
+                                <span class="text-xs font-bold">x +</span>
+                                <input type="number" id="a32" value="0" class="w-16 sm:w-20 px-2 py-1.5 text-center font-bold bg-white border border-emerald-300 rounded-lg shadow-sm focus:ring-2 focus:ring-emerald-400 outline-none">
+                                <span class="text-xs font-bold">y +</span>
+                                <input type="number" id="a33" value="0" class="w-16 sm:w-20 px-2 py-1.5 text-center font-bold bg-white border border-emerald-300 rounded-lg shadow-sm focus:ring-2 focus:ring-emerald-400 outline-none">
+                                <span class="text-xs font-bold">z =</span>
+                                <input type="number" id="b3" value="0" class="w-16 sm:w-20 px-2 py-1.5 text-center font-bold bg-amber-50 border border-amber-300 text-amber-800 rounded-lg shadow-sm focus:ring-2 focus:ring-amber-400 outline-none">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Buttons -->
+                    <div class="flex items-center justify-center gap-3 pt-2">
+                        <button onclick="calculateGaussian()" class="px-6 py-2.5 bg-emerald-500 hover:bg-emerald-600 text-white font-bold rounded-xl shadow-md hover:shadow-lg transition flex items-center gap-2 text-sm sm:text-base">
+                            <i class="fa-solid fa-play"></i> Calculate Step-by-Step
+                        </button>
+                        <button onclick="clearInputs()" class="px-5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-600 font-semibold rounded-xl border border-slate-300 transition flex items-center gap-2 text-sm">
+                            <i class="fa-solid fa-rotate-left"></i> Reset
+                        </button>
+                    </div>
+                </div>
+
+                <!-- SOLUTION CONTAINER -->
+                <div id="solutionContainer" class="bg-purple-50/50 border border-purple-200 rounded-xl p-4 sm:p-6 space-y-6">
+                    
+                    <!-- View Mode Toggle -->
+                    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 border-b border-purple-200 pb-3">
+                        <div class="flex items-center gap-2 text-purple-900 font-bold text-lg">
+                            <i class="fa-solid fa-list-check text-purple-600"></i> Solution Display:
+                        </div>
+                        <div id="viewModeToggleGroup" class="flex items-center bg-white rounded-lg p-1 border border-purple-200 shadow-sm text-xs font-semibold">
+                            <button id="btnAllSteps" onclick="setViewMode('all')" class="px-3 py-1.5 rounded-md bg-purple-600 text-white transition">
+                                All Steps
+                            </button>
+                            <button id="btnInteractiveSteps" onclick="setViewMode('interactive')" class="px-3 py-1.5 rounded-md text-slate-600 hover:text-purple-600 transition">
+                                Interactive Steps
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Interactive Nav Controller -->
+                    <div id="interactiveNav" class="hidden flex items-center justify-between bg-white p-3 rounded-xl border border-purple-200 shadow-sm">
+                        <button id="btnPrevStep" onclick="prevStep()" class="px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold flex items-center gap-1 disabled:opacity-40">
+                            <i class="fa-solid fa-chevron-left"></i> Previous
+                        </button>
+                        <span id="stepIndicator" class="text-xs font-bold text-purple-800">Step 1 of 5</span>
+                        <button id="btnNextStep" onclick="nextStep()" class="px-3 py-1.5 rounded-lg bg-purple-600 hover:bg-purple-700 text-white text-xs font-bold flex items-center gap-1 disabled:opacity-40">
+                            Next <i class="fa-solid fa-chevron-right"></i>
+                        </button>
+                    </div>
+
+                    <!-- Steps Wrapper -->
+                    <div id="stepsWrapper" class="space-y-8">
+                        <!-- Generated steps or placeholder injected here -->
+                    </div>
+
+                </div>
+
+            </div>
+        </main>
+    </div>
+
+    <!-- USER MANUAL MODAL -->
+    <div id="manualModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-white rounded-2xl max-w-2xl w-full max-h-[85vh] flex flex-col shadow-2xl border border-slate-200 overflow-hidden">
+            <div class="bg-purple-600 text-white p-4 flex items-center justify-between">
+                <div class="flex items-center gap-2 font-bold text-lg">
+                    <i class="fa-solid fa-book-open"></i> User Manual - Gaussian Elimination Method
+                </div>
+                <button onclick="closeManual()" class="w-8 h-8 rounded-full bg-purple-700 hover:bg-purple-800 text-white flex items-center justify-center transition">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <div class="p-6 overflow-y-auto space-y-4 text-sm text-slate-700 leading-relaxed">
+                <div class="pastel-yellow p-4 rounded-xl border">
+                    <h4 class="font-bold text-amber-900 mb-1"><i class="fa-solid fa-circle-info"></i> Simulation Overview</h4>
+                    <p class="text-xs text-amber-800">
+                        This simulator solves a 3-variable linear system ($x, y, z$) using the **Gaussian Elimination Method** with row cross-multiplication to convert the matrix into an upper triangular form for back substitution.
+                    </p>
+                </div>
+
+                <h4 class="font-bold text-slate-800 text-base border-b pb-1">Step-by-Step Guide:</h4>
+                <ol class="list-decimal list-inside space-y-2 text-xs sm:text-sm">
+                    <li><strong class="text-purple-700">Step 1 (Matrix Form):</strong> Convert linear equations into matrix notation $[A][X] = [B]$.</li>
+                    <li><strong class="text-purple-700">Step 2 (Augmented Matrix):</strong> Combine the coefficient matrix and constant vector into $[A|B]$.</li>
+                    <li><strong class="text-purple-700">Step 3 (Eliminate $a_{21}$ and $a_{31}$):</strong> Apply row cross-multiplication $R_{2(new)} = a_{11}R_2 - a_{21}R_1$ and $R_{3(new)} = a_{11}R_3 - a_{31}R_1$ to zero out row 2 and row 3 in column 1.</li>
+                    <li><strong class="text-purple-700">Step 4 (Eliminate $a_{32}$):</strong> Apply $R_{3(new)} = R_{2,col2}R_3 - R_{3,col2}R_2$ to complete the Upper Triangular Matrix.</li>
+                    <li><strong class="text-purple-700">Step 5 (Back Substitution):</strong> Calculate $z$, substitute to find $y$, and lastly solve for $x$.</li>
+                </ol>
+
+                <div class="p-3 bg-slate-50 rounded-xl border border-slate-200">
+                    <h5 class="font-bold text-slate-800 text-xs mb-1"><i class="fa-solid fa-lightbulb text-amber-500"></i> Usage Tip:</h5>
+                    <p class="text-xs text-slate-600">Click the <span class="font-bold text-amber-600">Load Example</span> button to automatically populate the exact textbook problem values.</p>
+                </div>
+            </div>
+
+            <div class="bg-slate-50 p-4 border-t flex justify-end">
+                <button onclick="closeManual()" class="px-5 py-2 bg-purple-600 hover:bg-purple-700 text-white font-bold rounded-xl text-sm transition">
+                    Got it & Close
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- HOME MODAL -->
+    <div id="homeModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl border border-slate-200 space-y-4 text-center">
+            <div class="w-16 h-16 bg-sky-100 text-sky-600 rounded-full flex items-center justify-center text-3xl mx-auto shadow-inner">
+                <i class="fa-solid fa-house"></i>
+            </div>
+            <h3 class="text-xl font-bold text-slate-800">Main Menu / Reset Calculator</h3>
+            <p class="text-sm text-slate-600">
+                Would you like to reset all input values and restore the default sample calculation?
+            </p>
+            <div class="flex items-center gap-3 pt-2">
+                <button onclick="resetAndCloseHome()" class="flex-1 py-2.5 bg-sky-600 hover:bg-sky-700 text-white font-bold rounded-xl text-sm transition">
+                    Yes, Reset
+                </button>
+                <button onclick="closeHome()" class="flex-1 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl text-sm border transition">
+                    Cancel
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        /* Fraction helper class for exact fraction representation and formatting */
+        class Fraction {
+            constructor(num, den = 1) {
+                if (den === 0) {
+                    this.num = num >= 0 ? Infinity : -Infinity;
+                    this.den = 1;
+                    return;
+                }
+                if (den < 0) { num = -num; den = -den; }
+                const g = this.gcd(Math.abs(num), Math.abs(den));
+                this.num = num / g;
+                this.den = den / g;
+            }
+
+            gcd(a, b) {
+                return b === 0 ? a : this.gcd(b, a % b);
+            }
+
+            toString() {
+                if (this.den === 1) return `${this.num}`;
+                return `\\frac{${this.num}}{${this.den}}`;
+            }
+
+            toPlainText() {
+                if (this.den === 1) return `${this.num}`;
+                return `${this.num}/${this.den}`;
+            }
+
+            toNumber() {
+                return this.num / this.den;
+            }
+        }
+
+        // Global State variables
+        let currentViewMode = 'all'; // 'all' or 'interactive'
+        let currentStepIndex = 1;
+        const totalSteps = 5;
+        let lastCalculatedData = null;
+
+        window.onload = function() {
+            clearInputs();
+        };
+
+        function calculateGaussian() {
+            // Read input values
+            const a11 = parseFloat(document.getElementById('a11').value) || 0;
+            const a12 = parseFloat(document.getElementById('a12').value) || 0;
+            const a13 = parseFloat(document.getElementById('a13').value) || 0;
+            const b1 = parseFloat(document.getElementById('b1').value) || 0;
+
+            const a21 = parseFloat(document.getElementById('a21').value) || 0;
+            const a22 = parseFloat(document.getElementById('a22').value) || 0;
+            const a23 = parseFloat(document.getElementById('a23').value) || 0;
+            const b2 = parseFloat(document.getElementById('b2').value) || 0;
+
+            const a31 = parseFloat(document.getElementById('a31').value) || 0;
+            const a32 = parseFloat(document.getElementById('a32').value) || 0;
+            const a33 = parseFloat(document.getElementById('a33').value) || 0;
+            const b3 = parseFloat(document.getElementById('b3').value) || 0;
+
+            // STEP 3: Eliminate a21 and a31 using R1
+            const r2_mult1 = a11;
+            const r2_mult2 = a21;
+
+            const r2_calc_1 = r2_mult1 * a21 - r2_mult2 * a11; // 0
+            const r2_calc_2 = r2_mult1 * a22 - r2_mult2 * a12;
+            const r2_calc_3 = r2_mult1 * a23 - r2_mult2 * a13;
+            const r2_calc_b = r2_mult1 * b2 - r2_mult2 * b1;
+
+            const r3_mult1 = a11;
+            const r3_mult2 = a31;
+
+            const r3_calc_1 = r3_mult1 * a31 - r3_mult2 * a11; // 0
+            const r3_calc_2 = r3_mult1 * a32 - r3_mult2 * a12;
+            const r3_calc_3 = r3_mult1 * a33 - r3_mult2 * a13;
+            const r3_calc_b = r3_mult1 * b3 - r3_mult2 * b1;
+
+            // STEP 4: Eliminate a32 using R2_new and R3_new
+            const mult_s4_1 = r2_calc_2;
+            const mult_s4_2 = r3_calc_2;
+
+            const final_r3_1 = 0;
+            const final_r3_2 = 0;
+            const final_r3_3 = mult_s4_1 * r3_calc_3 - mult_s4_2 * r2_calc_3;
+            const final_r3_b = mult_s4_1 * r3_calc_b - mult_s4_2 * r2_calc_b;
+
+            // STEP 5: Back Substitution
+            let zFrac = new Fraction(final_r3_b, final_r3_3);
+
+            const yNum = r2_calc_b * zFrac.den - r2_calc_3 * zFrac.num;
+            const yDen = r2_calc_2 * zFrac.den;
+            let yFrac = new Fraction(yNum, yDen);
+
+            const commonDen = yFrac.den * zFrac.den;
+            const numYPart = a12 * yFrac.num * zFrac.den;
+            const numZPart = a13 * zFrac.num * yFrac.den;
+            const xNum = (b1 * commonDen) - numYPart - numZPart;
+            const xDen = a11 * commonDen;
+            let xFrac = new Fraction(xNum, xDen);
+
+            lastCalculatedData = {
+                inputs: { a11, a12, a13, b1, a21, a22, a23, b2, a31, a32, a33, b3 },
+                step3: {
+                    r2_mult1, r2_mult2, r2_calc_1, r2_calc_2, r2_calc_3, r2_calc_b,
+                    r3_mult1, r3_mult2, r3_calc_1, r3_calc_2, r3_calc_3, r3_calc_b
+                },
+                step4: {
+                    mult_s4_1, mult_s4_2, final_r3_1, final_r3_2, final_r3_3, final_r3_b
+                },
+                step5: {
+                    zFrac, yFrac, xFrac
+                }
+            };
+
+            if (currentViewMode === 'interactive') {
+                const interactiveNav = document.getElementById('interactiveNav');
+                if (interactiveNav) interactiveNav.classList.remove('hidden');
+            }
+
+            renderSteps();
+        }
+
+        function renderSteps() {
+            if (!lastCalculatedData) return;
+
+            const d = lastCalculatedData;
+            const inp = d.inputs;
+            const s3 = d.step3;
+            const s4 = d.step4;
+            const s5 = d.step5;
+
+            const wrapper = document.getElementById('stepsWrapper');
+            wrapper.innerHTML = `
+                <!-- STEP 1 -->
+                <div id="step-block-1" class="step-card bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-3">
+                    <h3 class="text-sm font-bold text-sky-700 uppercase tracking-wider flex items-center gap-2">
+                        <span class="w-6 h-6 rounded-full bg-sky-100 text-sky-700 flex items-center justify-center text-xs font-black">1</span>
+                        STEP 1: Transform linear equations into matrices
+                    </h3>
+                    <div id="katex-step1" class="py-2 overflow-x-auto text-center"></div>
+                </div>
+
+                <!-- STEP 2 -->
+                <div id="step-block-2" class="step-card bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-3">
+                    <h3 class="text-sm font-bold text-sky-700 uppercase tracking-wider flex items-center gap-2">
+                        <span class="w-6 h-6 rounded-full bg-sky-100 text-sky-700 flex items-center justify-center text-xs font-black">2</span>
+                        STEP 2: Form Augmented Matrix [A|B]
+                    </h3>
+                    <div id="katex-step2" class="py-2 overflow-x-auto text-center"></div>
+                </div>
+
+                <!-- STEP 3 -->
+                <div id="step-block-3" class="step-card bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+                    <h3 class="text-sm font-bold text-sky-700 uppercase tracking-wider flex items-center gap-2">
+                        <span class="w-6 h-6 rounded-full bg-sky-100 text-sky-700 flex items-center justify-center text-xs font-black">3</span>
+                        STEP 3: Express a₂₁ = 0 & a₃₁ = 0
+                    </h3>
+
+                    <!-- Cross Multiplication Visualization -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 pt-2">
+                        <!-- Column 1: Row 2 Elimination -->
+                        <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-3">
+                            <div class="flex items-center justify-center gap-4 text-sm font-bold text-slate-700">
+                                <div class="text-right">
+                                    <div>R₁</div>
+                                    <div class="mt-2 text-pink-600">R₂</div>
+                                </div>
+                                <div class="text-center font-mono">
+                                    <i class="fa-solid fa-xmark text-lg text-slate-400"></i>
+                                </div>
+                                <div>
+                                    <div>${inp.a11}</div>
+                                    <div class="mt-2">${inp.a21}</div>
+                                </div>
+                            </div>
+                            <div class="text-center text-xs font-bold text-purple-700 font-mono bg-purple-50 py-1 px-2 rounded-lg border border-purple-200">
+                                R₂₍ₙₑw₎ = ${s3.r2_mult1}R₂ - ${s3.r2_mult2}R₁
+                            </div>
+                            <div class="space-y-1 font-mono text-xs text-slate-700 bg-white p-3 rounded-lg border">
+                                <div>${s3.r2_mult1}(${inp.a21}) - ${s3.r2_mult2}(${inp.a11}) = ${s3.r2_calc_1}</div>
+                                <div>${s3.r2_mult1}(${inp.a22}) - ${s3.r2_mult2}(${inp.a12}) = ${s3.r2_calc_2}</div>
+                                <div>${s3.r2_mult1}(${inp.a23}) - ${s3.r2_mult2}(${inp.a13}) = ${s3.r2_calc_3}</div>
+                                <div>${s3.r2_mult1}(${inp.b2}) - ${s3.r2_mult2}(${inp.b1}) = ${s3.r2_calc_b}</div>
+                            </div>
+                        </div>
+
+                        <!-- Column 2: Row 3 Elimination -->
+                        <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-3">
+                            <div class="flex items-center justify-center gap-4 text-sm font-bold text-slate-700">
+                                <div class="text-right">
+                                    <div>R₁</div>
+                                    <div class="mt-2 text-emerald-600">R₃</div>
+                                </div>
+                                <div class="text-center font-mono">
+                                    <i class="fa-solid fa-xmark text-lg text-slate-400"></i>
+                                </div>
+                                <div>
+                                    <div>${inp.a11}</div>
+                                    <div class="mt-2">${inp.a31}</div>
+                                </div>
+                            </div>
+                            <div class="text-center text-xs font-bold text-purple-700 font-mono bg-purple-50 py-1 px-2 rounded-lg border border-purple-200">
+                                R₃₍ₙₑw₎ = ${s3.r3_mult1}R₃ - ${s3.r3_mult2}R₁
+                            </div>
+                            <div class="space-y-1 font-mono text-xs text-slate-700 bg-white p-3 rounded-lg border">
+                                <div>${s3.r3_mult1}(${inp.a31}) - ${s3.r3_mult2}(${inp.a11}) = ${s3.r3_calc_1}</div>
+                                <div>${s3.r3_mult1}(${inp.a32}) - ${s3.r3_mult2}(${inp.a12}) = ${s3.r3_calc_2}</div>
+                                <div>${s3.r3_mult1}(${inp.a33}) - ${s3.r3_mult2}(${inp.a13}) = ${s3.r3_calc_3}</div>
+                                <div>${s3.r3_mult1}(${inp.b3}) - ${s3.r3_mult2}(${inp.b1}) = ${s3.r3_calc_b}</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Step 3 Matrix Result -->
+                    <div class="pastel-yellow p-4 rounded-xl border text-center space-y-2">
+                        <span class="text-xs font-bold text-amber-800 uppercase tracking-wider">The new matrix is:</span>
+                        <div id="katex-step3-matrix" class="overflow-x-auto"></div>
+                    </div>
+                </div>
+
+                <!-- STEP 4 -->
+                <div id="step-block-4" class="step-card bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+                    <h3 class="text-sm font-bold text-sky-700 uppercase tracking-wider flex items-center gap-2">
+                        <span class="w-6 h-6 rounded-full bg-sky-100 text-sky-700 flex items-center justify-center text-xs font-black">4</span>
+                        STEP 4: Express a₃₂ = 0
+                    </h3>
+
+                    <div class="max-w-md mx-auto bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-3">
+                        <div class="flex items-center justify-center gap-4 text-sm font-bold text-slate-700">
+                            <div class="text-right">
+                                <div>R₂</div>
+                                <div class="mt-2 text-emerald-600">R₃</div>
+                            </div>
+                            <div class="text-center font-mono">
+                                <i class="fa-solid fa-xmark text-lg text-slate-400"></i>
+                            </div>
+                            <div>
+                                <div>${s3.r2_calc_2}</div>
+                                <div class="mt-2">${s3.r3_calc_2}</div>
+                            </div>
+                        </div>
+                        <div class="text-center text-xs font-bold text-purple-700 font-mono bg-purple-50 py-1 px-2 rounded-lg border border-purple-200">
+                            R₃₍ₙₑw₎ = ${s4.mult_s4_1}R₃ - ${s4.mult_s4_2}R₂
+                        </div>
+                        <div class="space-y-1 font-mono text-xs text-slate-700 bg-white p-3 rounded-lg border">
+                            <div>${s4.mult_s4_1}(${s3.r3_calc_1}) - ${s4.mult_s4_2}(${s3.r2_calc_1}) = ${s4.final_r3_1}</div>
+                            <div>${s4.mult_s4_1}(${s3.r3_calc_2}) - ${s4.mult_s4_2}(${s3.r2_calc_2}) = ${s4.final_r3_2}</div>
+                            <div>${s4.mult_s4_1}(${s3.r3_calc_3}) - ${s4.mult_s4_2}(${s3.r2_calc_3}) = ${s4.final_r3_3}</div>
+                            <div>${s4.mult_s4_1}(${s3.r3_calc_b}) - ${s4.mult_s4_2}(${s3.r2_calc_b}) = ${s4.final_r3_b}</div>
+                        </div>
+                    </div>
+
+                    <!-- Step 4 Matrix Result (Upper Triangular) -->
+                    <div class="pastel-yellow p-4 rounded-xl border text-center space-y-2">
+                        <span class="text-xs font-bold text-amber-800 uppercase tracking-wider">Upper Triangular Matrix Achieved:</span>
+                        <div id="katex-step4-matrix" class="overflow-x-auto"></div>
+                    </div>
+                </div>
+
+                <!-- STEP 5 -->
+                <div id="step-block-5" class="step-card bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+                    <h3 class="text-sm font-bold text-sky-700 uppercase tracking-wider flex items-center gap-2">
+                        <span class="w-6 h-6 rounded-full bg-sky-100 text-sky-700 flex items-center justify-center text-xs font-black">5</span>
+                        STEP 5: Transform the matrices into linear equations (Back Substitution)
+                    </h3>
+
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <!-- Z Calculation -->
+                        <div class="pastel-purple p-4 rounded-xl border space-y-2">
+                            <span class="text-xs font-bold uppercase tracking-wider block border-b border-purple-200 pb-1">1. Solve for z:</span>
+                            <div id="katex-calc-z" class="overflow-x-auto py-1"></div>
+                        </div>
+
+                        <!-- Y Calculation -->
+                        <div class="pastel-blue p-4 rounded-xl border space-y-2">
+                            <span class="text-xs font-bold uppercase tracking-wider block border-b border-sky-200 pb-1">2. Substitute z to solve for y:</span>
+                            <div id="katex-calc-y" class="overflow-x-auto py-1"></div>
+                        </div>
+
+                        <!-- X Calculation -->
+                        <div class="pastel-pink p-4 rounded-xl border space-y-2">
+                            <span class="text-xs font-bold uppercase tracking-wider block border-b border-pink-200 pb-1">3. Substitute y & z to solve for x:</span>
+                            <div id="katex-calc-x" class="overflow-x-auto py-1"></div>
+                        </div>
+                    </div>
+
+                    <!-- Final Answer Banner -->
+                    <div class="bg-gradient-to-r from-emerald-500 to-teal-600 text-white p-4 rounded-xl shadow-md text-center space-y-1">
+                        <span class="text-xs font-bold uppercase tracking-widest text-emerald-100">Final System Solution</span>
+                        <div id="katex-final-answer" class="text-xl font-extrabold overflow-x-auto py-1"></div>
+                    </div>
+                </div>
+            `;
+
+            renderKaTeXExpressions(d);
+            updateInteractiveVisibility();
+        }
+
+        function renderKaTeXExpressions(d) {
+            const inp = d.inputs;
+            const s3 = d.step3;
+            const s4 = d.step4;
+            const s5 = d.step5;
+
+            const safeRender = (id, tex) => {
+                const el = document.getElementById(id);
+                if (el) {
+                    try {
+                        katex.render(tex, el, { displayMode: true, throwOnError: false });
+                    } catch (e) {
+                        el.innerText = tex;
+                    }
+                }
+            };
+
+            // Step 1: Matrix Form [A][X] = [B]
+            const step1Tex = `\\begin{bmatrix} ${inp.a11} & ${inp.a12} & ${inp.a13} \\\\ ${inp.a21} & ${inp.a22} & ${inp.a23} \\\\ ${inp.a31} & ${inp.a32} & ${inp.a33} \\end{bmatrix} \\begin{bmatrix} x \\\\ y \\\\ z \\end{bmatrix} = \\begin{bmatrix} ${inp.b1} \\\\ ${inp.b2} \\\\ ${inp.b3} \\end{bmatrix}`;
+            safeRender('katex-step1', step1Tex);
+
+            // Step 2: Augmented Matrix [A|B]
+            const step2Tex = `\\left[\\begin{array}{ccc|c} ${inp.a11} & ${inp.a12} & ${inp.a13} & ${inp.b1} \\\\ ${inp.a21} & ${inp.a22} & ${inp.a23} & ${inp.b2} \\\\ ${inp.a31} & ${inp.a32} & ${inp.a33} & ${inp.b3} \\end{array}\\right]`;
+            safeRender('katex-step2', step2Tex);
+
+            // Step 3 Matrix
+            const step3Tex = `\\left[\\begin{array}{ccc|c} ${inp.a11} & ${inp.a12} & ${inp.a13} & ${inp.b1} \\\\ ${s3.r2_calc_1} & ${s3.r2_calc_2} & ${s3.r2_calc_3} & ${s3.r2_calc_b} \\\\ ${s3.r3_calc_1} & ${s3.r3_calc_2} & ${s3.r3_calc_3} & ${s3.r3_calc_b} \\end{array}\\right]`;
+            safeRender('katex-step3-matrix', step3Tex);
+
+            // Step 4 Matrix (Upper Triangular)
+            const step4Tex = `\\left[\\begin{array}{ccc|c} ${inp.a11} & ${inp.a12} & ${inp.a13} & ${inp.b1} \\\\ 0 & ${s3.r2_calc_2} & ${s3.r2_calc_3} & ${s3.r2_calc_b} \\\\ 0 & 0 & ${s4.final_r3_3} & ${s4.final_r3_b} \\end{array}\\right]`;
+            safeRender('katex-step4-matrix', step4Tex);
+
+            // Step 5 - Z calculation
+            const zTex = `${s4.final_r3_3}z = ${s4.final_r3_b} \\implies z = ${s5.zFrac.toString()}${s5.zFrac.den !== 1 ? ` = ${s5.zFrac.toNumber()}` : ''}`;
+            safeRender('katex-calc-z', zTex);
+
+            // Step 5 - Y calculation
+            const ySubVal = s5.zFrac.toNumber();
+            const yTex = `${s3.r2_calc_2}y + (${s3.r2_calc_3})(${s5.zFrac.toString()}) = ${s3.r2_calc_b} \\\\ \\implies ${s3.r2_calc_2}y = ${s3.r2_calc_b - s3.r2_calc_3 * ySubVal} \\\\ \\implies y = ${s5.yFrac.toString()}${s5.yFrac.den !== 1 ? ` = ${s5.yFrac.toNumber()}` : ''}`;
+            safeRender('katex-calc-y', yTex);
+
+            // Step 5 - X calculation
+            const xSubY = s5.yFrac.toNumber();
+            const xSubZ = s5.zFrac.toNumber();
+            const xTex = `${inp.a11}x + ${inp.a12}\\left(${s5.yFrac.toString()}\\right) + ${inp.a13}\\left(${s5.zFrac.toString()}\\right) = ${inp.b1} \\\\ \\implies ${inp.a11}x = ${inp.b1 - inp.a12 * xSubY - inp.a13 * xSubZ} \\\\ \\implies x = ${s5.xFrac.toString()}${s5.xFrac.den !== 1 ? ` = ${s5.xFrac.toNumber()}` : ''}`;
+            safeRender('katex-calc-x', xTex);
+
+            // Step 5 - Final Answer
+            const finalTex = `\\therefore x = ${s5.xFrac.toPlainText()}, \\quad y = ${s5.yFrac.toPlainText()}, \\quad z = ${s5.zFrac.toPlainText()}`;
+            safeRender('katex-final-answer', finalTex);
+        }
+
+        function setViewMode(mode) {
+            currentViewMode = mode;
+            const btnAll = document.getElementById('btnAllSteps');
+            const btnInteractive = document.getElementById('btnInteractiveSteps');
+            const interactiveNav = document.getElementById('interactiveNav');
+
+            if (mode === 'all') {
+                btnAll.className = "px-3 py-1.5 rounded-md bg-purple-600 text-white transition";
+                btnInteractive.className = "px-3 py-1.5 rounded-md text-slate-600 hover:text-purple-600 transition";
+                if (interactiveNav) interactiveNav.classList.add('hidden');
+            } else {
+                btnInteractive.className = "px-3 py-1.5 rounded-md bg-purple-600 text-white transition";
+                btnAll.className = "px-3 py-1.5 rounded-md text-slate-600 hover:text-purple-600 transition";
+                if (lastCalculatedData && interactiveNav) {
+                    interactiveNav.classList.remove('hidden');
+                }
+            }
+            if (lastCalculatedData) {
+                updateInteractiveVisibility();
+            }
+        }
+
+        function updateInteractiveVisibility() {
+            for (let i = 1; i <= totalSteps; i++) {
+                const card = document.getElementById(`step-block-${i}`);
+                if (!card) continue;
+                if (currentViewMode === 'all') {
+                    card.classList.remove('hidden');
+                } else {
+                    if (i === currentStepIndex) {
+                        card.classList.remove('hidden');
+                    } else {
+                        card.classList.add('hidden');
+                    }
+                }
+            }
+
+            document.getElementById('stepIndicator').innerText = `Step ${currentStepIndex} of ${totalSteps}`;
+            document.getElementById('btnPrevStep').disabled = (currentStepIndex <= 1);
+            document.getElementById('btnNextStep').disabled = (currentStepIndex >= totalSteps);
+        }
+
+        function prevStep() {
+            if (currentStepIndex > 1) {
+                currentStepIndex--;
+                updateInteractiveVisibility();
+            }
+        }
+
+        function nextStep() {
+            if (currentStepIndex < totalSteps) {
+                currentStepIndex++;
+                updateInteractiveVisibility();
+            }
+        }
+
+        function loadExample() {
+            document.getElementById('a11').value = 10;
+            document.getElementById('a12').value = 5;
+            document.getElementById('a13').value = 2;
+            document.getElementById('b1').value = 12;
+
+            document.getElementById('a21').value = 8;
+            document.getElementById('a22').value = 10;
+            document.getElementById('a23').value = -1;
+            document.getElementById('b2').value = 8;
+
+            document.getElementById('a31').value = 6;
+            document.getElementById('a32').value = 15;
+            document.getElementById('a33').value = -3;
+            document.getElementById('b3').value = 6;
+
+            calculateGaussian();
+        }
+
+        function clearInputs() {
+            ['a11','a12','a13','b1','a21','a22','a23','b2','a31','a32','a33','b3'].forEach(id => {
+                document.getElementById(id).value = 0;
+            });
+            lastCalculatedData = null;
+
+            const interactiveNav = document.getElementById('interactiveNav');
+            if (interactiveNav) interactiveNav.classList.add('hidden');
+
+            const wrapper = document.getElementById('stepsWrapper');
+            if (wrapper) {
+                wrapper.innerHTML = `
+                    <div class="text-center py-12 px-4 bg-white/80 rounded-xl border border-dashed border-purple-200 space-y-3">
+                        <div class="w-12 h-12 bg-purple-100 text-purple-600 rounded-2xl flex items-center justify-center text-xl mx-auto shadow-inner">
+                            <i class="fa-solid fa-calculator"></i>
+                        </div>
+                        <h4 class="text-slate-800 font-bold text-base">No solution generated yet</h4>
+                        <p class="text-slate-500 text-xs max-w-md mx-auto leading-relaxed">
+                            Enter your equation coefficients above and click <span class="font-bold text-emerald-600">"Calculate Step-by-Step"</span> to display the full Gaussian Elimination solution.
+                        </p>
+                    </div>
+                `;
+            }
+        }
+
+        function openManual() {
+            document.getElementById('manualModal').classList.remove('hidden');
+        }
+
+        function closeManual() {
+            document.getElementById('manualModal').classList.add('hidden');
+        }
+
+        function handleHome() {
+            document.getElementById('homeModal').classList.remove('hidden');
+        }
+
+        function closeHome() {
+            document.getElementById('homeModal').classList.add('hidden');
+        }
+
+        function resetAndCloseHome() {
+            clearInputs();
+            closeHome();
+        }
+    </script>
+</body>
+</html>
