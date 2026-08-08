@@ -117,8 +117,8 @@
                         <span class="text-slate-400">|</span>
                         <span class="text-slate-600" x-text="currentUser.institution"></span>
                     </span>
-                    <button @click="logout()" class="ml-2 text-red-600 hover:text-red-800 text-xs font-black underline">
-                        Edit Profile
+                    <button @click="logout()" class="ml-2 text-red-600 hover:text-red-800 text-xs font-black underline flex items-center gap-1">
+                        <i class="fa-solid fa-right-from-bracket"></i> Edit Profile / Logout
                     </button>
                 </div>
             </template>
@@ -1159,7 +1159,7 @@
                     googleSheetsUrl: 'https://script.google.com/macros/s/AKfycbzutvwuVpb3lZ0WRmcweuEztkJ3s03xaJ5NNz5L7mSAmdnpRUq5GvYHi9umKNcw3jYg/exec',
                     toastMessage: '',
 
-                    // Navigation URLs (Can be updated to custom .html pages or URLs)
+                    // Navigation URLs (Linked directly to your target HTML pages)
                     basicMatrixUrl: 'Basic Matrix_calc.html',
                     gaussianUrl: 'gaussian_sim.html',
                     doolittleUrl: 'doolittle_sim.html',
@@ -1204,8 +1204,8 @@
                     // Current Active User Profile
                     currentUser: {
                         userType: 'Student',
-                        name: 'Ahmad Hakimi',
-                        institution: 'Politeknik Port Dickson',
+                        name: '',
+                        institution: '',
                         country: 'Malaysia',
                         purpose: 'Learning',
                         discoverySource: 'Lecturer / Teacher',
@@ -1249,6 +1249,21 @@
 
                     init() {
                         window.matrixAlpineInstance = this;
+                        
+                        // Check local storage for existing logged-in session
+                        const savedProfile = localStorage.getItem('matrix_user_profile');
+                        if (savedProfile) {
+                            try {
+                                const parsed = JSON.parse(savedProfile);
+                                if (parsed && parsed.name && parsed.institution) {
+                                    this.currentUser = { ...parsed, isLoggedIn: true };
+                                    this.showLoginModal = false;
+                                }
+                            } catch(e) {
+                                console.log("Error restoring user session:", e);
+                            }
+                        }
+
                         this.calculateBasic();
                     },
 
@@ -1278,6 +1293,14 @@
                             discoverySource: this.loginForm.discoverySource || 'Lecturer / Teacher',
                             isLoggedIn: true
                         };
+
+                        // Persist session to localStorage so reloading or returning to home keeps user logged in
+                        try {
+                            localStorage.setItem('matrix_user_profile', JSON.stringify(this.currentUser));
+                        } catch(e) {
+                            console.log("LocalStorage access error:", e);
+                        }
+
                         this.showLoginModal = false;
                         // Reset session log tracker on fresh user profiling
                         this.sessionLoggedModules = [];
@@ -1285,6 +1308,14 @@
                     },
 
                     logout() {
+                        // Clear persistent session
+                        try {
+                            localStorage.removeItem('matrix_user_profile');
+                        } catch(e) {
+                            console.log("LocalStorage clear error:", e);
+                        }
+
+                        this.currentUser.isLoggedIn = false;
                         this.showLoginModal = true;
                     },
 
