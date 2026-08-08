@@ -1126,6 +1126,9 @@
                 pinError: false,
                 searchLog: '',
 
+                // Pautan URL / Fail HTML untuk Basic Matrix
+                basicMatrixUrl: 'basic_matrix.html', // 👈 Tukar kepada nama fail .html anda (cth: 'basic_matrix.html' atau URL penuh)
+
                 // Current User Session Profile
                 currentUser: {
                     userType: 'Student',
@@ -1355,9 +1358,16 @@
                 },
 
                 enterBasicMatrix() {
-                    this.currentView = 'basic';
-                    this.recordActivity('basic', 'Basic Matrix Hub Entry');
-                    this.calculateBasic();
+                    // Rekod profil dan aktiviti pengguna ke dalam Firestore & Log terlebih dahulu
+                    this.recordActivity('basic', 'Basic Matrix HTML Page Access');
+                    
+                    // Lencongkan ke fail HTML Basic Matrix pilihan anda
+                    if (this.basicMatrixUrl && this.basicMatrixUrl !== '#') {
+                        window.location.href = this.basicMatrixUrl;
+                    } else {
+                        this.currentView = 'basic';
+                        this.calculateBasic();
+                    }
                 },
 
                 enterAdvanceMethod(method) {
