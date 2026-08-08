@@ -103,7 +103,7 @@
         <!-- GLOBAL TOP USER STATUS & ADMIN BAR -->
         <div class="max-w-5xl mx-auto w-full mb-3 flex flex-wrap items-center justify-between gap-2 px-2">
             <!-- Student Profile Badge -->
-            <template x-if="currentUser.isLoggedIn">
+            <template x-if="currentUser && currentUser.isLoggedIn">
                 <div class="bg-white/90 backdrop-blur border-2 border-[#0284c7] px-4 py-1.5 rounded-full shadow flex items-center gap-2.5 text-xs font-bold text-slate-800">
                     <div class="w-6 h-6 rounded-full bg-[#16a34a] text-white flex items-center justify-center text-xs">
                         <i x-show="currentUser.userType === 'Student'" class="fa-solid fa-graduation-cap"></i>
@@ -122,7 +122,7 @@
                     </button>
                 </div>
             </template>
-            <template x-if="!currentUser.isLoggedIn">
+            <template x-if="!currentUser || !currentUser.isLoggedIn">
                 <div class="bg-amber-100 border-2 border-amber-400 px-3.5 py-1.5 rounded-full text-xs font-extrabold text-amber-900 flex items-center gap-2 shadow">
                     <i class="fa-solid fa-lock text-amber-600"></i> Public Profiling Active
                 </div>
@@ -307,7 +307,7 @@
                             <!-- Enter Button -->
                             <div class="p-6 pt-0">
                                 <button @click="enterBasicMatrix()" class="w-full py-3.5 px-5 bg-gradient-to-r from-[#0284c7] to-[#1d4ed8] hover:from-[#0369a1] hover:to-[#1e40af] text-white font-extrabold text-sm rounded-2xl border-2 border-white shadow-lg flex items-center justify-center gap-2.5 transition active:scale-95">
-                                    <span>Basic Matrix_calc.html</span>
+                                    <span>ENTER BASIC MATRIX PAGE</span>
                                     <i class="fa-solid fa-arrow-right-long"></i>
                                 </button>
                             </div>
@@ -380,7 +380,6 @@
                 </div>
             </main>
         </template>
-
 
         <!-- ================= VIEW 2: BASIC MATRIX PAGE ================= -->
         <template x-if="currentView === 'basic'">
@@ -509,7 +508,6 @@
                 </div>
             </main>
         </template>
-
 
         <!-- ================= VIEW 3: ADVANCED MATRIX PAGE ================= -->
         <template x-if="currentView === 'advance'">
@@ -789,7 +787,6 @@
             </main>
         </template>
 
-
         <!-- ================= VIEW 4: ADMIN DASHBOARD MODAL ================= -->
         <div x-show="showAdminModal" x-transition.opacity class="fixed inset-0 z-50 bg-slate-900/80 backdrop-blur-md flex items-center justify-center p-3 sm:p-6">
             <div @click.away="showAdminModal = false" class="bg-white border-4 border-[#0284c7] rounded-3xl max-w-5xl w-full p-4 sm:p-8 text-slate-900 shadow-2xl relative max-h-[92vh] overflow-y-auto">
@@ -810,12 +807,35 @@
                         </div>
                     </div>
 
-                    <div class="flex items-center gap-2">
+                    <div class="flex items-center gap-2 flex-wrap">
+                        <button @click="exportToCSV()" class="px-3.5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-xs rounded-xl border-2 border-white shadow transition flex items-center gap-1.5">
+                            <i class="fa-solid fa-file-excel text-amber-300"></i>
+                            <span>Export to Excel (CSV)</span>
+                        </button>
                         <button @click="lockAdminSession()" class="px-3.5 py-2 bg-slate-800 hover:bg-slate-900 text-white font-extrabold text-xs rounded-xl border border-slate-700 transition">
                             <i class="fa-solid fa-key mr-1 text-amber-400"></i> Lock Admin Access
                         </button>
                         <button @click="clearLogs()" class="px-3.5 py-2 bg-red-100 hover:bg-red-200 text-red-700 font-extrabold text-xs rounded-xl border border-red-300 transition">
                             <i class="fa-solid fa-trash-can mr-1"></i> Reset Logs
+                        </button>
+                    </div>
+                </div>
+
+                <!-- GOOGLE SHEETS LIVE SYNC SETTING BOX -->
+                <div class="bg-amber-50 border-2 border-amber-300 p-3.5 rounded-2xl mb-6 shadow-xs flex flex-wrap items-center justify-between gap-3">
+                    <div class="flex items-center gap-2.5">
+                        <div class="w-8 h-8 rounded-xl bg-emerald-600 text-white flex items-center justify-center text-sm font-black shadow">
+                            <i class="fa-solid fa-file-csv"></i>
+                        </div>
+                        <div>
+                            <div class="text-xs font-black text-amber-950 uppercase">Live Google Sheets Web App Sync</div>
+                            <div class="text-[11px] font-bold text-amber-800">Paste your Google Apps Script Web App URL below to sync all user logs automatically:</div>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-2 w-full sm:w-auto flex-1 max-w-md">
+                        <input type="text" x-model="googleSheetsUrl" placeholder="https://script.google.com/macros/s/AKfycbx.../exec" class="w-full px-3 py-1.5 font-mono text-xs bg-white border border-amber-300 rounded-xl focus:ring-2 focus:ring-amber-500 focus:outline-none">
+                        <button @click="saveGoogleSheetsUrl()" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-black rounded-xl border border-white whitespace-nowrap shadow-xs">
+                            Save Link
                         </button>
                     </div>
                 </div>
@@ -828,7 +848,7 @@
                             <span class="text-xs font-extrabold uppercase">Total Users</span>
                             <i class="fa-solid fa-users text-lg"></i>
                         </div>
-                        <div class="text-2xl sm:text-3xl font-black" x-text="stats.totalUsers"></div>
+                        <div class="text-2xl sm:text-3xl font-black" x-text="stats ? stats.totalUsers : 1"></div>
                         <div class="text-[10px] font-bold text-slate-500 mt-1">Unique Profile Entries</div>
                     </div>
 
@@ -838,7 +858,7 @@
                             <span class="text-xs font-extrabold uppercase">🎓 Students</span>
                             <i class="fa-solid fa-graduation-cap text-lg"></i>
                         </div>
-                        <div class="text-2xl sm:text-3xl font-black" x-text="stats.studentsCount"></div>
+                        <div class="text-2xl sm:text-3xl font-black" x-text="stats ? stats.studentsCount : 0"></div>
                         <div class="text-[10px] font-bold text-slate-500 mt-1">Student Learners</div>
                     </div>
 
@@ -848,7 +868,7 @@
                             <span class="text-xs font-extrabold uppercase">👨‍🏫 Educators</span>
                             <i class="fa-solid fa-chalkboard-user text-lg"></i>
                         </div>
-                        <div class="text-2xl sm:text-3xl font-black" x-text="stats.teachersCount"></div>
+                        <div class="text-2xl sm:text-3xl font-black" x-text="stats ? stats.teachersCount : 0"></div>
                         <div class="text-[10px] font-bold text-slate-500 mt-1">Teachers & Lecturers</div>
                     </div>
 
@@ -858,7 +878,7 @@
                             <span class="text-xs font-extrabold uppercase">Total Accesses</span>
                             <i class="fa-solid fa-bolt text-lg"></i>
                         </div>
-                        <div class="text-2xl sm:text-3xl font-black" x-text="stats.totalAccess"></div>
+                        <div class="text-2xl sm:text-3xl font-black" x-text="stats ? stats.totalAccess : 0"></div>
                         <div class="text-[10px] font-bold text-slate-500 mt-1">Calculations & Visits</div>
                     </div>
                 </div>
@@ -872,7 +892,7 @@
                             <span class="text-sky-600 font-mono">User Count</span>
                         </h4>
                         <div class="space-y-2 text-xs font-bold">
-                            <template x-for="(inst, i) in stats.topInstitutions" :key="i">
+                            <template x-for="(inst, i) in (stats ? stats.topInstitutions : [])" :key="i">
                                 <div class="flex items-center justify-between bg-white p-2.5 rounded-xl border border-slate-200">
                                     <span class="flex items-center gap-2 truncate">
                                         <span class="w-5 h-5 rounded-full bg-sky-100 text-[#0284c7] text-[10px] flex items-center justify-center font-black" x-text="i+1"></span>
@@ -890,7 +910,7 @@
                             <span>🔥 Discovery Channels (How users found us)</span>
                         </h4>
                         <div class="space-y-2 text-xs font-bold">
-                            <template x-for="(source, i) in stats.discoveryBreakdown" :key="i">
+                            <template x-for="(source, i) in (stats ? stats.discoveryBreakdown : [])" :key="i">
                                 <div class="flex items-center justify-between bg-white p-2.5 rounded-xl border border-amber-200">
                                     <span class="truncate" x-text="source.channel"></span>
                                     <span class="px-2.5 py-0.5 rounded-full bg-amber-100 text-amber-800 font-black" x-text="source.count + ' users'"></span>
@@ -905,15 +925,15 @@
                     <div class="bg-sky-50 border-2 border-sky-300 p-4 rounded-2xl text-sky-950 flex items-center justify-between">
                         <div>
                             <div class="text-xs font-black uppercase">Basic Matrix Accesses</div>
-                            <div class="text-2xl font-black mt-0.5" x-text="stats.basicAccess"></div>
+                            <div class="text-2xl font-black mt-0.5" x-text="stats ? stats.basicAccess : 0"></div>
                         </div>
                         <i class="fa-solid fa-calculator text-3xl opacity-30 text-[#0284c7]"></i>
                     </div>
 
                     <div class="bg-[#f0fdf4] border-2 border-green-300 p-4 rounded-2xl text-emerald-950 flex items-center justify-between">
                         <div>
-                            <div class="text-xs font-black uppercase">Most Popular Tool</div>
-                            <div class="text-base font-black mt-0.5" x-text="stats.mostUsedTool"></div>
+                            <div class="text-xs font-black uppercase">Most Popular Module</div>
+                            <div class="text-base font-black mt-0.5" x-text="stats ? stats.mostUsedModule : 'N/A'"></div>
                         </div>
                         <i class="fa-solid fa-star text-3xl opacity-30 text-[#16a34a]"></i>
                     </div>
@@ -921,7 +941,7 @@
                     <div class="bg-purple-50 border-2 border-purple-300 p-4 rounded-2xl text-purple-950 flex items-center justify-between">
                         <div>
                             <div class="text-xs font-black uppercase">Last Logged Activity</div>
-                            <div class="text-xs font-extrabold mt-1" x-text="stats.lastAccessTime"></div>
+                            <div class="text-xs font-extrabold mt-1" x-text="stats ? stats.lastAccessTime : 'N/A'"></div>
                         </div>
                         <i class="fa-solid fa-clock text-3xl opacity-30 text-purple-700"></i>
                     </div>
@@ -933,7 +953,7 @@
                         <h3 class="text-sm font-black flex items-center gap-2">
                             <i class="fa-solid fa-list text-amber-400"></i> Student Activity Trail Log
                         </h3>
-                        <input type="text" x-model="searchLog" placeholder="Search by name, institution or tool..." class="px-3 py-1 rounded-lg bg-slate-800 text-white text-xs font-bold border border-slate-700 focus:outline-none">
+                        <input type="text" x-model="searchLog" placeholder="Search by name, institution or module..." class="px-3 py-1 rounded-lg bg-slate-800 text-white text-xs font-bold border border-slate-700 focus:outline-none">
                     </div>
 
                     <div class="overflow-x-auto max-h-80">
@@ -945,7 +965,7 @@
                                     <th class="p-3">Role</th>
                                     <th class="p-3">Institution</th>
                                     <th class="p-3">Purpose</th>
-                                    <th class="p-3">Action / Tool Used</th>
+                                    <th class="p-3">Module Accessed</th>
                                 </tr>
                             </thead>
                             <tbody class="divide-y divide-slate-200 font-semibold text-slate-800">
@@ -960,7 +980,7 @@
                                         <td class="p-3">
                                             <span class="px-2 py-0.5 rounded bg-slate-200 font-bold" x-text="log.purpose"></span>
                                         </td>
-                                        <td class="p-3 font-bold text-slate-900" x-text="log.toolUsed"></td>
+                                        <td class="p-3 font-bold text-slate-900" x-text="log.module"></td>
                                     </tr>
                                 </template>
 
@@ -1067,6 +1087,12 @@
             </div>
         </div>
 
+        <!-- GLOBAL TOAST NOTIFICATION CONTAINER -->
+        <div x-show="toastMessage" x-transition class="fixed bottom-6 right-6 z-50 bg-slate-900 text-white px-5 py-3 rounded-2xl shadow-2xl border-2 border-amber-400 flex items-center gap-3 text-xs font-black">
+            <i class="fa-solid fa-circle-info text-amber-400 text-base"></i>
+            <span x-text="toastMessage"></span>
+        </div>
+
         <!-- FOOTER COPYRIGHT -->
         <footer class="mt-6 text-center text-xs font-bold text-white">
             <p class="bg-[#0284c7]/80 backdrop-blur inline-block px-4 py-1.5 rounded-full border border-white/40 shadow">Interactive Numerical Methods Simulator &copy; 2026. Politeknik Poster Palette Edition.</p>
@@ -1078,7 +1104,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, collection, addDoc, onSnapshot, query } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getFirestore, collection, addDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         // Firebase Initialization with standard environment fallbacks
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'matrix-learning-hub';
@@ -1103,8 +1129,24 @@
             } else {
                 await signInAnonymously(auth);
             }
+
+            // Real-time Cloud Listener for access logs
+            const logsRef = collection(db, 'artifacts', appId, 'public', 'data', 'access_logs');
+            onSnapshot(logsRef, (snapshot) => {
+                const liveLogs = [];
+                snapshot.forEach(doc => {
+                    liveLogs.push(doc.data());
+                });
+                liveLogs.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
+                if (window.matrixAlpineInstance && liveLogs.length > 0) {
+                    window.matrixAlpineInstance.logs = liveLogs;
+                }
+            }, (error) => {
+                console.log("Firestore listener fallback mode:", error);
+            });
+
         } catch (e) {
-            console.log("Firebase setup operating in fallback memory mode.");
+            console.log("Firebase setup operating in local memory mode.");
         }
 
         window.db = db;
@@ -1112,708 +1154,1048 @@
     </script>
 
     <script>
-        document.addEventListener('alpine:init', () => {
-            Alpine.data('matrixApp', () => ({
-                currentView: 'cover',
-                activeMethod: 'gaussian',
-                showLoginModal: true,
-                showManual: false,
-                showAdminModal: false,
-                showAdminPinModal: false,
-                adminInputPin: '',
-                adminSecretPin: 'admin123', // Kata laluan admin laluan asal
-                isAdminAuthenticated: false,
-                pinError: false,
-                searchLog: '',
+        function registerMatrixApp() {
+            Alpine.data('matrixApp', function() {
+                return {
+                    currentView: 'cover',
+                    activeMethod: 'gaussian',
+                    showLoginModal: true,
+                    showManual: false,
+                    showAdminModal: false,
+                    showAdminPinModal: false,
+                    adminInputPin: '',
+                    adminSecretPin: 'admin123',
+                    isAdminAuthenticated: false,
+                    pinError: false,
+                    searchLog: '',
+                    googleSheetsUrl: 'https://script.google.com/macros/s/AKfycbzutvwuVpb3lZ0WRmcweuEztkJ3s03xaJ5NNz5L7mSAmdnpRUq5GvYHi9umKNcw3jYg/exec',
+                    toastMessage: '',
 
-                // Pautan URL / Fail HTML untuk Basic Matrix
-                basicMatrixUrl: 'basic_matrix.html', // 👈 Tukar kepada nama fail .html anda (cth: 'basic_matrix.html' atau URL penuh)
+                    // File Links Configuration (e.g. 'basic_matrix.html' or '#')
+                    basicMatrixUrl: '#',
+                    gaussianUrl: '#',
+                    doolittleUrl: '#',
+                    croutUrl: '#',
 
-                // Pautan URL / Fail HTML untuk 3 Method Advanced Matrix
-                gaussianUrl: 'gaussian_sim.html',   // 👈 Tukar kepada nama fail .html Gaussian anda
-                doolittleUrl: 'doolittle_sim.html', // 👈 Tukar kepada nama fail .html Doolittle anda
-                croutUrl: 'crout_sim.html',         // 👈 Tukar kepada nama fail .html Crout anda
+                    // Basic Matrix Reactive Variables
+                    basicOp: 'add',
+                    basicA: [
+                        [3, 2, 1],
+                        [0, 1, 4],
+                        [2, 1, 0]
+                    ],
+                    basicB: [
+                        [1, 2, 0],
+                        [2, 0, 1],
+                        [1, 1, 3]
+                    ],
+                    basicResult: [
+                        [0, 0, 0],
+                        [0, 0, 0],
+                        [0, 0, 0]
+                    ],
 
-                // Current User Session Profile
-                currentUser: {
-                    userType: 'Student',
-                    name: 'Ahmad Hakimi',
-                    institution: 'Politeknik Port Dickson',
-                    country: 'Malaysia',
-                    purpose: 'Learning',
-                    discoverySource: 'Lecturer / Teacher',
-                    isLoggedIn: false
-                },
+                    // Advanced Solver Equations Array [a, b, c, d]
+                    eq: [
+                        [2, 1, -1, 8],
+                        [-3, -1, 2, -11],
+                        [-2, 1, 2, -3]
+                    ],
 
-                loginForm: {
-                    userType: 'Student',
-                    name: '',
-                    institution: '',
-                    country: 'Malaysia',
-                    purpose: 'Learning',
-                    discoverySource: 'Lecturer / Teacher'
-                },
+                    // Solver Execution State
+                    solutionTab: 'all',
+                    currentStepIndex: 0,
+                    hasCalculated: false,
+                    errorMessage: '',
+                    stepsList: [],
+                    finalResult: { x: 0, y: 0, z: 0 },
 
-                // Logs Array
-                logs: [
-                    {
-                        studentName: 'Ahmad Hakimi',
+                    // Current Active User Profile
+                    currentUser: {
                         userType: 'Student',
+                        name: 'Ahmad Hakimi',
                         institution: 'Politeknik Port Dickson',
                         country: 'Malaysia',
                         purpose: 'Learning',
                         discoverySource: 'Lecturer / Teacher',
-                        module: 'basic',
-                        toolUsed: 'Matrix Addition',
-                        timestamp: Date.now() - 3600000,
-                        formattedTime: new Date(Date.now() - 3600000).toLocaleString()
+                        isLoggedIn: false
                     },
-                    {
-                        studentName: 'Dr. Siti Nurhaliza',
-                        userType: 'Teacher / Lecturer',
-                        institution: 'UTM Skudai',
-                        country: 'Malaysia',
-                        purpose: 'Teaching',
-                        discoverySource: 'Google Search',
-                        module: 'advanced',
-                        toolUsed: 'Gaussian Elimination',
-                        timestamp: Date.now() - 1800000,
-                        formattedTime: new Date(Date.now() - 1800000).toLocaleString()
-                    },
-                    {
-                        studentName: 'Kumar Raj',
+
+                    loginForm: {
                         userType: 'Student',
-                        institution: 'SMK Port Dickson',
+                        name: '',
+                        institution: '',
                         country: 'Malaysia',
                         purpose: 'Learning',
-                        discoverySource: 'QR Code',
-                        module: 'advanced',
-                        toolUsed: 'Doolittle LU Method',
-                        timestamp: Date.now() - 900000,
-                        formattedTime: new Date(Date.now() - 900000).toLocaleString()
-                    }
-                ],
+                        discoverySource: 'Lecturer / Teacher'
+                    },
 
-                // Advanced Solution State
-                // Authentication & Profiling Handlers
-                handleLogin() {
-                    if (!this.loginForm.name || !this.loginForm.institution) return;
-                    this.currentUser = {
-                        userType: this.loginForm.userType || 'Student',
-                        name: this.loginForm.name,
-                        institution: this.loginForm.institution,
-                        country: this.loginForm.country || 'Malaysia',
-                        purpose: this.loginForm.purpose || 'Learning',
-                        discoverySource: this.loginForm.discoverySource || 'Lecturer / Teacher',
-                        isLoggedIn: true
-                    };
-                    this.showLoginModal = false;
-
-                    // Log initial user access
-                    this.recordActivity('auth', 'Access Hub Entry');
-                },
-
-                logout() {
-                    this.showLoginModal = true;
-                },
-
-                // Activity Logger
-                recordActivity(module, toolUsed) {
-                    const logItem = {
-                        studentName: this.currentUser.isLoggedIn ? this.currentUser.name : 'Anonymous Guest',
-                        userType: this.currentUser.isLoggedIn ? this.currentUser.userType : 'Guest',
-                        institution: this.currentUser.isLoggedIn ? this.currentUser.institution : 'Public Access',
-                        country: this.currentUser.isLoggedIn ? this.currentUser.country : 'Malaysia',
-                        purpose: this.currentUser.isLoggedIn ? this.currentUser.purpose : 'Self-learning',
-                        discoverySource: this.currentUser.isLoggedIn ? this.currentUser.discoverySource : 'Direct',
-                        module: module,
-                        toolUsed: toolUsed,
-                        timestamp: Date.now(),
-                        formattedTime: new Date().toLocaleString()
-                    };
-
-                    this.logs.unshift(logItem);
-
-                    // Write to Firestore Cloud database if configured
-                    if (window.db && window.appId) {
-                        try {
-                            const logsRef = collection(window.db, 'artifacts', window.appId, 'public', 'data', 'access_logs');
-                            addDoc(logsRef, logItem).catch(e => console.log(e));
-                        } catch(e) {}
-                    }
-                },
-
-                // Computed Analytics Stats
-                get stats() {
-                    const totalAccess = this.logs.length;
-                    const uniqueUsers = new Set(this.logs.map(l => l.studentName + l.institution)).size;
-                    
-                    const studentsCount = new Set(this.logs.filter(l => l.userType === 'Student').map(l => l.studentName)).size;
-                    const teachersCount = new Set(this.logs.filter(l => l.userType === 'Teacher / Lecturer').map(l => l.studentName)).size;
-                    const othersCount = uniqueUsers - (studentsCount + teachersCount);
-
-                    const basicAccess = this.logs.filter(l => l.module === 'basic').length;
-                    const advancedAccess = this.logs.filter(l => l.module === 'advanced').length;
-
-                    // Top Institutions
-                    const instCounts = {};
-                    this.logs.forEach(l => {
-                        if (l.institution && l.institution !== 'Public Access') {
-                            instCounts[l.institution] = (instCounts[l.institution] || 0) + 1;
+                    // User Activity Logs Data
+                    logs: [
+                        {
+                            studentName: 'Ahmad Hakimi',
+                            userType: 'Student',
+                            institution: 'Politeknik Port Dickson',
+                            country: 'Malaysia',
+                            purpose: 'Learning',
+                            discoverySource: 'Lecturer / Teacher',
+                            module: 'Basic Matrix',
+                            timestamp: Date.now() - 3600000,
+                            formattedTime: new Date(Date.now() - 3600000).toLocaleString()
+                        },
+                        {
+                            studentName: 'Dr. Siti Nurhaliza',
+                            userType: 'Teacher / Lecturer',
+                            institution: 'UTM Skudai',
+                            country: 'Malaysia',
+                            purpose: 'Teaching',
+                            discoverySource: 'Google Search',
+                            module: 'Gaussian Elimination',
+                            timestamp: Date.now() - 1800000,
+                            formattedTime: new Date(Date.now() - 1800000).toLocaleString()
                         }
-                    });
-                    const topInstitutions = Object.entries(instCounts)
-                        .map(([name, count]) => ({ name, count }))
-                        .sort((a,b) => b.count - a.count)
-                        .slice(0, 5);
+                    ],
 
-                    // Discovery Channels
-                    const sourceCounts = {};
-                    this.logs.forEach(l => {
-                        if (l.discoverySource) {
-                            sourceCounts[l.discoverySource] = (sourceCounts[l.discoverySource] || 0) + 1;
-                        }
-                    });
-                    const discoveryBreakdown = Object.entries(sourceCounts)
-                        .map(([channel, count]) => ({ channel, count }))
-                        .sort((a,b) => b.count - a.count);
-
-                    // Most Used Tool
-                    const toolCounts = {};
-                    this.logs.forEach(l => {
-                        if (l.toolUsed && l.toolUsed !== 'Access Hub Entry') {
-                            toolCounts[l.toolUsed] = (toolCounts[l.toolUsed] || 0) + 1;
-                        }
-                    });
-                    let mostUsed = 'Matrix Addition';
-                    let maxCount = 0;
-                    for (const [tool, count] of Object.entries(toolCounts)) {
-                        if (count > maxCount) {
-                            maxCount = count;
-                            mostUsed = tool;
-                        }
-                    }
-
-                    const lastLog = this.logs[0];
-                    const lastAccessTime = lastLog ? lastLog.formattedTime : 'N/A';
-
-                    return {
-                        totalUsers: uniqueUsers || 1,
-                        studentsCount,
-                        teachersCount,
-                        othersCount: Math.max(0, othersCount),
-                        totalAccess,
-                        basicAccess,
-                        advancedAccess,
-                        topInstitutions: topInstitutions.length > 0 ? topInstitutions : [{ name: 'Politeknik Port Dickson', count: 1 }],
-                        discoveryBreakdown,
-                        mostUsedTool: mostUsed,
-                        lastAccessTime
-                    };
-                },
-
-                get filteredLogs() {
-                    if (!this.searchLog) return this.logs;
-                    const q = this.searchLog.toLowerCase();
-                    return this.logs.filter(l => 
-                        l.studentName.toLowerCase().includes(q) ||
-                        l.institution.toLowerCase().includes(q) ||
-                        l.userType.toLowerCase().includes(q) ||
-                        l.toolUsed.toLowerCase().includes(q)
-                    );
-                },
-
-                clearLogs() {
-                    this.logs = [];
-                },
-
-                handleAdminClick() {
-                    if (this.isAdminAuthenticated) {
-                        this.showAdminModal = true;
-                    } else {
-                        this.adminInputPin = '';
-                        this.pinError = false;
-                        this.showAdminPinModal = true;
-                    }
-                },
-
-                verifyAdminPin() {
-                    if (this.adminInputPin === this.adminSecretPin) {
-                        this.isAdminAuthenticated = true;
-                        this.showAdminPinModal = false;
-                        this.showAdminModal = true;
-                        this.pinError = false;
-                    } else {
-                        this.pinError = true;
-                    }
-                },
-
-                lockAdminSession() {
-                    this.isAdminAuthenticated = false;
-                    this.showAdminModal = false;
-                },
-
-                openAdminModal() {
-                    this.handleAdminClick();
-                },
-
-                // Navigation Handlers
-                goHome() {
-                    this.currentView = 'cover';
-                },
-
-                enterBasicMatrix() {
-                    // Rekod profil dan aktiviti pengguna ke dalam Firestore & Log terlebih dahulu
-                    this.recordActivity('basic', 'Basic Matrix HTML Page Access');
-                    
-                    // Lencongkan ke fail HTML Basic Matrix pilihan anda
-                    if (this.basicMatrixUrl && this.basicMatrixUrl !== '#') {
-                        window.location.href = this.basicMatrixUrl;
-                    } else {
-                        this.currentView = 'basic';
+                    init() {
+                        window.matrixAlpineInstance = this;
                         this.calculateBasic();
-                    }
-                },
+                    },
 
-                enterAdvanceMethod(method) {
-                    this.activeMethod = method;
-                    
-                    const methodNames = {
-                        gaussian: 'Gaussian Elimination',
-                        doolittle: 'Doolittle LU Method',
-                        crout: 'Crout LU Method'
-                    };
+                    notify(msg) {
+                        this.toastMessage = msg;
+                        setTimeout(() => {
+                            this.toastMessage = '';
+                        }, 3500);
+                    },
 
-                    const methodUrls = {
-                        gaussian: this.gaussianUrl,
-                        doolittle: this.doolittleUrl,
-                        crout: this.croutUrl
-                    };
+                    saveGoogleSheetsUrl() {
+                        if (this.googleSheetsUrl && this.googleSheetsUrl.trim().startsWith('http')) {
+                            this.notify("Google Sheets Web App URL saved! Logs will sync automatically.");
+                        } else {
+                            this.notify("Please enter a valid Web App URL (starting with http:// or https://)");
+                        }
+                    },
 
-                    // Rekod profil dan aktiviti pengguna bagi method pilihan
-                    this.recordActivity('advanced', methodNames[method] || 'Advanced Matrix Method');
+                    handleLogin() {
+                        if (!this.loginForm.name || !this.loginForm.institution) return;
+                        this.currentUser = {
+                            userType: this.loginForm.userType || 'Student',
+                            name: this.loginForm.name,
+                            institution: this.loginForm.institution,
+                            country: this.loginForm.country || 'Malaysia',
+                            purpose: this.loginForm.purpose || 'Learning',
+                            discoverySource: this.loginForm.discoverySource || 'Lecturer / Teacher',
+                            isLoggedIn: true
+                        };
+                        this.showLoginModal = false;
+                        this.recordActivity('Access Hub Entry');
+                    },
 
-                    // Lencongkan ke fail HTML masing-masing
-                    const targetUrl = methodUrls[method];
-                    if (targetUrl && targetUrl !== '#') {
-                        window.location.href = targetUrl;
-                    } else {
-                        // Mod sandaran (fallback) jika fail HTML belum diisi
-                        this.currentView = 'advance';
-                        this.loadExample();
-                        this.calculateSolution();
-                    }
-                },
+                    logout() {
+                        this.showLoginModal = true;
+                    },
 
-                selectMethod(method) {
-                    this.activeMethod = method;
-                    this.recordActivity('advanced', this.getMethodTitle());
-                    if (this.hasCalculated) {
-                        this.calculateSolution();
-                    }
-                },
+                    recordActivity(module) {
+                        const logItem = {
+                            studentName: this.currentUser.isLoggedIn ? this.currentUser.name : 'Anonymous Guest',
+                            userType: this.currentUser.isLoggedIn ? this.currentUser.userType : 'Guest',
+                            institution: this.currentUser.isLoggedIn ? this.currentUser.institution : 'Public Access',
+                            country: this.currentUser.isLoggedIn ? this.currentUser.country : 'Malaysia',
+                            purpose: this.currentUser.isLoggedIn ? this.currentUser.purpose : 'Self-learning',
+                            discoverySource: this.currentUser.isLoggedIn ? this.currentUser.discoverySource : 'Direct',
+                            module: module,
+                            timestamp: Date.now(),
+                            formattedTime: new Date().toLocaleString()
+                        };
 
-                setBasicOp(op) {
-                    this.basicOp = op;
-                    const toolNames = {
-                        add: 'Matrix Addition (A+B)',
-                        sub: 'Matrix Subtraction (A-B)',
-                        mul: 'Matrix Multiplication (A×B)',
-                        det: 'Matrix Determinant det(A)',
-                        trans: 'Matrix Transpose (Aᵀ)'
-                    };
-                    this.recordActivity('basic', toolNames[op] || 'Basic Op');
-                    this.calculateBasic();
-                },
+                        this.logs.unshift(logItem);
 
-                // Basic Matrix Calculations
-                fillSampleBasicA() {
-                    this.basicA = [[3, 2, 1], [0, 1, 4], [2, 1, 0]];
-                    this.calculateBasic();
-                },
+                        if (window.db && window.appId) {
+                            try {
+                                const logsRef = window.db.collection ? window.db.collection('artifacts/' + window.appId + '/public/data/access_logs') : null;
+                            } catch(e) {}
+                        }
 
-                fillSampleBasicB() {
-                    this.basicB = [[1, 2, 0], [2, 0, 1], [1, 1, 3]];
-                    this.calculateBasic();
-                },
+                        if (this.googleSheetsUrl && this.googleSheetsUrl.trim().startsWith('http')) {
+                            try {
+                                fetch(this.googleSheetsUrl.trim(), {
+                                    method: "POST",
+                                    mode: "no-cors",
+                                    headers: { "Content-Type": "text/plain;charset=utf-8" },
+                                    body: JSON.stringify(logItem)
+                                }).catch(e => console.log("Google Sheets sync error:", e));
+                            } catch(e) {}
+                        }
+                    },
 
-                calculateBasic() {
-                    const A = this.basicA;
-                    const B = this.basicB;
+                    get stats() {
+                        const totalAccess = this.logs.length;
+                        const uniqueUsers = new Set(this.logs.map(l => l.studentName + l.institution)).size;
+                        
+                        const studentsCount = new Set(this.logs.filter(l => l.userType === 'Student').map(l => l.studentName)).size;
+                        const teachersCount = new Set(this.logs.filter(l => l.userType === 'Teacher / Lecturer').map(l => l.studentName)).size;
+                        const othersCount = uniqueUsers - (studentsCount + teachersCount);
 
-                    if (this.basicOp === 'add') {
-                        this.basicResult = A.map((row, r) => row.map((val, c) => val + B[r][c]));
-                    } else if (this.basicOp === 'sub') {
-                        this.basicResult = A.map((row, r) => row.map((val, c) => val - B[r][c]));
-                    } else if (this.basicOp === 'mul') {
-                        let res = [[0,0,0],[0,0,0],[0,0,0]];
-                        for (let i = 0; i < 3; i++) {
-                            for (let j = 0; j < 3; j++) {
-                                for (let k = 0; k < 3; k++) {
-                                    res[i][j] += A[i][k] * B[k][j];
-                                }
+                        const basicAccess = this.logs.filter(l => (l.module || '').includes('Basic Matrix')).length;
+                        const advancedAccess = totalAccess - basicAccess;
+
+                        const instCounts = {};
+                        this.logs.forEach(l => {
+                            if (l.institution && l.institution !== 'Public Access') {
+                                instCounts[l.institution] = (instCounts[l.institution] || 0) + 1;
+                            }
+                        });
+                        const topInstitutions = Object.entries(instCounts)
+                            .map(([name, count]) => ({ name, count }))
+                            .sort((a,b) => b.count - a.count)
+                            .slice(0, 5);
+
+                        const sourceCounts = {};
+                        this.logs.forEach(l => {
+                            if (l.discoverySource) {
+                                sourceCounts[l.discoverySource] = (sourceCounts[l.discoverySource] || 0) + 1;
+                            }
+                        });
+                        const discoveryBreakdown = Object.entries(sourceCounts)
+                            .map(([channel, count]) => ({ channel, count }))
+                            .sort((a,b) => b.count - a.count);
+
+                        const moduleCounts = {};
+                        this.logs.forEach(l => {
+                            if (l.module && l.module !== 'Access Hub Entry') {
+                                moduleCounts[l.module] = (moduleCounts[l.module] || 0) + 1;
+                            }
+                        });
+                        let mostUsed = 'Basic Matrix';
+                        let maxCount = 0;
+                        for (const [mod, count] of Object.entries(moduleCounts)) {
+                            if (count > maxCount) {
+                                maxCount = count;
+                                mostUsed = mod;
                             }
                         }
-                        this.basicResult = res;
-                    } else if (this.basicOp === 'det') {
-                        const det = A[0][0]*(A[1][1]*A[2][2] - A[1][2]*A[2][1])
-                                  - A[0][1]*(A[1][0]*A[2][2] - A[1][2]*A[2][0])
-                                  + A[0][2]*(A[1][0]*A[2][1] - A[1][1]*A[2][0]);
-                        this.basicResult = det;
-                    } else if (this.basicOp === 'trans') {
-                        this.basicResult = [
-                            [A[0][0], A[1][0], A[2][0]],
-                            [A[0][1], A[1][0], A[2][1]],
-                            [A[0][2], A[1][2], A[2][2]]
-                        ];
-                    }
-                },
 
-                // UI Text Helpers
-                getMethodTitle() {
-                    if (this.activeMethod === 'gaussian') return 'Gaussian Method';
-                    if (this.activeMethod === 'doolittle') return 'Doolittle LU Method';
-                    if (this.activeMethod === 'crout') return 'Crout LU Method';
-                    return '';
-                },
+                        const lastLog = this.logs[0];
+                        const lastAccessTime = lastLog ? lastLog.formattedTime : 'N/A';
 
-                getMethodBadge() {
-                    if (this.activeMethod === 'gaussian') return 'Gaussian Elimination';
-                    if (this.activeMethod === 'doolittle') return 'Doolittle Decomposition';
-                    if (this.activeMethod === 'crout') return 'Crout Decomposition';
-                    return '';
-                },
+                        return {
+                            totalUsers: uniqueUsers || 1,
+                            studentsCount,
+                            teachersCount,
+                            othersCount: Math.max(0, othersCount),
+                            totalAccess,
+                            basicAccess,
+                            advancedAccess,
+                            topInstitutions: topInstitutions.length > 0 ? topInstitutions : [{ name: 'Politeknik Port Dickson', count: 1 }],
+                            discoveryBreakdown,
+                            mostUsedModule: mostUsed,
+                            lastAccessTime
+                        };
+                    },
 
-                getMethodFullSubtitle() {
-                    if (this.activeMethod === 'gaussian') return 'Gaussian Elimination Method';
-                    if (this.activeMethod === 'doolittle') return 'Doolittle LU Decomposition';
-                    if (this.activeMethod === 'crout') return 'Crout LU Decomposition';
-                    return '';
-                },
+                    get filteredLogs() {
+                        if (!this.searchLog) return this.logs;
+                        const q = this.searchLog.toLowerCase();
+                        return this.logs.filter(l => 
+                            (l.studentName || '').toLowerCase().includes(q) ||
+                            (l.institution || '').toLowerCase().includes(q) ||
+                            (l.userType || '').toLowerCase().includes(q) ||
+                            (l.module || '').toLowerCase().includes(q)
+                        );
+                    },
 
-                getMethodTagline() {
-                    if (this.activeMethod === 'gaussian') return 'Upper Triangular Matrix • Back Substitution';
-                    if (this.activeMethod === 'doolittle') return 'A = L·U Matrix Factorization (Lii = 1)';
-                    if (this.activeMethod === 'crout') return 'A = L·U Matrix Factorization (Uii = 1)';
-                    return '';
-                },
+                    clearLogs() {
+                        this.logs = [];
+                        this.notify("Logs reset successfully!");
+                    },
 
-                loadExample() {
-                    if (this.activeMethod === 'gaussian') {
-                        this.eq = [
-                            [2, 1, -1, 8],
-                            [-3, -1, 2, -11],
-                            [-2, 1, 2, -3]
-                        ];
-                    } else if (this.activeMethod === 'doolittle') {
-                        this.eq = [
-                            [2, 3, 1, 9],
-                            [4, 7, 5, 25],
-                            [6, 18, 19, 67]
-                        ];
-                    } else {
-                        this.eq = [
-                            [1, 1, 1, 6],
-                            [2, 4, 2, 16],
-                            [-1, 5, -4, -3]
-                        ];
-                    }
-                    if (this.currentView === 'advance') {
-                        this.calculateSolution();
-                    }
-                },
-
-                resetInputs() {
-                    this.eq = [
-                        [0, 0, 0, 0],
-                        [0, 0, 0, 0],
-                        [0, 0, 0, 0]
-                    ];
-                    this.hasCalculated = false;
-                    this.stepsList = [];
-                    this.errorMessage = '';
-                },
-
-                formatNum(num) {
-                    if (num === undefined || num === null || isNaN(num)) return '0';
-                    const val = Math.round(num * 10000) / 10000;
-                    return val.toString();
-                },
-
-                get visibleSteps() {
-                    if (this.solutionTab === 'interactive') {
-                        return this.stepsList.length > 0 ? [this.stepsList[this.currentStepIndex]] : [];
-                    }
-                    return this.stepsList;
-                },
-
-                calculateSolution() {
-                    this.hasCalculated = true;
-                    this.errorMessage = '';
-                    this.stepsList = [];
-                    this.currentStepIndex = 0;
-
-                    const A = [
-                        [this.eq[0][0], this.eq[0][1], this.eq[0][2]],
-                        [this.eq[1][0], this.eq[1][1], this.eq[1][2]],
-                        [this.eq[2][0], this.eq[2][1], this.eq[2][2]]
-                    ];
-                    const B = [this.eq[0][3], this.eq[1][3], this.eq[2][3]];
-
-                    const isAllZero = A.every(row => row.every(val => val === 0));
-                    if (isAllZero) {
-                        this.errorMessage = 'Please enter valid numerical coefficients for the matrix.';
-                        return;
-                    }
-
-                    try {
-                        if (this.activeMethod === 'gaussian') {
-                            this.solveGaussian(A, B);
-                        } else if (this.activeMethod === 'doolittle') {
-                            this.solveDoolittle(A, B);
-                        } else if (this.activeMethod === 'crout') {
-                            this.solveCrout(A, B);
+                    exportToCSV() {
+                        if (!this.logs || this.logs.length === 0) {
+                            this.notify("No access logs available to export.");
+                            return;
                         }
-                    } catch (err) {
-                        this.errorMessage = err.message || 'Calculation error occurred (Possible division by zero / no unique solution).';
+
+                        const headers = ["Timestamp", "Formatted Time", "Name", "User Type", "Institution", "Country", "Purpose", "Discovery Source", "Module"];
+                        const csvRows = [];
+                        csvRows.push(headers.join(","));
+
+                        this.logs.forEach(log => {
+                            const row = [
+                                `"${log.timestamp || ''}"`,
+                                `"${(log.formattedTime || '').replace(/"/g, '""')}"`,
+                                `"${(log.studentName || '').replace(/"/g, '""')}"`,
+                                `"${(log.userType || '').replace(/"/g, '""')}"`,
+                                `"${(log.institution || '').replace(/"/g, '""')}"`,
+                                `"${(log.country || '').replace(/"/g, '""')}"`,
+                                `"${(log.purpose || '').replace(/"/g, '""')}"`,
+                                `"${(log.discoverySource || '').replace(/"/g, '""')}"`,
+                                `"${(log.module || '').replace(/"/g, '""')}"`
+                            ];
+                            csvRows.push(row.join(","));
+                        });
+
+                        const csvContent = "\uFEFF" + csvRows.join("\n");
+                        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+                        const url = URL.createObjectURL(blob);
+                        
+                        const link = document.createElement("a");
+                        link.setAttribute("href", url);
+                        link.setAttribute("download", `Matrix_Hub_Access_Logs_${new Date().toISOString().slice(0,10)}.csv`);
+                        document.body.appendChild(link);
+                        link.click();
+                        document.body.removeChild(link);
+                        this.notify("Exported activity log to CSV successfully!");
+                    },
+
+                    handleAdminClick() {
+                        if (this.isAdminAuthenticated) {
+                            this.showAdminModal = true;
+                        } else {
+                            this.adminInputPin = '';
+                            this.pinError = false;
+                            this.showAdminPinModal = true;
+                        }
+                    },
+
+                    verifyAdminPin() {
+                        if (this.adminInputPin === this.adminSecretPin) {
+                            this.isAdminAuthenticated = true;
+                            this.showAdminPinModal = false;
+                            this.showAdminModal = true;
+                            this.pinError = false;
+                        } else {
+                            this.pinError = true;
+                        }
+                    },
+
+                    lockAdminSession() {
+                        this.isAdminAuthenticated = false;
+                        this.showAdminModal = false;
+                        this.notify("Admin session locked.");
+                    },
+
+                    goHome() {
+                        this.currentView = 'cover';
+                    },
+
+                    enterBasicMatrix() {
+                        this.recordActivity('Basic Matrix');
+                        if (this.basicMatrixUrl && this.basicMatrixUrl !== '#') {
+                            window.location.href = this.basicMatrixUrl;
+                        } else {
+                            this.currentView = 'basic';
+                            this.calculateBasic();
+                        }
+                    },
+
+                    enterAdvanceMethod(method) {
+                        this.activeMethod = method;
+                        const methodNames = {
+                            gaussian: 'Gaussian Elimination',
+                            doolittle: 'Doolittle LU Method',
+                            crout: 'Crout LU Method'
+                        };
+                        const methodUrls = {
+                            gaussian: this.gaussianUrl,
+                            doolittle: this.doolittleUrl,
+                            crout: this.croutUrl
+                        };
+
+                        this.recordActivity(methodNames[method] || 'Advanced Matrix');
+                        const targetUrl = methodUrls[method];
+                        if (targetUrl && targetUrl !== '#') {
+                            window.location.href = targetUrl;
+                        } else {
+                            this.currentView = 'advance';
+                            this.loadExample();
+                            this.calculateSolution();
+                        }
+                    },
+
+                    selectMethod(method) {
+                        this.activeMethod = method;
+                        this.recordActivity(this.getMethodTitle());
+                        if (this.hasCalculated) {
+                            this.calculateSolution();
+                        }
+                    },
+
+                    setBasicOp(op) {
+                        this.basicOp = op;
+                        const toolNames = {
+                            add: 'Basic Matrix (Addition)',
+                            sub: 'Basic Matrix (Subtraction)',
+                            mul: 'Basic Matrix (Multiplication)',
+                            det: 'Basic Matrix (Determinant)',
+                            trans: 'Basic Matrix (Transpose)'
+                        };
+                        this.recordActivity(toolNames[op] || 'Basic Matrix');
+                        this.calculateBasic();
+                    },
+
+                    notify(msg) {
+                        this.toastMessage = msg;
+                        setTimeout(() => {
+                            this.toastMessage = '';
+                        }, 3500);
+                    },
+
+                    saveGoogleSheetsUrl() {
+                        if (this.googleSheetsUrl && this.googleSheetsUrl.trim().startsWith('http')) {
+                            this.notify("Google Sheets Web App URL saved! Logs will sync automatically.");
+                        } else {
+                            this.notify("Please enter a valid Web App URL (starting with http:// or https://)");
+                        }
+                    },
+
+                    handleLogin() {
+                        if (!this.loginForm.name || !this.loginForm.institution) return;
+                        this.currentUser = {
+                            userType: this.loginForm.userType || 'Student',
+                            name: this.loginForm.name,
+                            institution: this.loginForm.institution,
+                            country: this.loginForm.country || 'Malaysia',
+                            purpose: this.loginForm.purpose || 'Learning',
+                            discoverySource: this.loginForm.discoverySource || 'Lecturer / Teacher',
+                            isLoggedIn: true
+                        };
+                        this.showLoginModal = false;
+                        this.recordActivity('auth', 'Access Hub Entry');
+                    },
+
+                    logout() {
+                        this.showLoginModal = true;
+                    },
+
+                    recordActivity(module, toolUsed) {
+                        const logItem = {
+                            studentName: this.currentUser.isLoggedIn ? this.currentUser.name : 'Anonymous Guest',
+                            userType: this.currentUser.isLoggedIn ? this.currentUser.userType : 'Guest',
+                            institution: this.currentUser.isLoggedIn ? this.currentUser.institution : 'Public Access',
+                            country: this.currentUser.isLoggedIn ? this.currentUser.country : 'Malaysia',
+                            purpose: this.currentUser.isLoggedIn ? this.currentUser.purpose : 'Self-learning',
+                            discoverySource: this.currentUser.isLoggedIn ? this.currentUser.discoverySource : 'Direct',
+                            module: module,
+                            toolUsed: toolUsed,
+                            timestamp: Date.now(),
+                            formattedTime: new Date().toLocaleString()
+                        };
+
+                        this.logs.unshift(logItem);
+
+                        if (window.db && window.appId) {
+                            try {
+                                const logsRef = window.db.collection ? window.db.collection('artifacts/' + window.appId + '/public/data/access_logs') : null;
+                            } catch(e) {}
+                        }
+
+                        if (this.googleSheetsUrl && this.googleSheetsUrl.trim().startsWith('http')) {
+                            try {
+                                fetch(this.googleSheetsUrl.trim(), {
+                                    method: "POST",
+                                    mode: "no-cors",
+                                    headers: { "Content-Type": "application/json" },
+                                    body: JSON.stringify(logItem)
+                                }).catch(e => console.log("Google Sheets sync error:", e));
+                            } catch(e) {}
+                        }
+                    },
+
+                    get stats() {
+                        const totalAccess = this.logs.length;
+                        const uniqueUsers = new Set(this.logs.map(l => l.studentName + l.institution)).size;
+                        
+                        const studentsCount = new Set(this.logs.filter(l => l.userType === 'Student').map(l => l.studentName)).size;
+                        const teachersCount = new Set(this.logs.filter(l => l.userType === 'Teacher / Lecturer').map(l => l.studentName)).size;
+                        const othersCount = uniqueUsers - (studentsCount + teachersCount);
+
+                        const basicAccess = this.logs.filter(l => l.module === 'basic').length;
+                        const advancedAccess = this.logs.filter(l => l.module === 'advanced').length;
+
+                        const instCounts = {};
+                        this.logs.forEach(l => {
+                            if (l.institution && l.institution !== 'Public Access') {
+                                instCounts[l.institution] = (instCounts[l.institution] || 0) + 1;
+                            }
+                        });
+                        const topInstitutions = Object.entries(instCounts)
+                            .map(([name, count]) => ({ name, count }))
+                            .sort((a,b) => b.count - a.count)
+                            .slice(0, 5);
+
+                        const sourceCounts = {};
+                        this.logs.forEach(l => {
+                            if (l.discoverySource) {
+                                sourceCounts[l.discoverySource] = (sourceCounts[l.discoverySource] || 0) + 1;
+                            }
+                        });
+                        const discoveryBreakdown = Object.entries(sourceCounts)
+                            .map(([channel, count]) => ({ channel, count }))
+                            .sort((a,b) => b.count - a.count);
+
+                        const toolCounts = {};
+                        this.logs.forEach(l => {
+                            if (l.toolUsed && l.toolUsed !== 'Access Hub Entry') {
+                                toolCounts[l.toolUsed] = (toolCounts[l.toolUsed] || 0) + 1;
+                            }
+                        });
+                        let mostUsed = 'Matrix Addition';
+                        let maxCount = 0;
+                        for (const [tool, count] of Object.entries(toolCounts)) {
+                            if (count > maxCount) {
+                                maxCount = count;
+                                mostUsed = tool;
+                            }
+                        }
+
+                        const lastLog = this.logs[0];
+                        const lastAccessTime = lastLog ? lastLog.formattedTime : 'N/A';
+
+                        return {
+                            totalUsers: uniqueUsers || 1,
+                            studentsCount,
+                            teachersCount,
+                            othersCount: Math.max(0, othersCount),
+                            totalAccess,
+                            basicAccess,
+                            advancedAccess,
+                            topInstitutions: topInstitutions.length > 0 ? topInstitutions : [{ name: 'Politeknik Port Dickson', count: 1 }],
+                            discoveryBreakdown,
+                            mostUsedTool: mostUsed,
+                            lastAccessTime
+                        };
+                    },
+
+                    get filteredLogs() {
+                        if (!this.searchLog) return this.logs;
+                        const q = this.searchLog.toLowerCase();
+                        return this.logs.filter(l => 
+                            (l.studentName || '').toLowerCase().includes(q) ||
+                            (l.institution || '').toLowerCase().includes(q) ||
+                            (l.userType || '').toLowerCase().includes(q) ||
+                            (l.toolUsed || '').toLowerCase().includes(q)
+                        );
+                    },
+
+                    clearLogs() {
+                        this.logs = [];
+                        this.notify("Logs reset successfully!");
+                    },
+
+                    exportToCSV() {
+                        if (!this.logs || this.logs.length === 0) {
+                            this.notify("No access logs available to export.");
+                            return;
+                        }
+
+                        const headers = ["Timestamp", "Formatted Time", "Name", "User Type", "Institution", "Country", "Purpose", "Discovery Source", "Module", "Tool Used"];
+                        const csvRows = [];
+                        csvRows.push(headers.join(","));
+
+                        this.logs.forEach(log => {
+                            const row = [
+                                `"${log.timestamp || ''}"`,
+                                `"${(log.formattedTime || '').replace(/"/g, '""')}"`,
+                                `"${(log.studentName || '').replace(/"/g, '""')}"`,
+                                `"${(log.userType || '').replace(/"/g, '""')}"`,
+                                `"${(log.institution || '').replace(/"/g, '""')}"`,
+                                `"${(log.country || '').replace(/"/g, '""')}"`,
+                                `"${(log.purpose || '').replace(/"/g, '""')}"`,
+                                `"${(log.discoverySource || '').replace(/"/g, '""')}"`,
+                                `"${(log.module || '').replace(/"/g, '""')}"`,
+                                `"${(log.toolUsed || '').replace(/"/g, '""')}"`
+                            ];
+                            csvRows.push(row.join(","));
+                        });
+
+                        const csvContent = "\uFEFF" + csvRows.join("\n");
+                        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+                        const url = URL.createObjectURL(blob);
+                        
+                        const link = document.createElement("a");
+                        link.setAttribute("href", url);
+                        link.setAttribute("download", `Matrix_Hub_Access_Logs_${new Date().toISOString().slice(0,10)}.csv`);
+                        document.body.appendChild(link);
+                        link.click();
+                        document.body.removeChild(link);
+                        this.notify("Exported activity log to CSV successfully!");
+                    },
+
+                    handleAdminClick() {
+                        if (this.isAdminAuthenticated) {
+                            this.showAdminModal = true;
+                        } else {
+                            this.adminInputPin = '';
+                            this.pinError = false;
+                            this.showAdminPinModal = true;
+                        }
+                    },
+
+                    verifyAdminPin() {
+                        if (this.adminInputPin === this.adminSecretPin) {
+                            this.isAdminAuthenticated = true;
+                            this.showAdminPinModal = false;
+                            this.showAdminModal = true;
+                            this.pinError = false;
+                        } else {
+                            this.pinError = true;
+                        }
+                    },
+
+                    lockAdminSession() {
+                        this.isAdminAuthenticated = false;
+                        this.showAdminModal = false;
+                        this.notify("Admin session locked.");
+                    },
+
+                    goHome() {
+                        this.currentView = 'cover';
+                    },
+
+                    enterBasicMatrix() {
+                        this.recordActivity('basic', 'Basic Matrix Page Access');
+                        if (this.basicMatrixUrl && this.basicMatrixUrl !== '#') {
+                            window.location.href = this.basicMatrixUrl;
+                        } else {
+                            this.currentView = 'basic';
+                            this.calculateBasic();
+                        }
+                    },
+
+                    enterAdvanceMethod(method) {
+                        this.activeMethod = method;
+                        const methodNames = {
+                            gaussian: 'Gaussian Elimination',
+                            doolittle: 'Doolittle LU Method',
+                            crout: 'Crout LU Method'
+                        };
+                        const methodUrls = {
+                            gaussian: this.gaussianUrl,
+                            doolittle: this.doolittleUrl,
+                            crout: this.croutUrl
+                        };
+
+                        this.recordActivity('advanced', methodNames[method] || 'Advanced Matrix Method');
+                        const targetUrl = methodUrls[method];
+                        if (targetUrl && targetUrl !== '#') {
+                            window.location.href = targetUrl;
+                        } else {
+                            this.currentView = 'advance';
+                            this.loadExample();
+                            this.calculateSolution();
+                        }
+                    },
+
+                    selectMethod(method) {
+                        this.activeMethod = method;
+                        this.recordActivity('advanced', this.getMethodTitle());
+                        if (this.hasCalculated) {
+                            this.calculateSolution();
+                        }
+                    },
+
+                    setBasicOp(op) {
+                        this.basicOp = op;
+                        const toolNames = {
+                            add: 'Matrix Addition (A+B)',
+                            sub: 'Matrix Subtraction (A-B)',
+                            mul: 'Matrix Multiplication (A×B)',
+                            det: 'Matrix Determinant det(A)',
+                            trans: 'Matrix Transpose (Aᵀ)'
+                        };
+                        this.recordActivity('basic', toolNames[op] || 'Basic Op');
+                        this.calculateBasic();
+                    },
+
+                    fillSampleBasicA() {
+                        this.basicA = [[3, 2, 1], [0, 1, 4], [2, 1, 0]];
+                        this.calculateBasic();
+                    },
+
+                    fillSampleBasicB() {
+                        this.basicB = [[1, 2, 0], [2, 0, 1], [1, 1, 3]];
+                        this.calculateBasic();
+                    },
+
+                    calculateBasic() {
+                        const A = this.basicA;
+                        const B = this.basicB;
+
+                        if (this.basicOp === 'add') {
+                            this.basicResult = A.map((row, r) => row.map((val, c) => (Number(val)||0) + (Number(B[r][c])||0)));
+                        } else if (this.basicOp === 'sub') {
+                            this.basicResult = A.map((row, r) => row.map((val, c) => (Number(val)||0) - (Number(B[r][c])||0)));
+                        } else if (this.basicOp === 'mul') {
+                            let res = [[0,0,0],[0,0,0],[0,0,0]];
+                            for (let i = 0; i < 3; i++) {
+                                for (let j = 0; j < 3; j++) {
+                                    for (let k = 0; k < 3; k++) {
+                                        res[i][j] += (Number(A[i][k])||0) * (Number(B[k][j])||0);
+                                    }
+                                }
+                            }
+                            this.basicResult = res;
+                        } else if (this.basicOp === 'det') {
+                            const det = A[0][0]*(A[1][1]*A[2][2] - A[1][2]*A[2][1])
+                                      - A[0][1]*(A[1][0]*A[2][2] - A[1][2]*A[2][0])
+                                      + A[0][2]*(A[1][0]*A[2][1] - A[1][1]*A[2][0]);
+                            this.basicResult = det;
+                        } else if (this.basicOp === 'trans') {
+                            this.basicResult = [
+                                [A[0][0], A[1][0], A[2][0]],
+                                [A[0][1], A[1][1], A[2][1]],
+                                [A[0][2], A[1][2], A[2][2]]
+                            ];
+                        }
+                    },
+
+                    getMethodTitle() {
+                        if (this.activeMethod === 'gaussian') return 'Gaussian Method';
+                        if (this.activeMethod === 'doolittle') return 'Doolittle LU Method';
+                        if (this.activeMethod === 'crout') return 'Crout LU Method';
+                        return '';
+                    },
+
+                    getMethodBadge() {
+                        if (this.activeMethod === 'gaussian') return 'Gaussian Elimination';
+                        if (this.activeMethod === 'doolittle') return 'Doolittle Decomposition';
+                        if (this.activeMethod === 'crout') return 'Crout Decomposition';
+                        return '';
+                    },
+
+                    getMethodFullSubtitle() {
+                        if (this.activeMethod === 'gaussian') return 'Gaussian Elimination Method';
+                        if (this.activeMethod === 'doolittle') return 'Doolittle LU Decomposition';
+                        if (this.activeMethod === 'crout') return 'Crout LU Decomposition';
+                        return '';
+                    },
+
+                    getMethodTagline() {
+                        if (this.activeMethod === 'gaussian') return 'Upper Triangular Matrix • Back Substitution';
+                        if (this.activeMethod === 'doolittle') return 'A = L·U Matrix Factorization (Lii = 1)';
+                        if (this.activeMethod === 'crout') return 'A = L·U Matrix Factorization (Uii = 1)';
+                        return '';
+                    },
+
+                    loadExample() {
+                        if (this.activeMethod === 'gaussian') {
+                            this.eq = [
+                                [2, 1, -1, 8],
+                                [-3, -1, 2, -11],
+                                [-2, 1, 2, -3]
+                            ];
+                        } else if (this.activeMethod === 'doolittle') {
+                            this.eq = [
+                                [2, 3, 1, 9],
+                                [4, 7, 5, 25],
+                                [6, 18, 19, 67]
+                            ];
+                        } else {
+                            this.eq = [
+                                [1, 1, 1, 6],
+                                [2, 4, 2, 16],
+                                [-1, 5, -4, -3]
+                            ];
+                        }
+                        if (this.currentView === 'advance') {
+                            this.calculateSolution();
+                        }
+                    },
+
+                    resetInputs() {
+                        this.eq = [
+                            [0, 0, 0, 0],
+                            [0, 0, 0, 0],
+                            [0, 0, 0, 0]
+                        ];
+                        this.hasCalculated = false;
+                        this.stepsList = [];
+                        this.errorMessage = '';
+                    },
+
+                    formatNum(num) {
+                        if (num === undefined || num === null || isNaN(num)) return '0';
+                        const val = Math.round(num * 10000) / 10000;
+                        return val.toString();
+                    },
+
+                    get visibleSteps() {
+                        if (this.solutionTab === 'interactive') {
+                            return this.stepsList.length > 0 ? [this.stepsList[this.currentStepIndex]] : [];
+                        }
+                        return this.stepsList;
+                    },
+
+                    calculateSolution() {
+                        this.hasCalculated = true;
+                        this.errorMessage = '';
+                        this.stepsList = [];
+                        this.currentStepIndex = 0;
+
+                        const A = [
+                            [Number(this.eq[0][0])||0, Number(this.eq[0][1])||0, Number(this.eq[0][2])||0],
+                            [Number(this.eq[1][0])||0, Number(this.eq[1][1])||0, Number(this.eq[1][2])||0],
+                            [Number(this.eq[2][0])||0, Number(this.eq[2][1])||0, Number(this.eq[2][2])||0]
+                        ];
+                        const B = [Number(this.eq[0][3])||0, Number(this.eq[1][3])||0, Number(this.eq[2][3])||0];
+
+                        const isAllZero = A.every(row => row.every(val => val === 0));
+                        if (isAllZero) {
+                            this.errorMessage = 'Please enter valid numerical coefficients for the matrix.';
+                            return;
+                        }
+
+                        try {
+                            if (this.activeMethod === 'gaussian') {
+                                this.solveGaussian(A, B);
+                            } else if (this.activeMethod === 'doolittle') {
+                                this.solveDoolittle(A, B);
+                            } else if (this.activeMethod === 'crout') {
+                                this.solveCrout(A, B);
+                            }
+                        } catch (err) {
+                            this.errorMessage = err.message || 'Calculation error occurred (Possible division by zero / no unique solution).';
+                        }
+                    },
+
+                    solveGaussian(A, B) {
+                        let aug = [
+                            [...A[0], B[0]],
+                            [...A[1], B[1]],
+                            [...A[2], B[2]]
+                        ];
+
+                        this.stepsList.push({
+                            stepNumber: 1,
+                            title: 'Augmented Matrix Formation [A | B]',
+                            description: 'Construct the system of linear equations into Augmented Matrix form [A | B]:',
+                            matrices: [
+                                { label: 'Augmented Matrix [A | B]', data: aug }
+                            ]
+                        });
+
+                        if (Math.abs(aug[0][0]) < 1e-9) {
+                            throw new Error("First pivot A[0][0] is zero. Please swap rows (Pivoting) or enter a non-zero coefficient.");
+                        }
+
+                        const m21 = aug[1][0] / aug[0][0];
+                        const m31 = aug[2][0] / aug[0][0];
+
+                        for (let j = 0; j < 4; j++) {
+                            aug[1][j] -= m21 * aug[0][j];
+                            aug[2][j] -= m31 * aug[0][j];
+                        }
+
+                        this.stepsList.push({
+                            stepNumber: 2,
+                            title: 'Eliminating Column 1',
+                            description: 'Perform Elementary Row Operations (ERO) to eliminate variable x in Row 2 and Row 3:',
+                            details: [
+                                `Multiplier m<sub>21</sub> = A<sub>21</sub> / A<sub>11</sub> = ${this.formatNum(m21)}`,
+                                `New Row 2 = R<sub>2</sub> - (${this.formatNum(m21)}) × R<sub>1</sub>`,
+                                `Multiplier m<sub>31</sub> = A<sub>31</sub> / A<sub>11</sub> = ${this.formatNum(m31)}`,
+                                `New Row 3 = R<sub>3</sub> - (${this.formatNum(m31)}) × R<sub>1</sub>`
+                            ],
+                            matrices: [
+                                { label: 'Matrix After Step 1 ERO', data: aug }
+                            ]
+                        });
+
+                        if (Math.abs(aug[1][1]) < 1e-9) {
+                            throw new Error("Second pivot A[1][1] is zero.");
+                        }
+
+                        const m32 = aug[2][1] / aug[1][1];
+                        for (let j = 0; j < 4; j++) {
+                            aug[2][j] -= m32 * aug[1][j];
+                        }
+
+                        this.stepsList.push({
+                            stepNumber: 3,
+                            title: 'Eliminating Column 2 -> Upper Triangular Matrix (U)',
+                            description: 'Perform ERO to eliminate variable y in Row 3 and yield Upper Triangular Matrix U:',
+                            details: [
+                                `Multiplier m<sub>32</sub> = A<sub>32</sub> / A<sub>22</sub> = ${this.formatNum(m32)}`,
+                                `New Row 3 = R<sub>3</sub> - (${this.formatNum(m32)}) × R<sub>2</sub>`
+                            ],
+                            matrices: [
+                                { label: 'Upper Triangular Matrix [U | B\']', data: aug }
+                            ]
+                        });
+
+                        if (Math.abs(aug[2][2]) < 1e-9) {
+                            throw new Error("Matrix system has no unique solution (Singular matrix).");
+                        }
+
+                        const z = aug[2][3] / aug[2][2];
+                        const y = (aug[1][3] - aug[1][2] * z) / aug[1][1];
+                        const x = (aug[0][3] - aug[0][1] * y - aug[0][2] * z) / aug[0][0];
+
+                        this.stepsList.push({
+                            stepNumber: 4,
+                            title: 'Back Substitution',
+                            description: 'Solve variables sequentially from the bottom row upwards:',
+                            details: [
+                                `z = (${this.formatNum(aug[2][3])}) / (${this.formatNum(aug[2][2])}) = ${this.formatNum(z)}`,
+                                `y = (${this.formatNum(aug[1][3])} - (${this.formatNum(aug[1][2])} × ${this.formatNum(z)})) / (${this.formatNum(aug[1][1])}) = ${this.formatNum(y)}`,
+                                `x = (${this.formatNum(aug[0][3])} - (${this.formatNum(aug[0][1])} × ${this.formatNum(y)}) - (${this.formatNum(aug[0][2])} × ${this.formatNum(z)})) / (${this.formatNum(aug[0][0])}) = ${this.formatNum(x)}`
+                            ]
+                        });
+
+                        this.finalResult = { x, y, z };
+                    },
+
+                    solveDoolittle(A, B) {
+                        const L = [
+                            [1, 0, 0],
+                            [0, 1, 0],
+                            [0, 0, 1]
+                        ];
+                        const U = [
+                            [0, 0, 0],
+                            [0, 0, 0],
+                            [0, 0, 0]
+                        ];
+
+                        U[0][0] = A[0][0];
+                        U[0][1] = A[0][1];
+                        U[0][2] = A[0][2];
+
+                        if (Math.abs(U[0][0]) < 1e-9) throw new Error("U[0][0] is zero.");
+                        L[1][0] = A[1][0] / U[0][0];
+                        L[2][0] = A[2][0] / U[0][0];
+
+                        U[1][1] = A[1][1] - L[1][0] * U[0][1];
+                        U[1][2] = A[1][2] - L[1][0] * U[0][2];
+
+                        if (Math.abs(U[1][1]) < 1e-9) throw new Error("U[1][1] is zero.");
+                        L[2][1] = (A[2][1] - L[2][0] * U[0][1]) / U[1][1];
+
+                        U[2][2] = A[2][2] - (L[2][0] * U[0][2] + L[2][1] * U[1][2]);
+
+                        this.stepsList.push({
+                            stepNumber: 1,
+                            title: 'Doolittle LU Factorization (A = L · U)',
+                            description: 'Decompose matrix A into Lower Triangular Matrix L (with unit diagonal L<sub>ii</sub> = 1) and Upper Triangular Matrix U:',
+                            matrices: [
+                                { label: 'Matrix L (Lii = 1)', data: L },
+                                { label: 'Matrix U', data: U }
+                            ]
+                        });
+
+                        const y1 = B[0];
+                        const y2 = B[1] - L[1][0] * y1;
+                        const y3 = B[2] - (L[2][0] * y1 + L[2][1] * y2);
+
+                        this.stepsList.push({
+                            stepNumber: 2,
+                            title: 'Forward Substitution (L · y = B)',
+                            description: 'Solve for intermediate vector y = [y<sub>1</sub>, y<sub>2</sub>, y<sub>3</sub>]<sup>T</sup>:',
+                            details: [
+                                `y<sub>1</sub> = B<sub>1</sub> = ${this.formatNum(y1)}`,
+                                `y<sub>2</sub> = B<sub>2</sub> - L<sub>21</sub> · y<sub>1</sub> = ${this.formatNum(B[1])} - (${this.formatNum(L[1][0])} × ${this.formatNum(y1)}) = ${this.formatNum(y2)}`,
+                                `y<sub>3</sub> = B<sub>3</sub> - L<sub>31</sub> · y<sub>1</sub> - L<sub>32</sub> · y<sub>2</sub> = ${this.formatNum(y3)}`
+                            ]
+                        });
+
+                        if (Math.abs(U[2][2]) < 1e-9) throw new Error("Matrix U is singular (U[2][2] = 0).");
+                        const x3 = y3 / U[2][2];
+                        const x2 = (y2 - U[1][2] * x3) / U[1][1];
+                        const x1 = (y1 - U[0][1] * x2 - U[0][2] * x3) / U[0][0];
+
+                        this.stepsList.push({
+                            stepNumber: 3,
+                            title: 'Back Substitution (U · x = y)',
+                            description: 'Solve target variables x = [x, y, z]<sup>T</sup> using U and y:',
+                            details: [
+                                `z = x<sub>3</sub> = y<sub>3</sub> / U<sub>33</sub> = ${this.formatNum(x3)}`,
+                                `y = x<sub>2</sub> = (y<sub>2</sub> - U<sub>23</sub> · x<sub>3</sub>) / U<sub>22</sub> = ${this.formatNum(x2)}`,
+                                `x = x<sub>1</sub> = (y<sub>1</sub> - U<sub>12</sub> · x<sub>2</sub> - U<sub>13</sub> · x<sub>3</sub>) / U<sub>11</sub> = ${this.formatNum(x1)}`
+                            ]
+                        });
+
+                        this.finalResult = { x: x1, y: x2, z: x3 };
+                    },
+
+                    solveCrout(A, B) {
+                        const L = [
+                            [0, 0, 0],
+                            [0, 0, 0],
+                            [0, 0, 0]
+                        ];
+                        const U = [
+                            [1, 0, 0],
+                            [0, 1, 0],
+                            [0, 0, 1]
+                        ];
+
+                        L[0][0] = A[0][0];
+                        L[1][0] = A[1][0];
+                        L[2][0] = A[2][0];
+
+                        if (Math.abs(L[0][0]) < 1e-9) throw new Error("L[0][0] is zero.");
+                        U[0][1] = A[0][1] / L[0][0];
+                        U[0][2] = A[0][2] / L[0][0];
+
+                        L[1][1] = A[1][1] - L[1][0] * U[0][1];
+                        L[2][1] = A[2][1] - L[2][0] * U[0][1];
+
+                        if (Math.abs(L[1][1]) < 1e-9) throw new Error("L[1][1] is zero.");
+                        U[1][2] = (A[1][2] - L[1][0] * U[0][2]) / L[1][1];
+
+                        L[2][2] = A[2][2] - (L[2][0] * U[0][2] + L[2][1] * U[1][2]);
+
+                        this.stepsList.push({
+                            stepNumber: 1,
+                            title: 'Crout LU Factorization (A = L · U)',
+                            description: 'Decompose matrix A into Lower Triangular Matrix L and Upper Triangular Matrix U (with unit diagonal U<sub>ii</sub> = 1):',
+                            matrices: [
+                                { label: 'Matrix L', data: L },
+                                { label: 'Matrix U (Uii = 1)', data: U }
+                            ]
+                        });
+
+                        const y1 = B[0] / L[0][0];
+                        const y2 = (B[1] - L[1][0] * y1) / L[1][1];
+                        const y3 = (B[2] - (L[2][0] * y1 + L[2][1] * y2)) / L[2][2];
+
+                        this.stepsList.push({
+                            stepNumber: 2,
+                            title: 'Forward Substitution (L · y = B)',
+                            description: 'Solve for intermediate vector y = [y<sub>1</sub>, y<sub>2</sub>, y<sub>3</sub>]<sup>T</sup>:',
+                            details: [
+                                `y<sub>1</sub> = B<sub>1</sub> / L<sub>11</sub> = ${this.formatNum(y1)}`,
+                                `y<sub>2</sub> = (B<sub>2</sub> - L<sub>21</sub> · y<sub>1</sub>) / L<sub>22</sub> = ${this.formatNum(y2)}`,
+                                `y<sub>3</sub> = (B<sub>3</sub> - L<sub>31</sub> · y<sub>1</sub> - L<sub>32</sub> · y<sub>2</sub>) / L<sub>33</sub> = ${this.formatNum(y3)}`
+                            ]
+                        });
+
+                        const x3 = y3;
+                        const x2 = y2 - U[1][2] * x3;
+                        const x1 = y1 - U[0][1] * x2 - U[0][2] * x3;
+
+                        this.stepsList.push({
+                            stepNumber: 3,
+                            title: 'Back Substitution (U · x = y)',
+                            description: 'Solve target variables x = [x, y, z]<sup>T</sup> using matrix U (U<sub>ii</sub> = 1):',
+                            details: [
+                                `z = x<sub>3</sub> = y<sub>3</sub> = ${this.formatNum(x3)}`,
+                                `y = x<sub>2</sub> = y<sub>2</sub> - U<sub>23</sub> · x<sub>3</sub> = ${this.formatNum(x2)}`,
+                                `x = x<sub>1</sub> = y<sub>1</sub> - U<sub>12</sub> · x<sub>2</sub> - U<sub>13</sub> · x<sub>3</sub> = ${this.formatNum(x1)}`
+                            ]
+                        });
+
+                        this.finalResult = { x: x1, y: x2, z: x3 };
                     }
-                },
+                };
+            });
+        }
 
-                // 1. GAUSSIAN ELIMINATION
-                solveGaussian(A, B) {
-                    let aug = [
-                        [...A[0], B[0]],
-                        [...A[1], B[1]],
-                        [...A[2], B[2]]
-                    ];
-
-                    this.stepsList.push({
-                        stepNumber: 1,
-                        title: 'Augmented Matrix Formation [A | B]',
-                        description: 'Construct the system of linear equations into Augmented Matrix form [A | B]:',
-                        matrices: [
-                            { label: 'Augmented Matrix [A | B]', data: aug }
-                        ]
-                    });
-
-                    if (Math.abs(aug[0][0]) < 1e-9) {
-                        throw new Error("First pivot A[0][0] is zero. Please swap rows (Pivoting) or enter a non-zero coefficient.");
-                    }
-
-                    const m21 = aug[1][0] / aug[0][0];
-                    const m31 = aug[2][0] / aug[0][0];
-
-                    for (let j = 0; j < 4; j++) {
-                        aug[1][j] -= m21 * aug[0][j];
-                        aug[2][j] -= m31 * aug[0][j];
-                    }
-
-                    this.stepsList.push({
-                        stepNumber: 2,
-                        title: 'Eliminating Column 1',
-                        description: 'Perform Elementary Row Operations (ERO) to eliminate variable x in Row 2 and Row 3:',
-                        details: [
-                            `Multiplier m<sub>21</sub> = A<sub>21</sub> / A<sub>11</sub> = ${this.formatNum(m21)}`,
-                            `New Row 2 = R<sub>2</sub> - (${this.formatNum(m21)}) × R<sub>1</sub>`,
-                            `Multiplier m<sub>31</sub> = A<sub>31</sub> / A<sub>11</sub> = ${this.formatNum(m31)}`,
-                            `New Row 3 = R<sub>3</sub> - (${this.formatNum(m31)}) × R<sub>1</sub>`
-                        ],
-                        matrices: [
-                            { label: 'Matrix After Step 1 ERO', data: aug }
-                        ]
-                    });
-
-                    if (Math.abs(aug[1][1]) < 1e-9) {
-                        throw new Error("Second pivot A[1][1] is zero.");
-                    }
-
-                    const m32 = aug[2][1] / aug[1][1];
-                    for (let j = 0; j < 4; j++) {
-                        aug[2][j] -= m32 * aug[1][j];
-                    }
-
-                    this.stepsList.push({
-                        stepNumber: 3,
-                        title: 'Eliminating Column 2 -> Upper Triangular Matrix (U)',
-                        description: 'Perform ERO to eliminate variable y in Row 3 and yield Upper Triangular Matrix U:',
-                        details: [
-                            `Multiplier m<sub>32</sub> = A<sub>32</sub> / A<sub>22</sub> = ${this.formatNum(m32)}`,
-                            `New Row 3 = R<sub>3</sub> - (${this.formatNum(m32)}) × R<sub>2</sub>`
-                        ],
-                        matrices: [
-                            { label: 'Upper Triangular Matrix [U | B\']', data: aug }
-                        ]
-                    });
-
-                    if (Math.abs(aug[2][2]) < 1e-9) {
-                        throw new Error("Matrix system has no unique solution (Singular matrix).");
-                    }
-
-                    const z = aug[2][3] / aug[2][2];
-                    const y = (aug[1][3] - aug[1][2] * z) / aug[1][1];
-                    const x = (aug[0][3] - aug[0][1] * y - aug[0][2] * z) / aug[0][0];
-
-                    this.stepsList.push({
-                        stepNumber: 4,
-                        title: 'Back Substitution',
-                        description: 'Solve variables sequentially from the bottom row upwards:',
-                        details: [
-                            `z = (${this.formatNum(aug[2][3])}) / (${this.formatNum(aug[2][2])}) = ${this.formatNum(z)}`,
-                            `y = (${this.formatNum(aug[1][3])} - (${this.formatNum(aug[1][2])} × ${this.formatNum(z)})) / (${this.formatNum(aug[1][1])}) = ${this.formatNum(y)}`,
-                            `x = (${this.formatNum(aug[0][3])} - (${this.formatNum(aug[0][1])} × ${this.formatNum(y)}) - (${this.formatNum(aug[0][2])} × ${this.formatNum(z)})) / (${this.formatNum(aug[0][0])}) = ${this.formatNum(x)}`
-                        ]
-                    });
-
-                    this.finalResult = { x, y, z };
-                },
-
-                // 2. DOOLITTLE LU METHOD
-                solveDoolittle(A, B) {
-                    const L = [
-                        [1, 0, 0],
-                        [0, 1, 0],
-                        [0, 0, 1]
-                    ];
-                    const U = [
-                        [0, 0, 0],
-                        [0, 0, 0],
-                        [0, 0, 0]
-                    ];
-
-                    U[0][0] = A[0][0];
-                    U[0][1] = A[0][1];
-                    U[0][2] = A[0][2];
-
-                    if (Math.abs(U[0][0]) < 1e-9) throw new Error("U[0][0] is zero.");
-                    L[1][0] = A[1][0] / U[0][0];
-                    L[2][0] = A[2][0] / U[0][0];
-
-                    U[1][1] = A[1][1] - L[1][0] * U[0][1];
-                    U[1][2] = A[1][2] - L[1][0] * U[0][2];
-
-                    if (Math.abs(U[1][1]) < 1e-9) throw new Error("U[1][1] is zero.");
-                    L[2][1] = (A[2][1] - L[2][0] * U[0][1]) / U[1][1];
-
-                    U[2][2] = A[2][2] - (L[2][0] * U[0][2] + L[2][1] * U[1][2]);
-
-                    this.stepsList.push({
-                        stepNumber: 1,
-                        title: 'Doolittle LU Factorization (A = L · U)',
-                        description: 'Decompose matrix A into Lower Triangular Matrix L (with unit diagonal L<sub>ii</sub> = 1) and Upper Triangular Matrix U:',
-                        matrices: [
-                            { label: 'Matrix L (Lii = 1)', data: L },
-                            { label: 'Matrix U', data: U }
-                        ]
-                    });
-
-                    const y1 = B[0];
-                    const y2 = B[1] - L[1][0] * y1;
-                    const y3 = B[2] - (L[2][0] * y1 + L[2][1] * y2);
-
-                    this.stepsList.push({
-                        stepNumber: 2,
-                        title: 'Forward Substitution (L · y = B)',
-                        description: 'Solve for intermediate vector y = [y<sub>1</sub>, y<sub>2</sub>, y<sub>3</sub>]<sup>T</sup>:',
-                        details: [
-                            `y<sub>1</sub> = B<sub>1</sub> = ${this.formatNum(y1)}`,
-                            `y<sub>2</sub> = B<sub>2</sub> - L<sub>21</sub> · y<sub>1</sub> = ${this.formatNum(B[1])} - (${this.formatNum(L[1][0])} × ${this.formatNum(y1)}) = ${this.formatNum(y2)}`,
-                            `y<sub>3</sub> = B<sub>3</sub> - L<sub>31</sub> · y<sub>1</sub> - L<sub>32</sub> · y<sub>2</sub> = ${this.formatNum(y3)}`
-                        ]
-                    });
-
-                    if (Math.abs(U[2][2]) < 1e-9) throw new Error("Matrix U is singular (U[2][2] = 0).");
-                    const x3 = y3 / U[2][2];
-                    const x2 = (y2 - U[1][2] * x3) / U[1][1];
-                    const x1 = (y1 - U[0][1] * x2 - U[0][2] * x3) / U[0][0];
-
-                    this.stepsList.push({
-                        stepNumber: 3,
-                        title: 'Back Substitution (U · x = y)',
-                        description: 'Solve target variables x = [x, y, z]<sup>T</sup> using U and y:',
-                        details: [
-                            `z = x<sub>3</sub> = y<sub>3</sub> / U<sub>33</sub> = ${this.formatNum(x3)}`,
-                            `y = x<sub>2</sub> = (y<sub>2</sub> - U<sub>23</sub> · x<sub>3</sub>) / U<sub>22</sub> = ${this.formatNum(x2)}`,
-                            `x = x<sub>1</sub> = (y<sub>1</sub> - U<sub>12</sub> · x<sub>2</sub> - U<sub>13</sub> · x<sub>3</sub>) / U<sub>11</sub> = ${this.formatNum(x1)}`
-                        ]
-                    });
-
-                    this.finalResult = { x: x1, y: x2, z: x3 };
-                },
-
-                // 3. CROUT LU METHOD
-                solveCrout(A, B) {
-                    const L = [
-                        [0, 0, 0],
-                        [0, 0, 0],
-                        [0, 0, 0]
-                    ];
-                    const U = [
-                        [1, 0, 0],
-                        [0, 1, 0],
-                        [0, 0, 1]
-                    ];
-
-                    L[0][0] = A[0][0];
-                    L[1][0] = A[1][0];
-                    L[2][0] = A[2][0];
-
-                    if (Math.abs(L[0][0]) < 1e-9) throw new Error("L[0][0] is zero.");
-                    U[0][1] = A[0][1] / L[0][0];
-                    U[0][2] = A[0][2] / L[0][0];
-
-                    L[1][1] = A[1][1] - L[1][0] * U[0][1];
-                    L[2][1] = A[2][1] - L[2][0] * U[0][1];
-
-                    if (Math.abs(L[1][1]) < 1e-9) throw new Error("L[1][1] is zero.");
-                    U[1][2] = (A[1][2] - L[1][0] * U[0][2]) / L[1][1];
-
-                    L[2][2] = A[2][2] - (L[2][0] * U[0][2] + L[2][1] * U[1][2]);
-
-                    this.stepsList.push({
-                        stepNumber: 1,
-                        title: 'Crout LU Factorization (A = L · U)',
-                        description: 'Decompose matrix A into Lower Triangular Matrix L and Upper Triangular Matrix U (with unit diagonal U<sub>ii</sub> = 1):',
-                        matrices: [
-                            { label: 'Matrix L', data: L },
-                            { label: 'Matrix U (Uii = 1)', data: U }
-                        ]
-                    });
-
-                    const y1 = B[0] / L[0][0];
-                    const y2 = (B[1] - L[1][0] * y1) / L[1][1];
-                    const y3 = (B[2] - (L[2][0] * y1 + L[2][1] * y2)) / L[2][2];
-
-                    this.stepsList.push({
-                        stepNumber: 2,
-                        title: 'Forward Substitution (L · y = B)',
-                        description: 'Solve for intermediate vector y = [y<sub>1</sub>, y<sub>2</sub>, y<sub>3</sub>]<sup>T</sup>:',
-                        details: [
-                            `y<sub>1</sub> = B<sub>1</sub> / L<sub>11</sub> = ${this.formatNum(y1)}`,
-                            `y<sub>2</sub> = (B<sub>2</sub> - L<sub>21</sub> · y<sub>1</sub>) / L<sub>22</sub> = ${this.formatNum(y2)}`,
-                            `y<sub>3</sub> = (B<sub>3</sub> - L<sub>31</sub> · y<sub>1</sub> - L<sub>32</sub> · y<sub>2</sub>) / L<sub>33</sub> = ${this.formatNum(y3)}`
-                        ]
-                    });
-
-                    const x3 = y3;
-                    const x2 = y2 - U[1][2] * x3;
-                    const x1 = y1 - U[0][1] * x2 - U[0][2] * x3;
-
-                    this.stepsList.push({
-                        stepNumber: 3,
-                        title: 'Back Substitution (U · x = y)',
-                        description: 'Solve target variables x = [x, y, z]<sup>T</sup> using matrix U (U<sub>ii</sub> = 1):',
-                        details: [
-                            `z = x<sub>3</sub> = y<sub>3</sub> = ${this.formatNum(x3)}`,
-                            `y = x<sub>2</sub> = y<sub>2</sub> - U<sub>23</sub> · x<sub>3</sub> = ${this.formatNum(x2)}`,
-                            `x = x<sub>1</sub> = y<sub>1</sub> - U<sub>12</sub> · x<sub>2</sub> - U<sub>13</sub> · x<sub>3</sub> = ${this.formatNum(x1)}`
-                        ]
-                    });
-
-                    this.finalResult = { x: x1, y: x2, z: x3 };
-                }
-
-            }));
-        });
+        if (window.Alpine) {
+            registerMatrixApp();
+        } else {
+            document.addEventListener('alpine:init', registerMatrixApp);
+        }
     </script>
 </body>
 </html>
