@@ -108,9 +108,9 @@
                     </div>
                 </div>
                 <div class="grid grid-cols-2 gap-2">
-                    <button onclick="openModal('notes', 'Addition & Subtraction', 'A ± B = [a_ij ± b_ij]\nBoth matrices must have the exact same dimensions (e.g. 2x2 with 2x2).')" class="bg-sky-500 hover:bg-sky-600 text-white font-bold py-2 px-3 rounded-xl text-xs flex items-center justify-center gap-1.5 transition">
-                        <i class="fa-solid fa-book-open"></i> NOTES
-                    </button>
+             <button onclick="openModal('notes', 'Addition & Subtraction', '1. Matrix sizes must match (e.g. 2x2 with 2x2).\n2. Add/subtract numbers in the exact same positions.')" class="bg-sky-500 hover:bg-sky-600 text-white font-bold py-2 px-3 rounded-xl text-xs flex items-center justify-center gap-1.5 transition">
+    <i class="fa-solid fa-book-open"></i> NOTES
+</button>
                     <button onclick="openCalc('addsub')" class="bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-2 px-3 rounded-xl text-xs flex items-center justify-center gap-1.5 transition">
                         <i class="fa-solid fa-calculator"></i> CALCULATOR
                     </button>
@@ -137,9 +137,9 @@
                     </div>
                 </div>
                 <div class="grid grid-cols-2 gap-2">
-                    <button onclick="openModal('notes', 'Matrix Multiplication', 'C_ij = Σ (A_ik * B_kj)\nColumns of Matrix A must equal Rows of Matrix B.')" class="bg-sky-500 hover:bg-sky-600 text-white font-bold py-2 px-3 rounded-xl text-xs flex items-center justify-center gap-1.5 transition">
+                 <button onclick="openModal('notes', 'Matrix Multiplication', '1. Rule: Columns of A must match Rows of B (e.g. 2x3 with 3x2).\n2. Method: Multiply Row by Column and add the results.')" class="bg-sky-500 hover:bg-sky-600 text-white font-bold py-2 px-3 rounded-xl text-xs flex items-center justify-center gap-1.5 transition">
                         <i class="fa-solid fa-book-open"></i> NOTES
-                    </button>
+                </button>
                     <button onclick="openCalc('multiply')" class="bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-2 px-3 rounded-xl text-xs flex items-center justify-center gap-1.5 transition">
                         <i class="fa-solid fa-calculator"></i> CALCULATOR
                     </button>
@@ -166,9 +166,9 @@
                     </div>
                 </div>
                 <div class="grid grid-cols-2 gap-2">
-                    <button onclick="openModal('notes', 'Determinant Formula', 'For 2x2: |A| = ad - bc\nFor 3x3: Expand along row 1 using Sarrus or Cofactor expansion.')" class="bg-sky-500 hover:bg-sky-600 text-white font-bold py-2 px-3 rounded-xl text-xs flex items-center justify-center gap-1.5 transition">
-                        <i class="fa-solid fa-book-open"></i> NOTES
-                    </button>
+                <button onclick="openModal('notes', 'Determinant Formula', '1. For 2x2: |A| = ad - bc (Multiply main diagonal minus opposite diagonal).\n2. For 3x3: Use Sarrus Rule or Cofactor Expansion (+ - +).')" class="bg-sky-500 hover:bg-sky-600 text-white font-bold py-2 px-3 rounded-xl text-xs flex items-center justify-center gap-1.5 transition">
+                <i class="fa-solid fa-book-open"></i> NOTES
+                </button>
                     <button onclick="openCalc('det')" class="bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-2 px-3 rounded-xl text-xs flex items-center justify-center gap-1.5 transition">
                         <i class="fa-solid fa-calculator"></i> CALCULATOR
                     </button>
@@ -195,9 +195,9 @@
                     </div>
                 </div>
                 <div class="grid grid-cols-2 gap-2">
-                    <button onclick="openModal('notes', 'Minor, Cofactor & Adjoint', 'Minor (M_ij): Determinant of submatrix after removing row i & col j.\nCofactor (C_ij) = (-1)^(i+j) * M_ij.\nAdjoint = Transpose of Cofactor Matrix.')" class="bg-sky-500 hover:bg-sky-600 text-white font-bold py-2 px-3 rounded-xl text-xs flex items-center justify-center gap-1.5 transition">
-                        <i class="fa-solid fa-book-open"></i> NOTES
-                    </button>
+                <button onclick="openModal('notes', 'Minor, Cofactor & Adjoint', '1. Minor: Delete the row & column of an element, then find remaining determinant.\n2. Cofactor: Apply sign pattern (+ - +) to the Minor.\n3. Adjoint: Transpose (swap rows & columns of) the Cofactor matrix.')" class="bg-sky-500 hover:bg-sky-600 text-white font-bold py-2 px-3 rounded-xl text-xs flex items-center justify-center gap-1.5 transition">
+                <i class="fa-solid fa-book-open"></i> NOTES
+                </button>
                     <button onclick="openCalc('adj')" class="bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-2 px-3 rounded-xl text-xs flex items-center justify-center gap-1.5 transition">
                         <i class="fa-solid fa-calculator"></i> CALCULATOR
                     </button>
@@ -224,9 +224,9 @@
                     </div>
                 </div>
                 <div class="grid grid-cols-2 gap-2">
-                    <button onclick="openModal('notes', 'Inverse Matrix Formula', 'A^-1 = (1 / |A|) * adj(A)\nNote: Matrix must be non-singular (|A| ≠ 0).')" class="bg-sky-500 hover:bg-sky-600 text-white font-bold py-2 px-3 rounded-xl text-xs flex items-center justify-center gap-1.5 transition">
-                        <i class="fa-solid fa-book-open"></i> NOTES
-                    </button>
+                <button onclick="openModal('notes', 'Inverse Matrix', '1. Rule: |A| ≠ 0 (If |A| = 0, inverse does not exist).\n2. Formula: A⁻¹ = (1 / |A|) × adj(A).')" class="bg-sky-500 hover:bg-sky-600 text-white font-bold py-2 px-3 rounded-xl text-xs flex items-center justify-center gap-1.5 transition">
+                <i class="fa-solid fa-book-open"></i> NOTES
+                </button>
                     <button onclick="openCalc('inverse')" class="bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-2 px-3 rounded-xl text-xs flex items-center justify-center gap-1.5 transition">
                         <i class="fa-solid fa-calculator"></i> CALCULATOR
                     </button>
@@ -253,9 +253,9 @@
                     </div>
                 </div>
                 <div class="grid grid-cols-2 gap-2">
-                    <button onclick="openModal('notes', 'Cramer\'s Rule', 'x = |A_x| / |A|, y = |A_y| / |A|, z = |A_z| / |A|\nReplace column coefficients with constants matrix B.')" class="bg-sky-500 hover:bg-sky-600 text-white font-bold py-2 px-3 rounded-xl text-xs flex items-center justify-center gap-1.5 transition">
-                        <i class="fa-solid fa-book-open"></i> NOTES
-                    </button>
+                <button onclick="openModal('notes', 'Cramer\'s Rule', '1. Rule: Replace the x, y, or z column with the constant numbers (B) to find |A_x|, |A_y|, or |A_z|.\n2. Formula: x = |A_x| / |A|,  y = |A_y| / |A|,  z = |A_z| / |A|.')" class="bg-sky-500 hover:bg-sky-600 text-white font-bold py-2 px-3 rounded-xl text-xs flex items-center justify-center gap-1.5 transition">
+                <i class="fa-solid fa-book-open"></i> NOTES
+                </button>
                     <button onclick="openCalc('cramer')" class="bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-2 px-3 rounded-xl text-xs flex items-center justify-center gap-1.5 transition">
                         <i class="fa-solid fa-calculator"></i> CALCULATOR
                     </button>
