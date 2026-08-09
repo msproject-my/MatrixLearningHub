@@ -58,7 +58,7 @@
                     <i class="fa-solid fa-pen-to-square ml-1 text-amber-700 text-xs"></i>
                 </div>
 
-                <!-- Quick Logout Button (Visible only when logged in) -->
+                <!-- Quick Logout Button -->
                 <template x-if="userProfile.registered">
                     <button @click="logout()" title="Log Out" class="bg-red-500 hover:bg-red-600 text-white font-bold text-xs px-3 py-2 rounded-full shadow-sm transition flex items-center space-x-1">
                         <i class="fa-solid fa-right-from-bracket"></i>
@@ -308,7 +308,7 @@
                         <span x-text="userProfile.registered ? 'SAVE CHANGES' : 'ENTER HUB'"></span>
                     </button>
 
-                    <!-- Logout Button inside Profile Modal -->
+                    <!-- Logout Button -->
                     <template x-if="userProfile.registered">
                         <button type="button" @click="logout()" class="px-4 py-3 bg-red-500 hover:bg-red-600 text-white font-bold rounded-xl shadow-md transition text-sm flex items-center justify-center space-x-1" title="Log Out">
                             <i class="fa-solid fa-right-from-bracket"></i>
@@ -320,17 +320,17 @@
         </div>
     </div>
 
-    <!-- ADMIN AUTHENTICATION MODAL -->
-    <div x-show="showAdminModal" x-transition.opacity class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-        <div class="bg-white rounded-3xl max-w-md w-full p-6 main-card border border-slate-200 shadow-2xl">
+    <!-- ADMIN ANALYTICS MODAL (TERBINA DALAM WEB) -->
+    <div x-show="showAdminModal" x-transition.opacity class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 overflow-y-auto">
+        <div class="bg-white rounded-3xl max-w-4xl w-full p-6 main-card border border-slate-200 my-8 relative shadow-2xl">
             <div class="flex justify-between items-center mb-6 pb-4 border-b">
                 <div class="flex items-center space-x-3">
                     <div class="w-10 h-10 bg-slate-900 rounded-xl flex items-center justify-center text-amber-400 font-bold">
-                        <i class="fa-solid fa-shield-halved"></i>
+                        <i class="fa-solid fa-chart-pie"></i>
                     </div>
                     <div>
-                        <h3 class="text-lg font-bold text-slate-800">Admin Authentication</h3>
-                        <p class="text-xs text-slate-500">Administrator Access</p>
+                        <h3 class="text-lg font-bold text-slate-800">Admin Analytics Dashboard</h3>
+                        <p class="text-xs text-slate-500">Real-time Usage & Student Analytics</p>
                     </div>
                 </div>
                 <button @click="showAdminModal = false" class="text-slate-400 hover:text-slate-600">
@@ -338,13 +338,75 @@
                 </button>
             </div>
 
-            <form @submit.prevent="authenticateAdmin()" class="py-4 text-center space-y-4">
-                <i class="fa-solid fa-lock text-4xl text-blue-600"></i>
-                <h4 class="font-bold text-slate-800">Restricted Admin Portal</h4>
-                <p class="text-xs text-slate-500">Enter Admin PIN to open your Google Sheets analytics dashboard.</p>
-                <input type="password" x-model="adminPinInput" placeholder="Enter Admin PIN" class="w-full px-3 py-2 border rounded-xl text-center font-bold tracking-widest focus:outline-none focus:border-blue-500" required>
-                <button type="submit" class="w-full py-2.5 bg-slate-900 text-white font-bold rounded-xl text-sm uppercase">Open Google Sheets Admin</button>
-            </form>
+            <!-- PIN Auth View -->
+            <template x-if="!adminAuthenticated">
+                <form @submit.prevent="authenticateAdmin()" class="max-w-xs mx-auto py-8 text-center space-y-4">
+                    <i class="fa-solid fa-shield-halved text-4xl text-blue-600"></i>
+                    <h4 class="font-bold text-slate-800">Restricted Admin Access</h4>
+                    <input type="password" x-model="adminPinInput" placeholder="Enter Admin PIN" class="w-full px-3 py-2 border rounded-xl text-center font-bold tracking-widest focus:outline-none focus:border-blue-500" required>
+                    <button type="submit" class="w-full py-2.5 bg-slate-900 text-white font-bold rounded-xl text-sm">Access Dashboard</button>
+                </form>
+            </template>
+
+            <!-- Authenticated Analytics View -->
+            <template x-if="adminAuthenticated">
+                <div class="space-y-6">
+                    <!-- Stats Grid -->
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                        <div class="bg-sky-50 border border-sky-100 rounded-2xl p-4 text-center shadow-sm">
+                            <span class="text-xs font-bold text-sky-600 uppercase">Total Users</span>
+                            <div class="text-2xl font-extrabold text-sky-900" x-text="analyticsStats.totalUsers">0</div>
+                        </div>
+                        <div class="bg-emerald-50 border border-emerald-100 rounded-2xl p-4 text-center shadow-sm">
+                            <span class="text-xs font-bold text-emerald-600 uppercase">Total Accesses</span>
+                            <div class="text-2xl font-extrabold text-emerald-900" x-text="analyticsStats.totalAccesses">0</div>
+                        </div>
+                        <div class="bg-amber-50 border border-amber-100 rounded-2xl p-4 text-center shadow-sm">
+                            <span class="text-xs font-bold text-amber-600 uppercase">Top Module</span>
+                            <div class="text-sm font-extrabold text-amber-900 truncate" x-text="analyticsStats.topModule">N/A</div>
+                        </div>
+                        <div class="bg-purple-50 border border-purple-100 rounded-2xl p-4 text-center shadow-sm">
+                            <span class="text-xs font-bold text-purple-600 uppercase">Institutions</span>
+                            <div class="text-2xl font-extrabold text-purple-900" x-text="analyticsStats.uniqueInstitutions">0</div>
+                        </div>
+                    </div>
+
+                    <!-- Actions -->
+                    <div class="flex justify-between items-center bg-slate-50 p-4 rounded-2xl border">
+                        <span class="text-xs text-slate-500 font-bold uppercase tracking-wider">Recent User Access Activity</span>
+                        <button @click="exportToCSV()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl shadow transition flex items-center space-x-1.5">
+                            <i class="fa-solid fa-file-excel"></i>
+                            <span>Export Excel (CSV)</span>
+                        </button>
+                    </div>
+
+                    <!-- Log Table -->
+                    <div class="max-h-60 overflow-y-auto border rounded-xl bg-white">
+                        <table class="w-full text-left text-xs">
+                            <thead class="bg-slate-100 text-slate-700 sticky top-0 border-b">
+                                <tr>
+                                    <th class="p-2.5">Time</th>
+                                    <th class="p-2.5">Name</th>
+                                    <th class="p-2.5">Role</th>
+                                    <th class="p-2.5">Institution</th>
+                                    <th class="p-2.5">Module</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y">
+                                <template x-for="log in activityLogs" :key="log.id">
+                                    <tr class="hover:bg-slate-50">
+                                        <td class="p-2.5 text-slate-500" x-text="log.formattedTime"></td>
+                                        <td class="p-2.5 font-bold text-slate-800" x-text="log.studentName"></td>
+                                        <td class="p-2.5" x-text="log.userType"></td>
+                                        <td class="p-2.5" x-text="log.institution"></td>
+                                        <td class="p-2.5 font-semibold text-blue-700" x-text="log.module"></td>
+                                    </tr>
+                                </template>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </template>
         </div>
     </div>
 
@@ -358,15 +420,13 @@
                 doolittleUrl: 'doolittle_sim.html',
                 croutUrl: 'crout_sim.html',
 
-                // Google Apps Script Web App URL (Hantar data log)
+                // Google Apps Script Web App URL
                 googleAppsScriptUrl: 'https://script.google.com/macros/s/AKfycbyP6cdOhU0GNf9muK_s1FohI8cc2I-qlmtsLRYgm9EsNxb12a4NdxoubIIbLmj6JiY4/exec',
-                
-                // Google Sheets Dashboard URL (Ubah link bawah ini kepada link Google Sheets Excel anda jika mahu)
-                googleSheetDashboardUrl: 'https://docs.google.com/spreadsheets/d/1Yh9NWLsqel_wtSfwn3ItI1aWQkc2GsYkjr7gnImRcpY/edit',
 
                 // Admin Secret PIN
                 adminSecretPin: 'admin123',
                 adminPinInput: '',
+                adminAuthenticated: false,
 
                 // Inactivity Timer Setup (10 Minit)
                 inactivityTimeout: 10 * 60 * 1000, 
@@ -391,8 +451,15 @@
                     discoverySource: 'Lecturer / Teacher'
                 },
 
-                // Session Tracking
+                // Session Tracking & Logs
                 sessionLoggedModules: [],
+                activityLogs: [],
+                analyticsStats: {
+                    totalUsers: 0,
+                    totalAccesses: 0,
+                    topModule: '-',
+                    uniqueInstitutions: 0
+                },
 
                 initApp() {
                     const saved = localStorage.getItem('matrix_hub_user_profile');
@@ -407,6 +474,7 @@
                     } else {
                         this.showProfileModal = true;
                     }
+                    this.loadLogs();
                 },
 
                 startInactivityTimer() {
@@ -495,6 +563,12 @@
                         module: moduleName
                     };
 
+                    // Add to local activity logs
+                    this.activityLogs.unshift(logItem);
+                    localStorage.setItem('matrix_hub_logs', JSON.stringify(this.activityLogs));
+                    this.updateAnalytics();
+
+                    // Send to Google Sheets
                     if (this.googleAppsScriptUrl) {
                         fetch(this.googleAppsScriptUrl, {
                             method: "POST",
@@ -505,28 +579,73 @@
                     }
                 },
 
+                loadLogs() {
+                    const savedLogs = localStorage.getItem('matrix_hub_logs');
+                    if (savedLogs) {
+                        try {
+                            this.activityLogs = JSON.parse(savedLogs);
+                        } catch (e) {
+                            this.activityLogs = [];
+                        }
+                    }
+                    this.updateAnalytics();
+                },
+
+                updateAnalytics() {
+                    const totalAccesses = this.activityLogs.length;
+                    const usersSet = new Set(this.activityLogs.map(l => l.studentName + l.institution));
+                    const instSet = new Set(this.activityLogs.map(l => l.institution));
+
+                    const modCounts = {};
+                    this.activityLogs.forEach(l => {
+                        modCounts[l.module] = (modCounts[l.module] || 0) + 1;
+                    });
+                    let topMod = '-';
+                    let maxC = 0;
+                    for (const m in modCounts) {
+                        if (modCounts[m] > maxC) {
+                            maxC = modCounts[m];
+                            topMod = m;
+                        }
+                    }
+
+                    this.analyticsStats = {
+                        totalUsers: usersSet.size,
+                        totalAccesses: totalAccesses,
+                        topModule: topMod,
+                        uniqueInstitutions: instSet.size
+                    };
+                },
+
                 openAdminModal() {
                     this.showAdminModal = true;
                 },
 
                 authenticateAdmin() {
                     if (this.adminPinInput === this.adminSecretPin) {
-                        this.showAdminModal = false;
+                        this.adminAuthenticated = true;
                         this.adminPinInput = '';
-                        
-                        // Tentukan pautan yang hendak dibuka
-                        const targetUrl = this.googleSheetDashboardUrl || this.googleAppsScriptUrl;
-                        
-                        // Cuba buka tab baharu
-                        const newTab = window.open(targetUrl, '_blank');
-                        
-                        // Jika pop-up disekat oleh pelayar, lakukan redirect terus di halaman semasa
-                        if (!newTab || newTab.closed || typeof newTab.closed === 'undefined') {
-                            window.location.href = targetUrl;
-                        }
                     } else {
                         alert('Invalid Admin PIN!');
                     }
+                },
+
+                exportToCSV() {
+                    if (this.activityLogs.length === 0) {
+                        alert('No data available to export.');
+                        return;
+                    }
+                    let csv = 'Timestamp,Name,Role,Institution,Purpose,Discovery Source,Module\n';
+                    this.activityLogs.forEach(l => {
+                        csv += `"${l.formattedTime}","${l.studentName}","${l.userType}","${l.institution}","${l.purpose}","${l.discoverySource}","${l.module}"\n`;
+                    });
+
+                    const blob = new Blob([csv], { type: 'text/csv' });
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.setAttribute('href', url);
+                    a.setAttribute('download', `Matrix_Hub_Analytics_${Date.now()}.csv`);
+                    a.click();
                 }
             };
         }
