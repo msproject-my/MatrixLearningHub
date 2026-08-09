@@ -356,6 +356,10 @@
                 adminSecretPin: 'admin123',
                 adminPinInput: '',
 
+                // Inactivity Timer Setup (Ditetapkan tepat 10 Minit)
+                inactivityTimeout: 10 * 60 * 1000, // 10 minit dalam milisaat
+                timer: null,
+
                 // Modals & User Profile
                 showProfileModal: false,
                 showAdminModal: false,
@@ -384,12 +388,35 @@
                         try {
                             this.userProfile = JSON.parse(saved);
                             this.userProfile.registered = true;
+                            this.startInactivityTimer();
                         } catch (e) {
                             this.showProfileModal = true;
                         }
                     } else {
                         this.showProfileModal = true;
                     }
+                },
+
+                // Memulakan pemasa auto-logout & mengesan pergerakan pengguna
+                startInactivityTimer() {
+                    this.resetTimer();
+
+                    // Acara aktiviti untuk reset timer
+                    const events = ['mousemove', 'keydown', 'click', 'scroll', 'touchstart'];
+                    events.forEach(event => {
+                        window.addEventListener(event, () => this.resetTimer(), false);
+                    });
+                },
+
+                resetTimer() {
+                    if (!this.userProfile.registered) return;
+
+                    // Padam pemasa lama dan setkan semula pemasa 10 minit
+                    clearTimeout(this.timer);
+                    this.timer = setTimeout(() => {
+                        alert('Session expired due to 10 minutes of inactivity. You have been logged out.');
+                        this.logout();
+                    }, this.inactivityTimeout);
                 },
 
                 openProfileModal() {
@@ -410,9 +437,11 @@
                     };
                     localStorage.setItem('matrix_hub_user_profile', JSON.stringify(this.userProfile));
                     this.showProfileModal = false;
+                    this.startInactivityTimer();
                 },
 
                 logout() {
+                    clearTimeout(this.timer);
                     localStorage.removeItem('matrix_hub_user_profile');
                     this.userProfile = {
                         registered: false,
