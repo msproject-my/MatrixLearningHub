@@ -358,15 +358,18 @@
                 doolittleUrl: 'doolittle_sim.html',
                 croutUrl: 'crout_sim.html',
 
-                // Google Apps Script Web App URL
+                // Google Apps Script Web App URL (Hantar data log)
                 googleAppsScriptUrl: 'https://script.google.com/macros/s/AKfycbyP6cdOhU0GNf9muK_s1FohI8cc2I-qlmtsLRYgm9EsNxb12a4NdxoubIIbLmj6JiY4/exec',
                 
+                // Google Sheets Dashboard URL (Ubah link bawah ini kepada link Google Sheets Excel anda jika mahu)
+                googleSheetDashboardUrl: 'https://docs.google.com/spreadsheets/d/1Yh9NWLsqel_wtSfwn3ItI1aWQkc2GsYkjr7gnImRcpY/edit',
+
                 // Admin Secret PIN
                 adminSecretPin: 'admin123',
                 adminPinInput: '',
 
                 // Inactivity Timer Setup (10 Minit)
-                inactivityTimeout: 10 * 60 * 1000, // 10 minit dalam milisaat
+                inactivityTimeout: 10 * 60 * 1000, 
                 timer: null,
 
                 // Modals & User Profile
@@ -406,11 +409,9 @@
                     }
                 },
 
-                // Memulakan pemasa auto-logout & mengesan pergerakan pengguna
                 startInactivityTimer() {
                     this.resetTimer();
 
-                    // Acara aktiviti untuk reset timer
                     const events = ['mousemove', 'keydown', 'click', 'scroll', 'touchstart'];
                     events.forEach(event => {
                         window.addEventListener(event, () => this.resetTimer(), false);
@@ -420,7 +421,6 @@
                 resetTimer() {
                     if (!this.userProfile.registered) return;
 
-                    // Padam pemasa lama dan setkan semula pemasa 10 minit
                     clearTimeout(this.timer);
                     this.timer = setTimeout(() => {
                         alert('Session expired due to 10 minutes of inactivity. You have been logged out.');
@@ -471,13 +471,11 @@
                         return;
                     }
 
-                    // Record access once per session per module
                     if (!this.sessionLoggedModules.includes(moduleName)) {
                         this.recordActivity(moduleName);
                         this.sessionLoggedModules.push(moduleName);
                     }
 
-                    // Direct redirect to target HTML file
                     if (targetUrl) {
                         window.location.href = targetUrl;
                     }
@@ -497,7 +495,6 @@
                         module: moduleName
                     };
 
-                    // Send to Google Sheets
                     if (this.googleAppsScriptUrl) {
                         fetch(this.googleAppsScriptUrl, {
                             method: "POST",
@@ -516,7 +513,17 @@
                     if (this.adminPinInput === this.adminSecretPin) {
                         this.showAdminModal = false;
                         this.adminPinInput = '';
-                        window.open(this.googleAppsScriptUrl, '_blank');
+                        
+                        // Tentukan pautan yang hendak dibuka
+                        const targetUrl = this.googleSheetDashboardUrl || this.googleAppsScriptUrl;
+                        
+                        // Cuba buka tab baharu
+                        const newTab = window.open(targetUrl, '_blank');
+                        
+                        // Jika pop-up disekat oleh pelayar, lakukan redirect terus di halaman semasa
+                        if (!newTab || newTab.closed || typeof newTab.closed === 'undefined') {
+                            window.location.href = targetUrl;
+                        }
                     } else {
                         alert('Invalid Admin PIN!');
                     }
