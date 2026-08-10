@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>3D Matrix Determinant Calculator</title>
+    <title>Matrix Operations Calculator – Addition & Subtraction</title>
 
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -18,7 +18,6 @@
                         brandYellow: '#facc15',
                         brandGreen: '#10b981',
                         brandRed: '#ef4444',
-                        brandPurple: '#8b5cf6',
                     },
                     fontFamily: {
                         sans: ['Inter', 'sans-serif'],
@@ -45,7 +44,7 @@
             color: #0f172a;
         }
 
-        /* 3D Extruded Text Effect (Poster Style) */
+        /* 3D Extruded Text Effect */
         .text-3d-yellow {
             color: #facc15;
             text-shadow: 
@@ -113,6 +112,17 @@
             border-bottom-width: 2px;
         }
 
+        .btn-3d-red {
+            background: linear-gradient(180deg, #f87171 0%, #dc2626 100%);
+            border-bottom: 4px solid #991b1b;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            transition: all 0.1s ease;
+        }
+        .btn-3d-red:active {
+            transform: translateY(2px);
+            border-bottom-width: 2px;
+        }
+
         /* 3D Matrix Brackets */
         .matrix-bracket {
             display: inline-flex;
@@ -146,29 +156,31 @@
             border-color: #047857;
         }
 
-        .matrix-bracket-purple::before, .matrix-bracket-purple::after {
-            border-color: #5b21b6;
-        }
-
-        /* Matrix Grid & Cells */
+        /* Matrix Grids */
         .matrix-grid {
             display: grid;
-            gap: 6px;
+            gap: 4px;
         }
 
-        .g-2x2 { grid-template-columns: repeat(2, 46px); grid-template-rows: repeat(2, 42px); }
-        .g-3x3 { grid-template-columns: repeat(3, 44px); grid-template-rows: repeat(3, 40px); }
-        .g-3x5 { grid-template-columns: repeat(5, 42px); grid-template-rows: repeat(3, 38px); }
+        .grid-2x2 {
+            grid-template-columns: repeat(2, 44px);
+            grid-template-rows: repeat(2, 40px);
+        }
 
-        /* Input Cell Styling (Yellow Background) */
-        .matrix-grid input, .matrix-input {
+        .grid-3x3 {
+            grid-template-columns: repeat(3, 40px);
+            grid-template-rows: repeat(3, 38px);
+        }
+
+        /* Input Cell Styling */
+        .matrix-grid input {
             width: 100%;
             height: 100%;
             text-align: center;
             background-color: #ffff00;
             border: 2px solid #000000;
             border-radius: 6px;
-            font-size: 15px;
+            font-size: 14px;
             font-weight: 800;
             color: #000;
             box-sizing: border-box;
@@ -177,24 +189,10 @@
             transition: all 0.15s ease;
         }
 
-        .matrix-grid input:focus, .matrix-input:focus {
+        .matrix-grid input:focus {
             background-color: #ffffff;
             border-color: #2563eb;
             box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.4);
-        }
-
-        /* Auto-filled Cell Styling (White Background) */
-        .matrix-cell-white {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background-color: #ffffff;
-            border: 2px solid #000000;
-            border-radius: 6px;
-            font-size: 14px;
-            font-weight: 800;
-            color: #1e3a8a;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.08);
         }
 
         /* Hide Number Spinner Arrows */
@@ -207,56 +205,63 @@
             -moz-appearance: textfield;
         }
 
-        /* Boxed Calculation Displays */
-        .box-calc {
-            border: 2px solid #000000;
-            border-radius: 8px;
-            padding: 4px 10px;
-            background-color: #ffffff;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            min-width: 65px;
-            font-weight: 800;
-            font-size: 13px;
-            color: #1e3a8a;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.08);
+        /* Step & Result Cells */
+        .grid-step-2x2 {
+            grid-template-columns: repeat(2, 68px);
+            grid-template-rows: repeat(2, 40px);
         }
 
-        .result-bold-badge {
-            display: inline-flex;
+        .grid-step-3x3 {
+            grid-template-columns: repeat(3, 64px);
+            grid-template-rows: repeat(3, 38px);
+        }
+
+        .step-cell {
+            display: flex;
             align-items: center;
             justify-content: center;
+            text-align: center;
+            background-color: #ffffff;
+            border: 2px solid #000000;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 800;
+            color: #1e3a8a;
+            box-sizing: border-box;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.08);
+            padding: 0 2px;
+        }
+
+        .result-cell {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
             background-color: #dcfce7;
-            border: 3px solid #15803d;
-            border-radius: 12px;
-            padding: 6px 14px;
-            font-size: 18px;
+            border: 2px solid #15803d;
+            border-radius: 6px;
+            font-size: 15px;
             font-weight: 900;
             color: #166534;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            box-sizing: border-box;
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.1);
         }
 
-        /* Sarrus Diagram Overlays */
-        .diagram-container {
-            position: relative;
-            display: inline-block;
-        }
-
-        .svg-overlay {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-        }
-
-        .arrow-line {
-            stroke: #d97706;
-            stroke-width: 3;
-            stroke-dasharray: 4,2;
-            marker-end: url(#arrowhead);
+        /* Operator Badge */
+        .operator-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background: #ffffff;
+            border: 2px solid #000000;
+            border-radius: 50%;
+            font-size: 16px;
+            font-weight: 900;
+            color: #0f172a;
+            box-shadow: 0 2px 0 #000000;
+            width: 32px;
+            height: 32px;
+            flex-shrink: 0;
         }
 
         /* Label Tag */
@@ -288,8 +293,8 @@
 </head>
 <body class="pb-16 selection:bg-yellow-300 selection:text-slate-900">
 
-    <!-- Top Header Banner (Expanded Container Width max-w-[1500px]) -->
-    <header class="max-w-[1500px] mx-auto pt-6 px-4">
+    <!-- Top Header Banner -->
+    <header class="max-w-[1400px] mx-auto pt-6 px-4">
         <div class="bg-white/95 backdrop-blur-md rounded-3xl p-4 sm:p-5 border-4 border-sky-200 shadow-2xl flex flex-col md:flex-row items-center justify-between gap-4 relative overflow-hidden">
             <div class="flex items-center gap-4">
                 <div class="w-14 h-14 bg-gradient-to-tr from-blue-700 via-sky-500 to-sky-300 rounded-2xl border-4 border-white shadow-xl flex items-center justify-center text-white font-black text-2xl tracking-tighter shrink-0">
@@ -308,19 +313,22 @@
             </div>
 
             <!-- Header Action Buttons (With Home Button) -->
-            <div class="flex items-center gap-2.5">
+            <div class="flex flex-wrap items-center justify-center md:justify-end gap-2.5">
                 <a href="index.html" class="btn-3d-green px-4 py-2.5 rounded-2xl text-white font-extrabold text-xs flex items-center gap-2 no-underline">
                     <i class="fa-solid fa-house"></i> Home
                 </a>
                 <button onclick="toggleTopicsDrawer()" class="btn-3d-blue px-4 py-2.5 rounded-2xl text-white font-extrabold text-xs flex items-center gap-2">
                     <i class="fa-solid fa-layer-group"></i> 6 Sub-modules
                 </button>
+                <a href="index.html" class="btn-3d-red px-4 py-2.5 rounded-2xl text-white font-extrabold text-xs flex items-center gap-2 no-underline" title="Close module and return to main page">
+                    <i class="fa-solid fa-circle-xmark"></i> Close
+                </a>
             </div>
         </div>
     </header>
 
     <!-- Main Content Area -->
-    <main class="max-w-[1500px] mx-auto px-4 mt-6">
+    <main class="max-w-[1400px] mx-auto px-4 mt-6">
         <!-- Hero Banner -->
         <section class="relative bg-gradient-to-b from-sky-400 via-blue-500 to-blue-700 rounded-3xl p-6 sm:p-8 border-4 border-white shadow-2xl overflow-hidden mb-8 text-center">
             <div class="relative z-10 max-w-3xl mx-auto">
@@ -329,19 +337,19 @@
                 </div>
 
                 <h2 class="text-2xl sm:text-4xl font-black font-display tracking-wide mb-1 text-3d-yellow uppercase">
-                    FIND - DETERMINANT
+                    MATRIX OPERATIONS
                 </h2>
                 <h3 class="text-xl sm:text-2xl font-black font-display text-3d-white uppercase mb-3">
-                    (2x2 & 3x3)
+                    (ADDITION & SUBTRACTION)
                 </h3>
 
                 <p class="text-white text-xs sm:text-sm font-semibold leading-relaxed bg-blue-950/40 p-3 rounded-2xl border border-white/20 backdrop-blur-sm max-w-2xl mx-auto">
-                    Enter any values in the <span class="bg-yellow-300 text-slate-900 font-extrabold px-1.5 py-0.5 rounded">yellow</span> input cells below. The determinant $|A|$ calculations using **Method 1 (Minor Expansion)** and **Method 2 (Sarrus Rule)** will update in **real-time**!
+                    Enter any values in the <span class="bg-yellow-300 text-slate-900 font-extrabold px-1.5 py-0.5 rounded">yellow</span> input cells below. Step-by-step calculations and results update horizontally in **real-time**!
                 </p>
             </div>
         </section>
 
-        <!-- SECTION 1: METHOD 1 (EXPANSION / MINOR) -->
+        <!-- SECTION 1: 2x2 MATRIX OPERATIONS -->
         <section class="poster-card-blue p-4 sm:p-6 mb-8">
             <div class="poster-header-blue p-3 rounded-2xl text-white mb-6 flex flex-col sm:flex-row items-center justify-between gap-3">
                 <div class="flex items-center gap-3">
@@ -350,147 +358,125 @@
                     </div>
                     <div>
                         <h3 class="font-black text-base sm:text-lg tracking-wide uppercase font-display">
-                            1. METHOD 1: EXPANSION BY MINORS / COFACTORS
+                            1. 2x2 MATRIX OPERATIONS (ADDITION & SUBTRACTION)
                         </h3>
-                        <p class="text-[11px] text-sky-100 font-semibold" id="katex_formula_m1">Formula 2x2: $|A| = ad - bc$ | Formula 3x3: $|A| = a M_{11} - b M_{12} + c M_{13}$</p>
+                        <p class="text-[11px] text-sky-100 font-semibold" id="formula2x2">Formula: $A_{2 \times 2} \pm B_{2 \times 2} = [a_{ij} \pm b_{ij}]$</p>
                     </div>
                 </div>
             </div>
 
             <div class="space-y-6">
-                <!-- 1. DETERMINANT FOR (2x2) -->
-                <div class="bg-white/80 p-5 rounded-2xl border-2 border-sky-200 shadow-sm">
-                    <div class="label-tag inline-block mb-4">
-                        DETERMINANT FOR : (2x2)
-                    </div>
+                <!-- Row 1: 2x2 Addition (A + B) Horizontal -->
+                <div class="overflow-x-auto pb-2">
+                    <div class="min-w-[640px] flex items-center justify-between gap-2 sm:gap-3 bg-white/80 p-3.5 sm:p-4 rounded-2xl border-2 border-sky-200 shadow-sm">
+                        <div class="label-tag flex-shrink-0 text-center w-32 sm:w-36">
+                            ADDITION (2x2)<br>
+                            <span class="text-yellow-300 font-black text-sm">A + B</span>
+                        </div>
 
-                    <div class="flex flex-wrap items-center gap-4 text-sm font-bold text-slate-800">
-                        <span class="text-base font-serif italic text-blue-900">A</span>
-                        <span class="text-lg font-black">=</span>
-
-                        <!-- Matrix 2x2 Input -->
-                        <div class="matrix-bracket">
-                            <div class="matrix-grid g-2x2">
-                                <input type="number" id="m2_00" value="6" oninput="update2x2()">
-                                <input type="number" id="m2_01" value="1" oninput="update2x2()">
-                                <input type="number" id="m2_10" value="0" oninput="update2x2()">
-                                <input type="number" id="m2_11" value="-4" oninput="update2x2()">
+                        <!-- Matrix A -->
+                        <div class="flex flex-col items-center">
+                            <span class="text-[10px] font-black text-slate-500 uppercase mb-1">Matrix A</span>
+                            <div class="matrix-bracket">
+                                <div class="matrix-grid grid-2x2" id="a2_add">
+                                    <input type="number" value="2"><input type="number" value="4">
+                                    <input type="number" value="1"><input type="number" value="3">
+                                </div>
                             </div>
                         </div>
 
-                        <div class="flex items-center gap-2 ml-4">
-                            <span class="text-slate-600 font-black">Determinant of A:</span>
-                            <span class="text-blue-900 font-black">|A| =</span>
-                            <div class="box-calc" id="calc2_1">6 x -4</div>
-                            <span class="text-xl font-black text-rose-600">-</span>
-                            <div class="box-calc" id="calc2_2">1 x 0</div>
-                            <span class="text-xl font-black text-slate-800">=</span>
-                            <div class="result-bold-badge" id="res2x2">-24</div>
+                        <span class="operator-badge">+</span>
+
+                        <!-- Matrix B -->
+                        <div class="flex flex-col items-center">
+                            <span class="text-[10px] font-black text-slate-500 uppercase mb-1">Matrix B</span>
+                            <div class="matrix-bracket">
+                                <div class="matrix-grid grid-2x2" id="b2_add">
+                                    <input type="number" value="5"><input type="number" value="1">
+                                    <input type="number" value="6"><input type="number" value="2">
+                                </div>
+                            </div>
+                        </div>
+
+                        <span class="operator-badge">=</span>
+
+                        <!-- Step Calculation -->
+                        <div class="flex flex-col items-center">
+                            <span class="text-[10px] font-black text-blue-600 uppercase mb-1"><i class="fa-solid fa-gears"></i> Step-by-Step</span>
+                            <div class="matrix-bracket">
+                                <div class="matrix-grid grid-step-2x2" id="step2_add"></div>
+                            </div>
+                        </div>
+
+                        <span class="operator-badge">=</span>
+
+                        <!-- Final Result -->
+                        <div class="flex flex-col items-center">
+                            <span class="text-[10px] font-black text-emerald-600 uppercase mb-1"><i class="fa-solid fa-check-double"></i> Result</span>
+                            <div class="matrix-bracket matrix-bracket-green">
+                                <div class="matrix-grid grid-2x2" id="res2_add"></div>
+                            </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- 2. DETERMINANT FOR (3x3) - METHOD 1 -->
-                <div class="bg-white/80 p-5 rounded-2xl border-2 border-sky-200 shadow-sm">
-                    <div class="label-tag inline-block mb-4">
-                        DETERMINANT FOR : (3x3) [First Row Expansion]
-                    </div>
-
-                    <!-- Input Matrix A 3x3 -->
-                    <div class="flex items-center gap-3 mb-6">
-                        <span class="text-base font-serif italic text-blue-900 font-black">A</span>
-                        <span class="text-lg font-black">=</span>
-                        <div class="matrix-bracket">
-                            <div class="matrix-grid g-3x3">
-                                <input type="number" id="m31_00" value="8" oninput="update3x3_Method1()">
-                                <input type="number" id="m31_01" value="7" oninput="update3x3_Method1()">
-                                <input type="number" id="m31_02" value="9" oninput="update3x3_Method1()">
-
-                                <input type="number" id="m31_10" value="-5" oninput="update3x3_Method1()">
-                                <input type="number" id="m31_11" value="2" oninput="update3x3_Method1()">
-                                <input type="number" id="m31_12" value="1" oninput="update3x3_Method1()">
-
-                                <input type="number" id="m31_20" value="0" oninput="update3x3_Method1()">
-                                <input type="number" id="m31_21" value="-7" oninput="update3x3_Method1()">
-                                <input type="number" id="m31_22" value="6" oninput="update3x3_Method1()">
-                            </div>
+                <!-- Row 2: 2x2 Subtraction (A - B) Horizontal -->
+                <div class="overflow-x-auto pb-2">
+                    <div class="min-w-[640px] flex items-center justify-between gap-2 sm:gap-3 bg-white/80 p-3.5 sm:p-4 rounded-2xl border-2 border-sky-200 shadow-sm">
+                        <div class="label-tag flex-shrink-0 text-center w-32 sm:w-36">
+                            SUBTRACTION (2x2)<br>
+                            <span class="text-yellow-300 font-black text-sm">A - B</span>
                         </div>
-                    </div>
 
-                    <!-- Minor Matrix Breakdown -->
-                    <div class="flex flex-wrap items-center gap-3 text-sm font-bold text-slate-800 mb-4 bg-sky-50/80 p-4 rounded-xl border border-sky-200">
-                        <span class="text-blue-900 font-black">|A| =</span>
-
-                        <!-- Term 1: + a * |sub1| -->
-                        <span class="text-blue-700 font-extrabold text-base" id="c1_a">8</span>
-                        <div class="matrix-bracket matrix-bracket-purple">
-                            <div class="matrix-grid g-2x2">
-                                <div class="matrix-cell-white" id="sub1_11">2</div>
-                                <div class="matrix-cell-white" id="sub1_12">1</div>
-                                <div class="matrix-cell-white" id="sub1_21">-7</div>
-                                <div class="matrix-cell-white" id="sub1_22">6</div>
+                        <!-- Matrix A -->
+                        <div class="flex flex-col items-center">
+                            <span class="text-[10px] font-black text-slate-500 uppercase mb-1">Matrix A</span>
+                            <div class="matrix-bracket">
+                                <div class="matrix-grid grid-2x2" id="a2_sub">
+                                    <input type="number" value="8"><input type="number" value="5">
+                                    <input type="number" value="9"><input type="number" value="7">
+                                </div>
                             </div>
                         </div>
 
-                        <!-- Term 2: - b * |sub2| -->
-                        <span class="text-rose-600 font-black text-lg">-</span>
-                        <span class="text-blue-700 font-extrabold text-base" id="c1_b">7</span>
-                        <div class="matrix-bracket matrix-bracket-purple">
-                            <div class="matrix-grid g-2x2">
-                                <div class="matrix-cell-white" id="sub2_10">-5</div>
-                                <div class="matrix-cell-white" id="sub2_12">1</div>
-                                <div class="matrix-cell-white" id="sub2_20">0</div>
-                                <div class="matrix-cell-white" id="sub2_22">6</div>
+                        <span class="operator-badge">-</span>
+
+                        <!-- Matrix B -->
+                        <div class="flex flex-col items-center">
+                            <span class="text-[10px] font-black text-slate-500 uppercase mb-1">Matrix B</span>
+                            <div class="matrix-bracket">
+                                <div class="matrix-grid grid-2x2" id="b2_sub">
+                                    <input type="number" value="2"><input type="number" value="3">
+                                    <input type="number" value="4"><input type="number" value="1">
+                                </div>
                             </div>
                         </div>
 
-                        <!-- Term 3: + c * |sub3| -->
-                        <span class="text-emerald-600 font-black text-lg">+</span>
-                        <span class="text-blue-700 font-extrabold text-base" id="c1_c">9</span>
-                        <div class="matrix-bracket matrix-bracket-purple">
-                            <div class="matrix-grid g-2x2">
-                                <div class="matrix-cell-white" id="sub3_10">-5</div>
-                                <div class="matrix-cell-white" id="sub3_11">2</div>
-                                <div class="matrix-cell-white" id="sub3_20">0</div>
-                                <div class="matrix-cell-white" id="sub3_21">-7</div>
+                        <span class="operator-badge">=</span>
+
+                        <!-- Step Calculation -->
+                        <div class="flex flex-col items-center">
+                            <span class="text-[10px] font-black text-blue-600 uppercase mb-1"><i class="fa-solid fa-gears"></i> Step-by-Step</span>
+                            <div class="matrix-bracket">
+                                <div class="matrix-grid grid-step-2x2" id="step2_sub"></div>
                             </div>
                         </div>
-                    </div>
 
-                    <!-- Final Calculation Step -->
-                    <div class="flex flex-wrap items-center gap-2 text-sm font-bold text-slate-800 bg-white p-3.5 rounded-xl border border-slate-200">
-                        <span class="text-blue-900 font-black">|A| =</span>
-                        <span class="text-blue-700 font-black text-base" id="f1_a">8</span>
-                        <span>(</span>
-                        <div class="box-calc" id="f1_b1">2 x 6</div>
-                        <span class="text-rose-600 font-black">-</span>
-                        <div class="box-calc" id="f1_b2">1 x -7</div>
-                        <span>)</span>
+                        <span class="operator-badge">=</span>
 
-                        <span class="text-rose-600 font-black text-base">-</span>
-                        <span class="text-blue-700 font-black text-base" id="f1_c">7</span>
-                        <span>(</span>
-                        <div class="box-calc" id="f1_d1">-5 x 6</div>
-                        <span class="text-rose-600 font-black">-</span>
-                        <div class="box-calc" id="f1_d2">1 x 0</div>
-                        <span>)</span>
-
-                        <span class="text-emerald-600 font-black text-base">+</span>
-                        <span class="text-blue-700 font-black text-base" id="f1_e">9</span>
-                        <span>(</span>
-                        <div class="box-calc" id="f1_f1">-5 x -7</div>
-                        <span class="text-rose-600 font-black">-</span>
-                        <div class="box-calc" id="f1_f2">2 x 0</div>
-                        <span>)</span>
-
-                        <span class="text-lg font-black text-slate-800 ml-2">=</span>
-                        <div class="result-bold-badge ml-1" id="res3x3_m1">677</div>
+                        <!-- Final Result -->
+                        <div class="flex flex-col items-center">
+                            <span class="text-[10px] font-black text-emerald-600 uppercase mb-1"><i class="fa-solid fa-check-double"></i> Result</span>
+                            <div class="matrix-bracket matrix-bracket-green">
+                                <div class="matrix-grid grid-2x2" id="res2_sub"></div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
         </section>
 
-        <!-- SECTION 2: METHOD 2 (SARRUS RULE) -->
+        <!-- SECTION 2: 3x3 MATRIX OPERATIONS -->
         <section class="poster-card-green p-4 sm:p-6 mb-8">
             <div class="poster-header-green p-3 rounded-2xl text-white mb-6 flex flex-col sm:flex-row items-center justify-between gap-3">
                 <div class="flex items-center gap-3">
@@ -499,172 +485,153 @@
                     </div>
                     <div>
                         <h3 class="font-black text-base sm:text-lg tracking-wide uppercase font-display">
-                            2. METHOD 2: SARRUS RULE / DIAGONAL DIAGRAM
+                            2. 3x3 MATRIX OPERATIONS (ADDITION & SUBTRACTION)
                         </h3>
-                        <p class="text-[11px] text-emerald-100 font-semibold" id="katex_formula_m2">Formula: $|A| = (a_{11}a_{22}a_{33} + a_{12}a_{23}a_{31} + a_{13}a_{21}a_{32}) - (a_{13}a_{22}a_{31} + a_{11}a_{23}a_{32} + a_{12}a_{21}a_{33})$</p>
+                        <p class="text-[11px] text-emerald-100 font-semibold" id="formula3x3">Formula: $A_{3 \times 3} \pm B_{3 \times 3} = [a_{ij} \pm b_{ij}]$</p>
                     </div>
                 </div>
             </div>
 
             <div class="space-y-6">
-                <div class="bg-white/80 p-5 rounded-2xl border-2 border-emerald-200 shadow-sm">
-                    <div class="label-tag flex-shrink-0 inline-block mb-4">
-                        DETERMINANT FOR : (3x3) [Appended First 2 Columns]
-                    </div>
-
-                    <!-- Input Matrix 3x3 with Duplicated Columns -->
-                    <div class="flex items-center gap-3 mb-6">
-                        <span class="text-base font-serif italic text-blue-900 font-black">A</span>
-                        <span class="text-lg font-black">=</span>
-                        <div class="matrix-bracket matrix-bracket-green">
-                            <div class="matrix-grid g-3x5">
-                                <!-- 3x3 Input Original (Yellow) -->
-                                <input type="number" id="m32_00" value="2" oninput="update3x3_Method2()">
-                                <input type="number" id="m32_01" value="-4" oninput="update3x3_Method2()">
-                                <input type="number" id="m32_02" value="9" oninput="update3x3_Method2()">
-                                <!-- Duplicated Col 1 & 2 (White) -->
-                                <div class="matrix-cell-white" id="dup1_00">2</div>
-                                <div class="matrix-cell-white" id="dup1_01">-4</div>
-
-                                <input type="number" id="m32_10" value="-5" oninput="update3x3_Method2()">
-                                <input type="number" id="m32_11" value="2" oninput="update3x3_Method2()">
-                                <input type="number" id="m32_12" value="1" oninput="update3x3_Method2()">
-                                <div class="matrix-cell-white" id="dup1_10">-5</div>
-                                <div class="matrix-cell-white" id="dup1_11">2</div>
-
-                                <input type="number" id="m32_20" value="0" oninput="update3x3_Method2()">
-                                <input type="number" id="m32_21" value="-7" oninput="update3x3_Method2()">
-                                <input type="number" id="m32_22" value="6" oninput="update3x3_Method2()">
-                                <div class="matrix-cell-white" id="dup1_20">0</div>
-                                <div class="matrix-cell-white" id="dup1_21">-7</div>
-                            </div>
+                <!-- Row 1: 3x3 Addition (A + B) Horizontal -->
+                <div class="overflow-x-auto pb-2">
+                    <div class="min-w-[720px] flex items-center justify-between gap-2 sm:gap-3 bg-white/80 p-3.5 sm:p-4 rounded-2xl border-2 border-emerald-200 shadow-sm">
+                        <div class="label-tag flex-shrink-0 text-center w-32 sm:w-36">
+                            ADDITION (3x3)<br>
+                            <span class="text-yellow-300 font-black text-sm">A + B</span>
                         </div>
-                    </div>
 
-                    <!-- Sarrus Diagrams Section -->
-                    <div class="flex flex-wrap items-center gap-6 mb-6 bg-emerald-50/80 p-4 rounded-xl border border-emerald-200">
-                        <span class="text-blue-900 font-black text-sm">|A| =</span>
-
-                        <!-- Diagram 1 (Right Diagonal / Downward) -->
-                        <div class="diagram-container">
-                            <div class="matrix-bracket matrix-bracket-green bg-white rounded-xl">
-                                <div class="matrix-grid g-3x5">
-                                    <div class="matrix-cell-white bg-yellow-200" id="d1_00">2</div>
-                                    <div class="matrix-cell-white bg-yellow-200" id="d1_01">-4</div>
-                                    <div class="matrix-cell-white bg-yellow-200" id="d1_02">9</div>
-                                    <div class="matrix-cell-white" id="d1_03">2</div>
-                                    <div class="matrix-cell-white" id="d1_04">-4</div>
-
-                                    <div class="matrix-cell-white bg-yellow-200" id="d1_10">-5</div>
-                                    <div class="matrix-cell-white bg-yellow-200" id="d1_11">2</div>
-                                    <div class="matrix-cell-white bg-yellow-200" id="d1_12">1</div>
-                                    <div class="matrix-cell-white" id="d1_13">-5</div>
-                                    <div class="matrix-cell-white" id="d1_14">2</div>
-
-                                    <div class="matrix-cell-white bg-yellow-200" id="d1_20">0</div>
-                                    <div class="matrix-cell-white bg-yellow-200" id="d1_21">-7</div>
-                                    <div class="matrix-cell-white bg-yellow-200" id="d1_22">6</div>
-                                    <div class="matrix-cell-white" id="d1_23">0</div>
-                                    <div class="matrix-cell-white" id="d1_24">-7</div>
+                        <!-- Matrix A -->
+                        <div class="flex flex-col items-center">
+                            <span class="text-[10px] font-black text-slate-500 uppercase mb-1">Matrix A</span>
+                            <div class="matrix-bracket matrix-bracket-green">
+                                <div class="matrix-grid grid-3x3" id="a3_add">
+                                    <input type="number" value="1"><input type="number" value="3"><input type="number" value="2">
+                                    <input type="number" value="4"><input type="number" value="0"><input type="number" value="5">
+                                    <input type="number" value="2"><input type="number" value="1"><input type="number" value="3">
                                 </div>
                             </div>
-                            <svg class="svg-overlay">
-                                <defs>
-                                    <marker id="arrowhead" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
-                                        <path d="M 0 0 L 10 5 L 0 10 z" fill="#d97706"/>
-                                    </marker>
-                                </defs>
-                                <line x1="22" y1="18" x2="110" y2="105" class="arrow-line" />
-                                <line x1="64" y1="18" x2="152" y2="105" class="arrow-line" />
-                                <line x1="106" y1="18" x2="194" y2="105" class="arrow-line" />
-                            </svg>
                         </div>
 
-                        <span class="text-2xl font-black text-rose-600">-</span>
+                        <span class="operator-badge">+</span>
 
-                        <!-- Diagram 2 (Left Diagonal / Upward) -->
-                        <div class="diagram-container">
-                            <div class="matrix-bracket matrix-bracket-green bg-white rounded-xl">
-                                <div class="matrix-grid g-3x5">
-                                    <div class="matrix-cell-white bg-yellow-200" id="d2_00">2</div>
-                                    <div class="matrix-cell-white bg-yellow-200" id="d2_01">-4</div>
-                                    <div class="matrix-cell-white bg-yellow-200" id="d2_02">9</div>
-                                    <div class="matrix-cell-white" id="d2_03">2</div>
-                                    <div class="matrix-cell-white" id="d2_04">-4</div>
-
-                                    <div class="matrix-cell-white bg-yellow-200" id="d2_10">-5</div>
-                                    <div class="matrix-cell-white bg-yellow-200" id="d2_11">2</div>
-                                    <div class="matrix-cell-white bg-yellow-200" id="d2_12">1</div>
-                                    <div class="matrix-cell-white" id="d2_13">-5</div>
-                                    <div class="matrix-cell-white" id="d2_14">2</div>
-
-                                    <div class="matrix-cell-white bg-yellow-200" id="d2_20">0</div>
-                                    <div class="matrix-cell-white bg-yellow-200" id="d2_21">-7</div>
-                                    <div class="matrix-cell-white bg-yellow-200" id="d2_22">6</div>
-                                    <div class="matrix-cell-white" id="d2_23">0</div>
-                                    <div class="matrix-cell-white" id="d2_24">-7</div>
+                        <!-- Matrix B -->
+                        <div class="flex flex-col items-center">
+                            <span class="text-[10px] font-black text-slate-500 uppercase mb-1">Matrix B</span>
+                            <div class="matrix-bracket matrix-bracket-green">
+                                <div class="matrix-grid grid-3x3" id="b3_add">
+                                    <input type="number" value="2"><input type="number" value="1"><input type="number" value="4">
+                                    <input type="number" value="0"><input type="number" value="3"><input type="number" value="1">
+                                    <input type="number" value="5"><input type="number" value="2"><input type="number" value="0">
                                 </div>
                             </div>
-                            <svg class="svg-overlay">
-                                <line x1="110" y1="18" x2="22" y2="105" class="arrow-line" />
-                                <line x1="152" y1="18" x2="64" y2="105" class="arrow-line" />
-                                <line x1="194" y1="18" x2="106" y2="105" class="arrow-line" />
-                            </svg>
+                        </div>
+
+                        <span class="operator-badge">=</span>
+
+                        <!-- Step Calculation -->
+                        <div class="flex flex-col items-center">
+                            <span class="text-[10px] font-black text-blue-600 uppercase mb-1"><i class="fa-solid fa-gears"></i> Step-by-Step</span>
+                            <div class="matrix-bracket">
+                                <div class="matrix-grid grid-step-3x3" id="step3_add"></div>
+                            </div>
+                        </div>
+
+                        <span class="operator-badge">=</span>
+
+                        <!-- Final Result -->
+                        <div class="flex flex-col items-center">
+                            <span class="text-[10px] font-black text-emerald-600 uppercase mb-1"><i class="fa-solid fa-check-double"></i> Result</span>
+                            <div class="matrix-bracket matrix-bracket-green">
+                                <div class="matrix-grid grid-3x3" id="res3_add"></div>
+                            </div>
                         </div>
                     </div>
+                </div>
 
-                    <!-- Steps Calculation Bar -->
-                    <div class="flex flex-wrap items-center gap-2 text-sm font-bold text-slate-800 bg-white p-4 rounded-xl border border-slate-200">
-                        <span class="text-blue-900 font-black">|A| =</span>
-                        <span>(</span>
-                        <div class="box-calc" id="m2_p1">2 x 2 x 6</div>
-                        <span class="text-emerald-600 font-black">+</span>
-                        <div class="box-calc" id="m2_p2">-4 x 1 x 0</div>
-                        <span class="text-emerald-600 font-black">+</span>
-                        <div class="box-calc" id="m2_p3">9 x -5 x -7</div>
-                        <span>)</span>
+                <!-- Row 2: 3x3 Subtraction (A - B) Horizontal -->
+                <div class="overflow-x-auto pb-2">
+                    <div class="min-w-[720px] flex items-center justify-between gap-2 sm:gap-3 bg-white/80 p-3.5 sm:p-4 rounded-2xl border-2 border-emerald-200 shadow-sm">
+                        <div class="label-tag flex-shrink-0 text-center w-32 sm:w-36">
+                            SUBTRACTION (3x3)<br>
+                            <span class="text-yellow-300 font-black text-sm">A - B</span>
+                        </div>
 
-                        <span class="text-rose-600 font-black text-xl mx-1">-</span>
+                        <!-- Matrix A -->
+                        <div class="flex flex-col items-center">
+                            <span class="text-[10px] font-black text-slate-500 uppercase mb-1">Matrix A</span>
+                            <div class="matrix-bracket matrix-bracket-green">
+                                <div class="matrix-grid grid-3x3" id="a3_sub">
+                                    <input type="number" value="7"><input type="number" value="8"><input type="number" value="9">
+                                    <input type="number" value="6"><input type="number" value="5"><input type="number" value="4">
+                                    <input type="number" value="3"><input type="number" value="2"><input type="number" value="1">
+                                </div>
+                            </div>
+                        </div>
 
-                        <span>(</span>
-                        <div class="box-calc" id="m2_n1">9 x 2 x 0</div>
-                        <span class="text-emerald-600 font-black">+</span>
-                        <div class="box-calc" id="m2_n2">2 x 1 x -7</div>
-                        <span class="text-emerald-600 font-black">+</span>
-                        <div class="box-calc" id="m2_n3">-4 x -5 x 6</div>
-                        <span>)</span>
+                        <span class="operator-badge">-</span>
 
-                        <span class="text-lg font-black text-slate-800 ml-2">=</span>
-                        <div class="result-bold-badge ml-1" id="res3x3_m2">233</div>
+                        <!-- Matrix B -->
+                        <div class="flex flex-col items-center">
+                            <span class="text-[10px] font-black text-slate-500 uppercase mb-1">Matrix B</span>
+                            <div class="matrix-bracket matrix-bracket-green">
+                                <div class="matrix-grid grid-3x3" id="b3_sub">
+                                    <input type="number" value="4"><input type="number" value="3"><input type="number" value="2">
+                                    <input type="number" value="1"><input type="number" value="0"><input type="number" value="-2">
+                                    <input type="number" value="2"><input type="number" value="1"><input type="number" value="3">
+                                </div>
+                            </div>
+                        </div>
+
+                        <span class="operator-badge">=</span>
+
+                        <!-- Step Calculation -->
+                        <div class="flex flex-col items-center">
+                            <span class="text-[10px] font-black text-blue-600 uppercase mb-1"><i class="fa-solid fa-gears"></i> Step-by-Step</span>
+                            <div class="matrix-bracket">
+                                <div class="matrix-grid grid-step-3x3" id="step3_sub"></div>
+                            </div>
+                        </div>
+
+                        <span class="operator-badge">=</span>
+
+                        <!-- Final Result -->
+                        <div class="flex flex-col items-center">
+                            <span class="text-[10px] font-black text-emerald-600 uppercase mb-1"><i class="fa-solid fa-check-double"></i> Result</span>
+                            <div class="matrix-bracket matrix-bracket-green">
+                                <div class="matrix-grid grid-3x3" id="res3_sub"></div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
         </section>
     </main>
 
-    <!-- Sub-modules Drawer Modal -->
-    <div id="topicsDrawer" class="fixed inset-0 z-50 bg-slate-900/80 backdrop-blur-md flex items-center justify-center p-4 hidden">
-        <div class="bg-white border-4 border-sky-300 rounded-3xl max-w-xl w-full p-6 shadow-2xl space-y-3">
+    <!-- Sub-modules Drawer -->
+    <div id="topicsDrawer" class="fixed inset-0 z-50 bg-slate-900/80 backdrop-blur-md flex items-center justify-center p-4 hidden" onclick="handleBackdropClick(event, 'topicsDrawer')">
+        <div class="bg-white border-4 border-sky-300 rounded-3xl max-w-xl w-full p-6 shadow-2xl space-y-4 relative" onclick="event.stopPropagation()">
             <div class="flex items-center justify-between border-b pb-3">
-                <h3 class="text-lg font-black text-slate-800 flex items-center gap-2 font-display">
+                <h3 class="text-lg font-black text-slate-800 flex items-center gap-2">
                     <i class="fa-solid fa-list-check text-blue-600"></i> Six Sub-modules
                 </h3>
-                <button onclick="toggleTopicsDrawer()" class="text-slate-400 hover:text-slate-600 font-bold">
-                    <i class="fa-solid fa-xmark text-lg"></i>
+                <button onclick="toggleTopicsDrawer()" class="w-8 h-8 rounded-full bg-red-100 hover:bg-red-200 text-red-600 flex items-center justify-center font-bold transition-colors" title="Close drawer">
+                    <i class="fa-solid fa-xmark text-base"></i>
                 </button>
             </div>
-            <div class="space-y-2 text-xs font-semibold">
-                <div class="p-3 bg-slate-50 border rounded-xl flex items-center justify-between text-slate-700 opacity-75">
+            
+            <div class="space-y-2 text-xs font-semibold max-h-[60vh] overflow-y-auto pr-1">
+                <div class="p-3 bg-sky-100 border-2 border-sky-400 rounded-xl flex items-center justify-between font-bold text-sky-900">
                     <span>1. Basic Operation (Addition & Subtraction)</span>
-                    <span class="bg-slate-200 text-slate-600 text-[10px] px-2 py-0.5 rounded">Module 1</span>
+                    <span class="bg-sky-500 text-white text-[10px] px-2.5 py-0.5 rounded-full uppercase">Active</span>
                 </div>
                 <div class="p-3 bg-slate-50 border rounded-xl flex items-center justify-between text-slate-700 opacity-75">
                     <span>2. Basic Operation (Multiplication)</span>
                     <span class="bg-slate-200 text-slate-600 text-[10px] px-2 py-0.5 rounded">Module 2</span>
                 </div>
-                <div class="p-3 bg-sky-100 border-2 border-sky-400 rounded-xl flex items-center justify-between font-bold text-sky-900">
+                <div class="p-3 bg-slate-50 border rounded-xl flex items-center justify-between text-slate-700 opacity-75">
                     <span>3. Determinant</span>
-                    <span class="bg-sky-500 text-white text-[10px] px-2.5 py-0.5 rounded-full uppercase">Active</span>
+                    <span class="bg-slate-200 text-slate-600 text-[10px] px-2 py-0.5 rounded">Module 3</span>
                 </div>
                 <div class="p-3 bg-slate-50 border rounded-xl flex items-center justify-between text-slate-700 opacity-75">
                     <span>4. Matrix Analysis</span>
@@ -679,140 +646,104 @@
                     <span class="bg-slate-200 text-slate-600 text-[10px] px-2 py-0.5 rounded">Module 6</span>
                 </div>
             </div>
-            <div class="pt-2 text-right">
-                <button onclick="toggleTopicsDrawer()" class="btn-3d-blue px-4 py-2 rounded-xl text-white font-bold text-xs">
-                    Close
+
+            <div class="pt-2 flex justify-between items-center gap-2 border-t">
+                <a href="index.html" class="btn-3d-red px-4 py-2 rounded-xl text-white font-bold text-xs flex items-center gap-1.5 no-underline">
+                    <i class="fa-solid fa-house"></i> Home
+                </a>
+                <button onclick="toggleTopicsDrawer()" class="btn-3d-blue px-4 py-2 rounded-xl text-white font-bold text-xs flex items-center gap-1.5">
+                    <i class="fa-solid fa-xmark"></i> Close
                 </button>
             </div>
         </div>
     </div>
 
     <script>
-        // Helper function to safely read matrix values
-        function getVal(id) {
-            let elem = document.getElementById(id);
-            if (!elem) return 0;
-            let val = parseFloat(elem.value);
-            return isNaN(val) ? 0 : val;
-        }
+        // Matrix Calculation Core Logic
+        function calculateMatrix(containerA, containerB, containerStep, containerRes, operator) {
+            const inputsA = document.querySelectorAll(`#${containerA} input`);
+            const inputsB = document.querySelectorAll(`#${containerB} input`);
+            const stepBox = document.getElementById(containerStep);
+            const resBox = document.getElementById(containerRes);
 
-        // Method 1: Update 2x2 Determinant
-        function update2x2() {
-            let a = getVal('m2_00');
-            let b = getVal('m2_01');
-            let c = getVal('m2_10');
-            let d = getVal('m2_11');
+            if (!stepBox || !resBox) return;
 
-            document.getElementById('calc2_1').innerText = `${a} x ${d}`;
-            document.getElementById('calc2_2').innerText = `${b} x ${c}`;
-            document.getElementById('res2x2').innerText = (a * d) - (b * c);
-        }
+            stepBox.innerHTML = '';
+            resBox.innerHTML = '';
 
-        // Method 1: Update 3x3 Determinant (Minor Expansion)
-        function update3x3_Method1() {
-            let a = getVal('m31_00'), b = getVal('m31_01'), c = getVal('m31_02');
-            let d = getVal('m31_10'), e = getVal('m31_11'), f = getVal('m31_12');
-            let g = getVal('m31_20'), h = getVal('m31_21'), i = getVal('m31_22');
+            inputsA.forEach((inputA, index) => {
+                const valA = parseFloat(inputA.value) || 0;
+                const valB = parseFloat(inputsB[index]?.value) || 0;
+                let result = 0;
 
-            // Update Minor Matrix Display Cells
-            document.getElementById('c1_a').innerText = a;
-            document.getElementById('c1_b').innerText = b;
-            document.getElementById('c1_c').innerText = c;
-
-            document.getElementById('sub1_11').innerText = e;
-            document.getElementById('sub1_12').innerText = f;
-            document.getElementById('sub1_21').innerText = h;
-            document.getElementById('sub1_22').innerText = i;
-
-            document.getElementById('sub2_10').innerText = d;
-            document.getElementById('sub2_12').innerText = f;
-            document.getElementById('sub2_20').innerText = g;
-            document.getElementById('sub2_22').innerText = i;
-
-            document.getElementById('sub3_10').innerText = d;
-            document.getElementById('sub3_11').innerText = e;
-            document.getElementById('sub3_20').innerText = g;
-            document.getElementById('sub3_21').innerText = h;
-
-            // Update Formula Boxes
-            document.getElementById('f1_a').innerText = a;
-            document.getElementById('f1_b1').innerText = `${e} x ${i}`;
-            document.getElementById('f1_b2').innerText = `${f} x ${h}`;
-
-            document.getElementById('f1_c').innerText = b;
-            document.getElementById('f1_d1').innerText = `${d} x ${i}`;
-            document.getElementById('f1_d2').innerText = `${f} x ${g}`;
-
-            document.getElementById('f1_e').innerText = c;
-            document.getElementById('f1_f1').innerText = `${d} x ${h}`;
-            document.getElementById('f1_f2').innerText = `${e} x ${g}`;
-
-            // Calculate Result
-            let m1 = (e * i) - (f * h);
-            let m2 = (d * i) - (f * g);
-            let m3 = (d * h) - (e * g);
-            let total = (a * m1) - (b * m2) + (c * m3);
-
-            document.getElementById('res3x3_m1').innerText = total;
-        }
-
-        // Method 2: Update 3x3 Determinant (Sarrus Rule)
-        function update3x3_Method2() {
-            let a = getVal('m32_00'), b = getVal('m32_01'), c = getVal('m32_02');
-            let d = getVal('m32_10'), e = getVal('m32_11'), f = getVal('m32_12');
-            let g = getVal('m32_20'), h = getVal('m32_21'), i = getVal('m32_22');
-
-            const setCell = (id, val) => {
-                let elem = document.getElementById(id);
-                if (elem) elem.innerText = val;
-            };
-
-            // Set Duplicated Columns (Col 1 & Col 2)
-            setCell('dup1_00', a); setCell('dup1_10', d); setCell('dup1_20', g);
-            setCell('dup1_01', b); setCell('dup1_11', e); setCell('dup1_21', h);
-
-            // Update Sarrus Diagrams Cells
-            let matrixVals = [[a,b,c,a,b], [d,e,f,d,e], [g,h,i,g,h]];
-            for (let r = 0; r < 3; r++) {
-                for (let col = 0; col < 5; col++) {
-                    setCell(`d1_${r}${col}`, matrixVals[r][col]);
-                    setCell(`d2_${r}${col}`, matrixVals[r][col]);
+                if (operator === '+') {
+                    result = valA + valB;
+                } else {
+                    result = valA - valB;
                 }
-            }
 
-            // Formula Text Boxes
-            document.getElementById('m2_p1').innerText = `${a} x ${e} x ${i}`;
-            document.getElementById('m2_p2').innerText = `${b} x ${f} x ${g}`;
-            document.getElementById('m2_p3').innerText = `${c} x ${d} x ${h}`;
+                const formattedB = valB < 0 ? `(${valB})` : `${valB}`;
 
-            document.getElementById('m2_n1').innerText = `${c} x ${e} x ${g}`;
-            document.getElementById('m2_n2').innerText = `${a} x ${f} x ${h}`;
-            document.getElementById('m2_n3').innerText = `${b} x ${d} x ${i}`;
+                // Create Step Cell
+                const stepDiv = document.createElement('div');
+                stepDiv.className = 'step-cell';
+                stepDiv.innerText = `${valA}${operator}${formattedB}`;
+                stepBox.appendChild(stepDiv);
 
-            // Calculate Total
-            let p1 = a * e * i, p2 = b * f * g, p3 = c * d * h;
-            let n1 = c * e * g, n2 = a * f * h, n3 = b * d * i;
-
-            let total = (p1 + p2 + p3) - (n1 + n2 + n3);
-            document.getElementById('res3x3_m2').innerText = total;
+                // Create Result Cell
+                const resDiv = document.createElement('div');
+                resDiv.className = 'result-cell';
+                resDiv.innerText = Number.isInteger(result) ? result : result.toFixed(2);
+                resBox.appendChild(resDiv);
+            });
         }
 
-        // Toggle Drawer Control
+        function updateAll() {
+            calculateMatrix('a2_add', 'b2_add', 'step2_add', 'res2_add', '+');
+            calculateMatrix('a2_sub', 'b2_sub', 'step2_sub', 'res2_sub', '-');
+            calculateMatrix('a3_add', 'b3_add', 'step3_add', 'res3_add', '+');
+            calculateMatrix('a3_sub', 'b3_sub', 'step3_sub', 'res3_sub', '-');
+        }
+
+        // Modal Controls
         function toggleTopicsDrawer() {
             document.getElementById('topicsDrawer').classList.toggle('hidden');
         }
 
-        // Auto Run & Listener Initialization
-        document.addEventListener('DOMContentLoaded', () => {
-            update2x2();
-            update3x3_Method1();
-            update3x3_Method2();
+        function confirmExit() {
+            document.getElementById('exitModal').classList.remove('hidden');
+        }
 
-            // Render KaTeX Math Formulas
+        function closeExitModal() {
+            document.getElementById('exitModal').classList.add('hidden');
+        }
+
+        function handleBackdropClick(event, modalId) {
+            if (event.target.id === modalId) {
+                document.getElementById(modalId).classList.add('hidden');
+            }
+        }
+
+        // ESC Key to Close Modals
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                document.getElementById('topicsDrawer').classList.add('hidden');
+                document.getElementById('exitModal').classList.add('hidden');
+            }
+        });
+
+        // Initialization
+        document.addEventListener('DOMContentLoaded', () => {
+            updateAll();
+            document.querySelectorAll('input').forEach(input => {
+                input.addEventListener('input', updateAll);
+            });
+
+            // Render KaTeX if available
             if (window.katex) {
                 try {
-                    katex.render("|A| = ad - bc \\quad \\text{and} \\quad |A| = a M_{11} - b M_{12} + c M_{13}", document.getElementById('katex_formula_m1'));
-                    katex.render("|A| = (a_{11}a_{22}a_{33} + a_{12}a_{23}a_{31} + a_{13}a_{21}a_{32}) - (a_{13}a_{22}a_{31} + a_{11}a_{23}a_{32} + a_{12}a_{21}a_{33})", document.getElementById('katex_formula_m2'));
+                    katex.render("A_{2 \\times 2} \\pm B_{2 \\times 2} = [a_{ij} \\pm b_{ij}]", document.getElementById('formula2x2'));
+                    katex.render("A_{3 \\times 3} \\pm B_{3 \\times 3} = [a_{ij} \\pm b_{ij}]", document.getElementById('formula3x3'));
                 } catch(e) {}
             }
         });
