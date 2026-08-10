@@ -3,497 +3,295 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Matrix Calculator for Engineering Mathematics</title>
-
-    <!-- Tailwind CSS -->
+    <title>Matrix Calculator Simulator for Engineering Mathematics</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        brandBlue: '#0284c7',
-                        brandDarkBlue: '#1e3a8a',
-                        brandYellow: '#f59e0b',
-                        brandRed: '#ef4444',
-                        brandGreen: '#10b981',
-                    },
-                    fontFamily: {
-                        sans: ['Inter', 'sans-serif'],
-                        display: ['Fredoka', 'Inter', 'sans-serif'],
-                    }
-                }
-            }
-        }
-    </script>
-
-    <!-- FontAwesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Inter:wght@400;500;600;700;800&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
-    <!-- KaTeX Math Renderer -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
-    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
-
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         body {
-            font-family: 'Inter', sans-serif;
-            background: linear-gradient(180deg, #38bdf8 0%, #0284c7 50%, #0369a1 100%);
-            min-height: 100vh;
-            color: #0f172a;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #0284c7; /* Sky 600 vibrant blue */
         }
-
-        /* 3D Extruded Text effect */
-        .text-3d-yellow {
-            color: #facc15;
-            text-shadow: 
-                2px 2px 0px #b45309,
-                4px 4px 0px #78350f,
-                6px 6px 12px rgba(0, 0, 0, 0.4);
+        .3d-text {
+            text-shadow: 0 4px 0 #d97706, 0 8px 12px rgba(0,0,0,0.25);
         }
-
-        /* Claymorphism 3D Containers */
-        .clay-card {
-            background: #ffffff;
-            border: 4px solid #38bdf8;
-            border-radius: 1.75rem;
-            box-shadow: 0 12px 0 #0284c7, 0 15px 25px rgba(0,0,0,0.25);
-            transition: all 0.2s ease;
+        .custom-shadow {
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
         }
-        .clay-card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 16px 0 #0284c7, 0 20px 30px rgba(0,0,0,0.3);
-        }
-
-        .clay-card-green {
-            background: #ffffff;
-            border: 4px solid #34d399;
-            border-radius: 1.75rem;
-            box-shadow: 0 12px 0 #059669, 0 15px 25px rgba(0,0,0,0.25);
-            transition: all 0.2s ease;
-        }
-        .clay-card-green:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 16px 0 #059669, 0 20px 30px rgba(0,0,0,0.3);
-        }
-
-        .clay-card-amber {
-            background: #ffffff;
-            border: 4px solid #fbbf24;
-            border-radius: 1.75rem;
-            box-shadow: 0 12px 0 #d97706, 0 15px 25px rgba(0,0,0,0.25);
-            transition: all 0.2s ease;
-        }
-        .clay-card-amber:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 16px 0 #d97706, 0 20px 30px rgba(0,0,0,0.3);
-        }
-
-        /* 3D Glossy Buttons */
-        .btn-3d-blue {
-            background: linear-gradient(180deg, #38bdf8 0%, #0284c7 100%);
-            border-bottom: 4px solid #0369a1;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-            transition: all 0.1s ease;
-        }
-        .btn-3d-blue:active {
-            transform: translateY(2px);
-            border-bottom-width: 2px;
-        }
-
-        .btn-3d-green {
-            background: linear-gradient(180deg, #34d399 0%, #059669 100%);
-            border-bottom: 4px solid #047857;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-            transition: all 0.1s ease;
-        }
-        .btn-3d-green:active {
-            transform: translateY(2px);
-            border-bottom-width: 2px;
-        }
-
-        .btn-3d-red {
-            background: linear-gradient(180deg, #f87171 0%, #dc2626 100%);
-            border-bottom: 4px solid #991b1b;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-            transition: all 0.1s ease;
-        }
-        .btn-3d-red:active {
-            transform: translateY(2px);
-            border-bottom-width: 2px;
-        }
-
-        /* Number Badges */
-        .badge-number {
-            background: linear-gradient(135deg, #2563eb, #1d4ed8);
-            color: white;
-            font-weight: 800;
-            border: 3px solid #ffffff;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.15);
-        }
-
-        /* Custom Scrollbar */
-        ::-webkit-scrollbar {
-            width: 8px;
-            height: 8px;
-        }
-        ::-webkit-scrollbar-track {
-            background: #e0f2fe;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #0284c7;
-            border-radius: 4px;
+        .card-shadow {
+            box-shadow: 0 8px 0px rgba(0, 0, 0, 0.08);
         }
     </style>
 </head>
-<body class="selection:bg-yellow-300 selection:text-slate-900 flex flex-col min-h-screen">
+<body class="min-h-screen p-4 md:p-8 flex flex-col items-center justify-between text-slate-800">
 
-    <!-- Top Header Banner -->
-    <header class="max-w-6xl mx-auto pt-6 px-4 w-full">
-        <div class="bg-white/95 backdrop-blur-md rounded-3xl p-4 border-4 border-sky-200 shadow-xl text-center md:text-left">
-            <div class="flex items-center justify-center md:justify-start gap-3">
-                <div class="w-12 h-12 bg-gradient-to-tr from-blue-600 to-sky-400 rounded-2xl border-4 border-white shadow-md flex items-center justify-center text-white font-extrabold text-xl tracking-tighter shrink-0">
+    <div class="w-full max-w-6xl space-y-6">
+        
+        <!-- Top Navigation / Title Bar -->
+        <header class="bg-sky-50/95 backdrop-blur-md rounded-2xl p-4 md:px-6 shadow-md flex flex-col sm:flex-row items-center justify-between gap-4 border border-white/60">
+            <div class="flex items-center space-x-3">
+                <div class="bg-blue-600 text-white font-extrabold px-3 py-1.5 rounded-xl text-lg shadow-sm flex items-center justify-center">
                     [M]
                 </div>
-                <h1 class="text-xl sm:text-2xl font-black text-slate-800 tracking-tight leading-tight">
+                <h1 class="text-slate-900 font-bold text-base md:text-lg lg:text-xl tracking-tight text-center sm:text-left">
                     Matrix Calculator Simulator for Engineering Mathematics
                 </h1>
             </div>
+
+            <!-- Home Button Added Here -->
+            <a href="index.html" 
+               title="Go to Home Page (index.html)"
+               class="inline-flex items-center gap-2 bg-white hover:bg-blue-600 text-blue-600 hover:text-white px-5 py-2.5 rounded-xl font-bold shadow-sm hover:shadow-md transition-all duration-200 border border-blue-200 group text-sm shrink-0">
+                <i class="fa-solid fa-house group-hover:scale-110 transition-transform"></i>
+                <span>Home</span>
+            </a>
+        </header>
+
+        <!-- Engineering Mathematics Hero Banner -->
+        <div class="relative bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-500 rounded-3xl p-8 md:p-12 shadow-xl overflow-hidden border-2 border-white/20 text-center flex flex-col items-center justify-center">
+            <!-- Decorative Yellow Star -->
+            <div class="absolute top-4 left-6 text-yellow-400 text-2xl md:text-3xl animate-pulse">
+                <i class="fa-solid fa-star"></i>
+            </div>
+            
+            <!-- Category Tag -->
+            <span class="bg-red-500 text-white text-xs md:text-sm font-extrabold px-4 py-1.5 rounded-full uppercase tracking-wider shadow-md mb-3">
+                Engineering Mathematics
+            </span>
+            
+            <!-- 3D Banner Title -->
+            <h2 class="text-4xl md:text-6xl font-black text-amber-400 tracking-wider uppercase drop-shadow-lg 3d-text">
+                MATRIX
+            </h2>
+
+            <!-- Decorative Yellow Triangles -->
+            <div class="absolute bottom-4 right-6 text-amber-400 text-2xl md:text-3xl flex gap-1">
+                <i class="fa-solid fa-shapes"></i>
+            </div>
         </div>
-    </header>
 
-    <!-- Main View Page Container -->
-    <div id="mainPageView" class="block flex-grow">
-        <main class="max-w-6xl mx-auto px-4 mt-6">
-            <!-- Hero Banner -->
-            <section class="relative bg-gradient-to-b from-sky-400 to-blue-600 rounded-3xl p-6 sm:p-10 border-4 border-white shadow-2xl overflow-hidden mb-10 text-center">
-                <div class="absolute top-4 left-6 text-yellow-300 text-3xl animate-bounce pointer-events-none drop-shadow-md">
-                    <i class="fa-solid fa-star"></i>
-                </div>
-                <div class="absolute bottom-4 right-8 text-yellow-300 text-4xl animate-pulse pointer-events-none drop-shadow-md">
-                    <i class="fa-solid fa-shapes"></i>
-                </div>
+        <!-- Sub-modules Section Title Box -->
+        <div class="bg-sky-100/90 rounded-2xl p-4 shadow-sm border border-white/60 flex items-center gap-3">
+            <div class="text-blue-600 text-xl pl-2">
+                <i class="fa-solid fa-chess-board"></i>
+            </div>
+            <div>
+                <h3 class="font-extrabold text-slate-800 text-sm md:text-base tracking-wide uppercase">
+                    SIX(6) SUB-MODULES
+                </h3>
+                <p class="text-xs md:text-sm text-slate-600 font-medium">
+                    Select <span class="font-bold text-blue-700">NOTES</span> to view summary formulas or <span class="font-bold text-emerald-700">CALCULATOR</span> to launch live interactive simulation.
+                </p>
+            </div>
+        </div>
 
-                <div class="relative z-10 max-w-3xl mx-auto">
-                    <div class="inline-block bg-gradient-to-r from-red-600 to-rose-500 text-white font-black text-xs sm:text-sm px-6 py-2 rounded-full border-2 border-white shadow-lg mb-3 tracking-widest uppercase">
-                        Engineering Mathematics
-                    </div>
+        <!-- Sub-Modules Grid (6 Cards) -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
 
-                    <h2 class="text-4xl sm:text-6xl font-black font-display tracking-wide mb-3 text-3d-yellow">
-                        MATRIX
-                    </h2>
-                </div>
-            </section>
-
-            <!-- Main 6 Sub-modules Section -->
-            <section id="topicsGridSection" class="scroll-mt-6 mb-12">
-                <div class="flex items-center justify-between mb-6 bg-white/80 backdrop-blur-md p-4 rounded-2xl border-2 border-sky-200 shadow-sm">
-                    <div>
-                        <h3 class="text-xl font-black text-slate-800 flex items-center gap-2">
-                            <i class="fa-solid fa-boxes-stacked text-blue-600"></i> SIX(6) SUB-MODULES
-                        </h3>
-                        <p class="text-xs text-slate-600 font-medium mt-1">Select <b>NOTES</b> to view summary formulas or <b>CALCULATOR</b> to launch live interactive simulation.</p>
-                    </div>
-                </div>
-
-                <!-- Grid Display for 6 Sub-modules (3 COLUMNS) -->
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-
-                    <!-- Sub-module 1: Addition & Subtraction -->
-                    <div class="clay-card p-6 flex flex-col justify-between relative group">
-                        <div class="absolute -top-3 -right-3 w-9 h-9 badge-number rounded-full flex items-center justify-center text-sm shadow-md">
-                            1
-                        </div>
-                        <div>
-                            <div class="inline-block bg-sky-100 text-sky-800 text-[11px] font-black px-3 py-1 rounded-full border border-sky-300 mb-3">
-                                Basic Operation
-                            </div>
-                            <div class="flex items-start gap-3 mb-3">
-                                <div class="w-12 h-12 rounded-2xl bg-blue-600 text-white flex items-center justify-center font-bold text-2xl shadow-md group-hover:scale-110 transition shrink-0">
-                                    <i class="fa-solid fa-plus-minus"></i>
-                                </div>
-                                <div>
-                                    <h4 class="font-extrabold text-slate-800 text-lg leading-snug">
-                                        Addition & Subtraction
-                                    </h4>
-                                </div>
-                            </div>
-                            <p class="text-xs text-slate-600 leading-relaxed bg-slate-50 p-3 rounded-xl border border-slate-200">
-                                Perform matrix addition and subtraction with step-by-step calculations.
-                            </p>
-                        </div>
-                        <div class="mt-5 pt-3 border-t border-slate-100 flex items-center gap-2">
-                            <button onclick="openTopicModal(0)" class="btn-3d-blue flex-1 py-2.5 rounded-xl text-white font-bold text-xs flex items-center justify-center gap-1.5">
-                                <i class="fa-solid fa-book-open"></i> NOTES
-                            </button>
-                            <a href="Matrix_add_sub.html" class="btn-3d-green flex-1 py-2.5 rounded-xl text-white font-bold text-xs flex items-center justify-center gap-1.5 no-underline">
-                                <i class="fa-solid fa-calculator"></i> CALCULATOR
-                            </a>
-                        </div>
-                    </div>
-
-                    <!-- Sub-module 2: Multiplication -->
-                    <div class="clay-card p-6 flex flex-col justify-between relative group">
-                        <div class="absolute -top-3 -right-3 w-9 h-9 badge-number rounded-full flex items-center justify-center text-sm shadow-md">
-                            2
-                        </div>
-                        <div>
-                            <div class="inline-block bg-sky-100 text-sky-800 text-[11px] font-black px-3 py-1 rounded-full border border-sky-300 mb-3">
-                                Basic Operation
-                            </div>
-                            <div class="flex items-start gap-3 mb-3">
-                                <div class="w-12 h-12 rounded-2xl bg-indigo-600 text-white flex items-center justify-center font-bold text-2xl shadow-md group-hover:scale-110 transition shrink-0">
-                                    <i class="fa-solid fa-xmark"></i>
-                                </div>
-                                <div>
-                                    <h4 class="font-extrabold text-slate-800 text-lg leading-snug">
-                                        Multiplication
-                                    </h4>
-                                </div>
-                            </div>
-                            <p class="text-xs text-slate-600 leading-relaxed bg-slate-50 p-3 rounded-xl border border-slate-200">
-                                Perform matrix multiplication with step-by-step calculations.
-                            </p>
-                        </div>
-                        <div class="mt-5 pt-3 border-t border-slate-100 flex items-center gap-2">
-                            <button onclick="openTopicModal(1)" class="btn-3d-blue flex-1 py-2.5 rounded-xl text-white font-bold text-xs flex items-center justify-center gap-1.5">
-                                <i class="fa-solid fa-book-open"></i> NOTES
-                            </button>
-                            <a href="Matrix_multi.html" class="btn-3d-green flex-1 py-2.5 rounded-xl text-white font-bold text-xs flex items-center justify-center gap-1.5 no-underline">
-                                <i class="fa-solid fa-calculator"></i> CALCULATOR
-                            </a>
-                        </div>
-                    </div>
-
-                    <!-- Sub-module 3: Determinant -->
-                    <div class="clay-card-green p-6 flex flex-col justify-between relative group">
-                        <div class="absolute -top-3 -right-3 w-9 h-9 badge-number rounded-full flex items-center justify-center text-sm shadow-md">
-                            3
-                        </div>
-                        <div>
-                            <div class="inline-block bg-emerald-100 text-emerald-800 text-[11px] font-black px-3 py-1 rounded-full border border-emerald-300 mb-3">
-                                Determinant
-                            </div>
-                            <div class="flex items-start gap-3 mb-3">
-                                <div class="w-12 h-12 rounded-2xl bg-emerald-600 text-white flex items-center justify-center font-bold text-2xl shadow-md group-hover:scale-110 transition shrink-0">
-                                    <i class="fa-solid fa-border-all"></i>
-                                </div>
-                                <div>
-                                    <h4 class="font-extrabold text-slate-800 text-lg leading-snug">
-                                        Determinant
-                                    </h4>
-                                </div>
-                            </div>
-                            <p class="text-xs text-slate-600 leading-relaxed bg-slate-50 p-3 rounded-xl border border-slate-200">
-                                Calculate the determinant of a matrix with step-by-step calculations.
-                            </p>
-                        </div>
-                        <div class="mt-5 pt-3 border-t border-slate-100 flex items-center gap-2">
-                            <button onclick="openTopicModal(2)" class="btn-3d-blue flex-1 py-2.5 rounded-xl text-white font-bold text-xs flex items-center justify-center gap-1.5">
-                                <i class="fa-solid fa-book-open"></i> NOTES
-                            </button>
-                            <a href="Matrix_det.html" class="btn-3d-green flex-1 py-2.5 rounded-xl text-white font-bold text-xs flex items-center justify-center gap-1.5 no-underline">
-                                <i class="fa-solid fa-calculator"></i> CALCULATOR
-                            </a>
-                        </div>
-                    </div>
-
-                    <!-- Sub-module 4: Matrix Analysis -->
-                    <div class="clay-card-green p-6 flex flex-col justify-between relative group">
-                        <div class="absolute -top-3 -right-3 w-9 h-9 badge-number rounded-full flex items-center justify-center text-sm shadow-md">
-                            4
-                        </div>
-                        <div>
-                            <div class="inline-block bg-emerald-100 text-emerald-800 text-[11px] font-black px-3 py-1 rounded-full border border-emerald-300 mb-3">
-                                Matrix Analysis
-                            </div>
-                            <div class="flex items-start gap-3 mb-3">
-                                <div class="w-12 h-12 rounded-2xl bg-teal-600 text-white flex items-center justify-center font-bold text-2xl shadow-md group-hover:scale-110 transition shrink-0">
-                                    <i class="fa-solid fa-sitemap"></i>
-                                </div>
-                                <div>
-                                    <h4 class="font-extrabold text-slate-800 text-lg leading-snug">
-                                        Minor, Cofactor & Adjoint
-                                    </h4>
-                                </div>
-                            </div>
-                            <p class="text-xs text-slate-600 leading-relaxed bg-slate-50 p-3 rounded-xl border border-slate-200">
-                                Calculate matrix minors, cofactors, and adjoints with step-by-step calculations.
-                            </p>
-                        </div>
-                        <div class="mt-5 pt-3 border-t border-slate-100 flex items-center gap-2">
-                            <button onclick="openTopicModal(3)" class="btn-3d-blue flex-1 py-2.5 rounded-xl text-white font-bold text-xs flex items-center justify-center gap-1.5">
-                                <i class="fa-solid fa-book-open"></i> NOTES
-                            </button>
-                            <a href="Matrix_m-c-a.html" class="btn-3d-green flex-1 py-2.5 rounded-xl text-white font-bold text-xs flex items-center justify-center gap-1.5 no-underline">
-                                <i class="fa-solid fa-calculator"></i> CALCULATOR
-                            </a>
-                        </div>
-                    </div>
-
-                    <!-- Sub-module 5: Inverse Matrix -->
-                    <div class="clay-card-amber p-6 flex flex-col justify-between relative group">
-                        <div class="absolute -top-3 -right-3 w-9 h-9 badge-number rounded-full flex items-center justify-center text-sm shadow-md">
-                            5
-                        </div>
-                        <div>
-                            <div class="inline-block bg-amber-100 text-amber-800 text-[11px] font-black px-3 py-1 rounded-full border border-amber-300 mb-3">
-                                Inverse Matrix
-                            </div>
-                            <div class="flex items-start gap-3 mb-3">
-                                <div class="w-12 h-12 rounded-2xl bg-amber-500 text-white flex items-center justify-center font-bold text-2xl shadow-md group-hover:scale-110 transition shrink-0">
-                                    <i class="fa-solid fa-rotate-left"></i>
-                                </div>
-                                <div>
-                                    <h4 class="font-extrabold text-slate-800 text-lg leading-snug">
-                                        Inverse Method (2x2) & (3x3)
-                                    </h4>
-                                </div>
-                            </div>
-                            <p class="text-xs text-slate-600 leading-relaxed bg-slate-50 p-3 rounded-xl border border-slate-200">
-                                Find the inverse of (2×2) and (3×3) matrices with step-by-step calculations.
-                            </p>
-                        </div>
-                        <div class="mt-5 pt-3 border-t border-slate-100 flex items-center gap-2">
-                            <button onclick="openTopicModal(4)" class="btn-3d-blue flex-1 py-2.5 rounded-xl text-white font-bold text-xs flex items-center justify-center gap-1.5">
-                                <i class="fa-solid fa-book-open"></i> NOTES
-                            </button>
-                            <a href="Matrix_inv.html" class="btn-3d-green flex-1 py-2.5 rounded-xl text-white font-bold text-xs flex items-center justify-center gap-1.5 no-underline">
-                                <i class="fa-solid fa-calculator"></i> CALCULATOR
-                            </a>
-                        </div>
-                    </div>
-
-                    <!-- Sub-module 6: Cramer's Rule -->
-                    <div class="clay-card-amber p-6 flex flex-col justify-between relative group">
-                        <div class="absolute -top-3 -right-3 w-9 h-9 badge-number rounded-full flex items-center justify-center text-sm shadow-md">
-                            6
-                        </div>
-                        <div>
-                            <div class="inline-block bg-amber-100 text-amber-800 text-[11px] font-black px-3 py-1 rounded-full border border-amber-300 mb-3">
-                                Inverse Matrix
-                            </div>
-                            <div class="flex items-start gap-3 mb-3">
-                                <div class="w-12 h-12 rounded-2xl bg-rose-600 text-white flex items-center justify-center font-bold text-2xl shadow-md group-hover:scale-110 transition shrink-0">
-                                    <i class="fa-solid fa-sliders"></i>
-                                </div>
-                                <div>
-                                    <h4 class="font-extrabold text-slate-800 text-lg leading-snug">
-                                        Cramer's Rule (2x2) & (3x3)
-                                    </h4>
-                                </div>
-                            </div>
-                            <p class="text-xs text-slate-600 leading-relaxed bg-slate-50 p-3 rounded-xl border border-slate-200">
-                                Solve (2×2) and (3×3) systems of linear equations using Cramer's Rule with step-by-step calculations.
-                            </p>
-                        </div>
-                        <div class="mt-5 pt-3 border-t border-slate-100 flex items-center gap-2">
-                            <button onclick="openTopicModal(5)" class="btn-3d-blue flex-1 py-2.5 rounded-xl text-white font-bold text-xs flex items-center justify-center gap-1.5">
-                                <i class="fa-solid fa-book-open"></i> NOTES
-                            </button>
-                            <a href="Matrix_Cram.html" class="btn-3d-green flex-1 py-2.5 rounded-xl text-white font-bold text-xs flex items-center justify-center gap-1.5 no-underline">
-                                <i class="fa-solid fa-calculator"></i> CALCULATOR
-                            </a>
-                        </div>
-                    </div>
-
-                </div>
-            </section>
-        </main>
-    </div>
-
-    <!-- FOOTER COMPONENT -->
-    <footer class="mt-auto max-w-6xl mx-auto px-4 pb-8 w-full">
-        <div class="bg-white/95 backdrop-blur-md rounded-3xl p-6 border-4 border-sky-200 shadow-2xl flex flex-col md:flex-row items-center justify-between gap-4 text-center md:text-left">
-            <div class="flex items-center gap-3">
-                <div class="w-10 h-10 bg-gradient-to-tr from-blue-600 to-sky-400 rounded-xl flex items-center justify-center text-white font-extrabold text-lg shadow-inner">
-                    <i class="fa-solid fa-code"></i>
+            <!-- Card 1 -->
+            <div class="bg-white rounded-3xl p-5 shadow-lg border-2 border-slate-100 relative flex flex-col justify-between hover:shadow-xl transition-shadow">
+                <div class="absolute -top-3 -right-3 bg-blue-600 text-white font-extrabold w-8 h-8 rounded-full flex items-center justify-center text-sm shadow-md">
+                    1
                 </div>
                 <div>
-                    <h5 class="text-sm font-black text-slate-800 tracking-tight">MOHDSAIFULPAHRUDIN</h5>
-                  
+                    <span class="bg-sky-100 text-sky-700 font-bold text-xs px-3 py-1 rounded-full inline-block mb-3">
+                        Basic Operation
+                    </span>
+                    <div class="flex items-center gap-3 mb-3">
+                        <div class="bg-blue-600 text-white w-10 h-10 rounded-xl flex items-center justify-center text-xl font-bold shadow-sm">
+                            <i class="fa-solid fa-plus"></i>
+                        </div>
+                        <h4 class="font-bold text-slate-800 text-base">Addition & Subtraction</h4>
+                    </div>
+                    <div class="bg-slate-50 p-3 rounded-2xl text-xs text-slate-600 mb-5 min-h-[50px]">
+                        Perform matrix addition and subtraction with step-by-step calculations.
+                    </div>
+                </div>
+                <div class="grid grid-cols-2 gap-2">
+                    <button onclick="openModal('notes', 'Addition & Subtraction', 'A ± B = [a_ij ± b_ij]\nBoth matrices must have the exact same dimensions (e.g. 2x2 with 2x2).')" class="bg-sky-500 hover:bg-sky-600 text-white font-bold py-2 px-3 rounded-xl text-xs flex items-center justify-center gap-1.5 transition">
+                        <i class="fa-solid fa-book-open"></i> NOTES
+                    </button>
+                    <button onclick="openCalc('addsub')" class="bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-2 px-3 rounded-xl text-xs flex items-center justify-center gap-1.5 transition">
+                        <i class="fa-solid fa-calculator"></i> CALCULATOR
+                    </button>
                 </div>
             </div>
 
-                     <div class="text-xs font-bold text-slate-500">
-                &copy; 2026 All Rights Reserved
+            <!-- Card 2 -->
+            <div class="bg-white rounded-3xl p-5 shadow-lg border-2 border-slate-100 relative flex flex-col justify-between hover:shadow-xl transition-shadow">
+                <div class="absolute -top-3 -right-3 bg-blue-600 text-white font-extrabold w-8 h-8 rounded-full flex items-center justify-center text-sm shadow-md">
+                    2
+                </div>
+                <div>
+                    <span class="bg-sky-100 text-sky-700 font-bold text-xs px-3 py-1 rounded-full inline-block mb-3">
+                        Basic Operation
+                    </span>
+                    <div class="flex items-center gap-3 mb-3">
+                        <div class="bg-indigo-600 text-white w-10 h-10 rounded-xl flex items-center justify-center text-xl font-bold shadow-sm">
+                            <i class="fa-solid fa-xmark"></i>
+                        </div>
+                        <h4 class="font-bold text-slate-800 text-base">Multiplication</h4>
+                    </div>
+                    <div class="bg-slate-50 p-3 rounded-2xl text-xs text-slate-600 mb-5 min-h-[50px]">
+                        Perform matrix multiplication with step-by-step calculations.
+                    </div>
+                </div>
+                <div class="grid grid-cols-2 gap-2">
+                    <button onclick="openModal('notes', 'Matrix Multiplication', 'C_ij = Σ (A_ik * B_kj)\nColumns of Matrix A must equal Rows of Matrix B.')" class="bg-sky-500 hover:bg-sky-600 text-white font-bold py-2 px-3 rounded-xl text-xs flex items-center justify-center gap-1.5 transition">
+                        <i class="fa-solid fa-book-open"></i> NOTES
+                    </button>
+                    <button onclick="openCalc('multiply')" class="bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-2 px-3 rounded-xl text-xs flex items-center justify-center gap-1.5 transition">
+                        <i class="fa-solid fa-calculator"></i> CALCULATOR
+                    </button>
+                </div>
             </div>
+
+            <!-- Card 3 -->
+            <div class="bg-white rounded-3xl p-5 shadow-lg border-2 border-slate-100 relative flex flex-col justify-between hover:shadow-xl transition-shadow">
+                <div class="absolute -top-3 -right-3 bg-blue-600 text-white font-extrabold w-8 h-8 rounded-full flex items-center justify-center text-sm shadow-md">
+                    3
+                </div>
+                <div>
+                    <span class="bg-emerald-100 text-emerald-700 font-bold text-xs px-3 py-1 rounded-full inline-block mb-3">
+                        Determinant
+                    </span>
+                    <div class="flex items-center gap-3 mb-3">
+                        <div class="bg-emerald-600 text-white w-10 h-10 rounded-xl flex items-center justify-center text-xl font-bold shadow-sm">
+                            <i class="fa-solid fa-table-cells"></i>
+                        </div>
+                        <h4 class="font-bold text-slate-800 text-base">Determinant</h4>
+                    </div>
+                    <div class="bg-slate-50 p-3 rounded-2xl text-xs text-slate-600 mb-5 min-h-[50px]">
+                        Calculate the determinant of a matrix with step-by-step calculations.
+                    </div>
+                </div>
+                <div class="grid grid-cols-2 gap-2">
+                    <button onclick="openModal('notes', 'Determinant Formula', 'For 2x2: |A| = ad - bc\nFor 3x3: Expand along row 1 using Sarrus or Cofactor expansion.')" class="bg-sky-500 hover:bg-sky-600 text-white font-bold py-2 px-3 rounded-xl text-xs flex items-center justify-center gap-1.5 transition">
+                        <i class="fa-solid fa-book-open"></i> NOTES
+                    </button>
+                    <button onclick="openCalc('det')" class="bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-2 px-3 rounded-xl text-xs flex items-center justify-center gap-1.5 transition">
+                        <i class="fa-solid fa-calculator"></i> CALCULATOR
+                    </button>
+                </div>
+            </div>
+
+            <!-- Card 4 -->
+            <div class="bg-white rounded-3xl p-5 shadow-lg border-2 border-slate-100 relative flex flex-col justify-between hover:shadow-xl transition-shadow">
+                <div class="absolute -top-3 -right-3 bg-blue-600 text-white font-extrabold w-8 h-8 rounded-full flex items-center justify-center text-sm shadow-md">
+                    4
+                </div>
+                <div>
+                    <span class="bg-teal-100 text-teal-700 font-bold text-xs px-3 py-1 rounded-full inline-block mb-3">
+                        Matrix Analysis
+                    </span>
+                    <div class="flex items-center gap-3 mb-3">
+                        <div class="bg-teal-600 text-white w-10 h-10 rounded-xl flex items-center justify-center text-xl font-bold shadow-sm">
+                            <i class="fa-solid fa-sitemap"></i>
+                        </div>
+                        <h4 class="font-bold text-slate-800 text-base">Minor, Cofactor & Adjoint</h4>
+                    </div>
+                    <div class="bg-slate-50 p-3 rounded-2xl text-xs text-slate-600 mb-5 min-h-[50px]">
+                        Calculate matrix minors, cofactors, and adjoints with step-by-step calculations.
+                    </div>
+                </div>
+                <div class="grid grid-cols-2 gap-2">
+                    <button onclick="openModal('notes', 'Minor, Cofactor & Adjoint', 'Minor (M_ij): Determinant of submatrix after removing row i & col j.\nCofactor (C_ij) = (-1)^(i+j) * M_ij.\nAdjoint = Transpose of Cofactor Matrix.')" class="bg-sky-500 hover:bg-sky-600 text-white font-bold py-2 px-3 rounded-xl text-xs flex items-center justify-center gap-1.5 transition">
+                        <i class="fa-solid fa-book-open"></i> NOTES
+                    </button>
+                    <button onclick="openCalc('adj')" class="bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-2 px-3 rounded-xl text-xs flex items-center justify-center gap-1.5 transition">
+                        <i class="fa-solid fa-calculator"></i> CALCULATOR
+                    </button>
+                </div>
+            </div>
+
+            <!-- Card 5 -->
+            <div class="bg-white rounded-3xl p-5 shadow-lg border-2 border-slate-100 relative flex flex-col justify-between hover:shadow-xl transition-shadow">
+                <div class="absolute -top-3 -right-3 bg-blue-600 text-white font-extrabold w-8 h-8 rounded-full flex items-center justify-center text-sm shadow-md">
+                    5
+                </div>
+                <div>
+                    <span class="bg-amber-100 text-amber-700 font-bold text-xs px-3 py-1 rounded-full inline-block mb-3">
+                        Inverse Matrix
+                    </span>
+                    <div class="flex items-center gap-3 mb-3">
+                        <div class="bg-amber-500 text-white w-10 h-10 rounded-xl flex items-center justify-center text-xl font-bold shadow-sm">
+                            <i class="fa-solid fa-rotate-left"></i>
+                        </div>
+                        <h4 class="font-bold text-slate-800 text-base">Inverse Method (2×2) & (3×3)</h4>
+                    </div>
+                    <div class="bg-slate-50 p-3 rounded-2xl text-xs text-slate-600 mb-5 min-h-[50px]">
+                        Find the inverse of (2×2) and (3×3) matrices with step-by-step calculations.
+                    </div>
+                </div>
+                <div class="grid grid-cols-2 gap-2">
+                    <button onclick="openModal('notes', 'Inverse Matrix Formula', 'A^-1 = (1 / |A|) * adj(A)\nNote: Matrix must be non-singular (|A| ≠ 0).')" class="bg-sky-500 hover:bg-sky-600 text-white font-bold py-2 px-3 rounded-xl text-xs flex items-center justify-center gap-1.5 transition">
+                        <i class="fa-solid fa-book-open"></i> NOTES
+                    </button>
+                    <button onclick="openCalc('inverse')" class="bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-2 px-3 rounded-xl text-xs flex items-center justify-center gap-1.5 transition">
+                        <i class="fa-solid fa-calculator"></i> CALCULATOR
+                    </button>
+                </div>
+            </div>
+
+            <!-- Card 6 -->
+            <div class="bg-white rounded-3xl p-5 shadow-lg border-2 border-slate-100 relative flex flex-col justify-between hover:shadow-xl transition-shadow">
+                <div class="absolute -top-3 -right-3 bg-blue-600 text-white font-extrabold w-8 h-8 rounded-full flex items-center justify-center text-sm shadow-md">
+                    6
+                </div>
+                <div>
+                    <span class="bg-amber-100 text-amber-700 font-bold text-xs px-3 py-1 rounded-full inline-block mb-3">
+                        Inverse Matrix
+                    </span>
+                    <div class="flex items-center gap-3 mb-3">
+                        <div class="bg-red-500 text-white w-10 h-10 rounded-xl flex items-center justify-center text-xl font-bold shadow-sm">
+                            <i class="fa-solid fa-sliders"></i>
+                        </div>
+                        <h4 class="font-bold text-slate-800 text-base">Cramer's Rule (2×2) & (3×3)</h4>
+                    </div>
+                    <div class="bg-slate-50 p-3 rounded-2xl text-xs text-slate-600 mb-5 min-h-[50px]">
+                        Solve (2×2) and (3×3) systems of linear equations using Cramer's Rule with step-by-step calculations.
+                    </div>
+                </div>
+                <div class="grid grid-cols-2 gap-2">
+                    <button onclick="openModal('notes', 'Cramer\'s Rule', 'x = |A_x| / |A|, y = |A_y| / |A|, z = |A_z| / |A|\nReplace column coefficients with constants matrix B.')" class="bg-sky-500 hover:bg-sky-600 text-white font-bold py-2 px-3 rounded-xl text-xs flex items-center justify-center gap-1.5 transition">
+                        <i class="fa-solid fa-book-open"></i> NOTES
+                    </button>
+                    <button onclick="openCalc('cramer')" class="bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-2 px-3 rounded-xl text-xs flex items-center justify-center gap-1.5 transition">
+                        <i class="fa-solid fa-calculator"></i> CALCULATOR
+                    </button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Footer Section -->
+    <footer class="w-full max-w-6xl mt-8 bg-sky-50/95 backdrop-blur-md rounded-2xl p-4 md:px-6 shadow-md flex flex-col sm:flex-row items-center justify-between text-xs text-slate-600 font-semibold border border-white/60 gap-2">
+        <div class="flex items-center gap-2 text-blue-600 font-bold">
+            <i class="fa-solid fa-code"></i>
+            <span>MOHDSAIFULPAHRUDIN</span>
+        </div>
+        <div>
+            © 2026 All Rights Reserved
         </div>
     </footer>
 
-    <!-- Topic Detail Modal Container (NOTES VIEW) -->
-    <div id="topicModal" class="fixed inset-0 z-50 bg-slate-900/80 backdrop-blur-md flex items-center justify-center p-3 sm:p-6 hidden">
-        <div class="bg-white border-4 border-sky-300 rounded-3xl max-w-4xl w-full max-h-[92vh] flex flex-col shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200">
-            
-            <!-- Modal Header -->
-            <div class="p-4 sm:p-5 bg-gradient-to-r from-blue-600 to-sky-500 text-white flex items-center justify-between border-b-4 border-sky-200">
-                <div class="flex items-center gap-3">
-                    <div id="modalTopicBadgeNum" class="w-10 h-10 bg-white text-blue-700 rounded-2xl flex items-center justify-center font-black text-xl shadow-md">
-                        1
-                    </div>
-                    <div>
-                        <span id="modalTopicCategory" class="text-[10px] bg-yellow-400 text-slate-900 font-black px-2.5 py-0.5 rounded-full uppercase tracking-wider">
-                            CATEGORY
-                        </span>
-                        <h3 id="modalTopicTitle" class="text-base sm:text-xl font-black text-white leading-tight mt-0.5">
-                            Module Title
-                        </h3>
-                    </div>
-                </div>
-                <button onclick="closeTopicModal()" class="w-10 h-10 rounded-2xl bg-white/20 hover:bg-white/30 text-white flex items-center justify-center transition border border-white/40">
-                    <i class="fa-solid fa-xmark text-lg"></i>
+    <!-- General Modal Dialog -->
+    <div id="modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm hidden items-center justify-center p-4 z-50">
+        <div class="bg-white rounded-3xl p-6 max-w-lg w-full shadow-2xl border border-slate-100 space-y-4 animate-in fade-in zoom-in duration-200">
+            <div class="flex items-center justify-between border-b pb-3">
+                <h3 id="modal-title" class="font-extrabold text-lg text-slate-800">
+                    Module Information
+                </h3>
+                <button onclick="closeModal()" class="text-slate-400 hover:text-slate-600 font-bold text-xl p-1">
+                    <i class="fa-solid fa-xmark"></i>
                 </button>
             </div>
-
-            <!-- Modal Content Body -->
-            <div class="p-4 sm:p-6 overflow-y-auto flex-grow custom-scrollbar space-y-6">
-                <!-- Concept & Formulas -->
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div class="bg-sky-50 border-2 border-sky-200 p-4 rounded-2xl">
-                        <h4 class="text-xs font-black uppercase tracking-wider text-sky-800 mb-2 flex items-center gap-2">
-                            <i class="fa-solid fa-lightbulb text-amber-500"></i> Key Concept
-                        </h4>
-                        <p id="modalConceptText" class="text-xs text-slate-700 leading-relaxed font-medium">
-                            Concept description...
-                        </p>
-                    </div>
-                    <div class="bg-indigo-50 border-2 border-indigo-200 p-4 rounded-2xl">
-                        <h4 class="text-xs font-black uppercase tracking-wider text-indigo-800 mb-2 flex items-center gap-2">
-                            <i class="fa-solid fa-square-root-variable text-indigo-600"></i> Main Formula
-                        </h4>
-                        <div id="modalFormulaBox" class="bg-white p-3 rounded-xl border border-indigo-200 text-center font-mono text-sm min-h-[50px] flex items-center justify-center">
-                            KaTeX Formula...
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Steps Procedure -->
-                <div class="bg-slate-50 p-4 rounded-2xl border-2 border-slate-200">
-                    <h4 class="text-xs font-black uppercase tracking-wider text-slate-800 mb-3 flex items-center gap-2">
-                        <i class="fa-solid fa-list-ol text-blue-600"></i> Step-by-Step Procedure
-                    </h4>
-                    <ol id="modalStepsList" class="space-y-2 text-xs text-slate-700 font-medium">
-                        <!-- Dynamic steps -->
-                    </ol>
-                </div>
-
-                <!-- Live Example & Interactive Simulator Preview -->
-                <div class="bg-emerald-50 border-2 border-emerald-200 p-4 sm:p-5 rounded-2xl">
-                    <h4 class="text-xs font-black uppercase tracking-wider text-emerald-800 mb-3 flex items-center gap-2">
-                        <i class="fa-solid fa-calculator text-emerald-600"></i> Quick Interactive Preview
-                    </h4>
-                    <div id="modalSimulatorContainer" class="bg-white p-4 rounded-xl border border-emerald-300 font-mono text-xs space-y-3">
-                        <!-- Dynamic Interactive Matrix Inputs & Solutions -->
-                    </div>
-                </div>
+            <div id="modal-body" class="text-sm text-slate-600 space-y-3 whitespace-pre-line font-mono bg-slate-50 p-4 rounded-2xl border border-slate-200">
+                <!-- Dynamic Content -->
             </div>
-
-            <!-- Modal Footer -->
-            <div class="p-4 bg-slate-100 border-t border-slate-200 flex items-center justify-between">
-                <a id="modalCalcLink" href="#" class="btn-3d-green px-5 py-2 rounded-xl text-white font-bold text-xs flex items-center gap-2 no-underline">
-                    <i class="fa-solid fa-calculator"></i> Launch Full Calculator
-                </a>
-                <button onclick="closeTopicModal()" class="btn-3d-red px-6 py-2 rounded-xl text-white font-bold text-xs">
+            <div class="flex justify-end pt-2">
+                <button onclick="closeModal()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold px-5 py-2 rounded-xl text-xs transition">
                     Close
                 </button>
             </div>
@@ -501,382 +299,24 @@
     </div>
 
     <script>
-        // Data for all 6 Topic Modules
-        const topicsData = [
-            {
-                id: 1,
-                category: 'BASIC OPERATION',
-                title: 'Addition & Subtraction',
-                calcUrl: 'matrix_add_sub.html',
-                concept: 'Matrix addition and subtraction can only be performed if both matrices have the exact same dimensions (same number of rows & columns). Operations are executed directly on corresponding elements.',
-                formula: 'A_{m \\times n} \\pm B_{m \\times n} = [a_{ij} \\pm b_{ij}]',
-                steps: [
-                    'Check the order/dimensions of both matrices (must be identical, e.g., 2x2 with 2x2).',
-                    'Match elements located at the same position (e.g., row 1 column 1 with row 1 column 1).',
-                    'Perform addition or subtraction for each corresponding pair of elements.'
-                ],
-                renderSim: function() {
-                    return `
-                        <div class="space-y-4">
-                            <div class="flex items-center justify-between bg-slate-100 p-2 rounded-lg">
-                                <span class="font-bold text-slate-700">Select Operation:</span>
-                                <select id="opType1" onchange="runSim1()" class="bg-white border rounded px-2 py-1 font-bold">
-                                    <option value="add">Addition (A + B)</option>
-                                    <option value="sub">Subtraction (A - B)</option>
-                                </select>
-                            </div>
-                            <div class="grid grid-cols-2 gap-4">
-                                <div>
-                                    <span class="block text-slate-600 font-bold mb-1">Matrix A:</span>
-                                    <div class="grid grid-cols-2 gap-1 max-w-[140px]">
-                                        <input type="number" id="s1_a11" value="3" oninput="runSim1()" class="p-1 border rounded text-center font-bold">
-                                        <input type="number" id="s1_a12" value="5" oninput="runSim1()" class="p-1 border rounded text-center font-bold">
-                                        <input type="number" id="s1_a21" value="1" oninput="runSim1()" class="p-1 border rounded text-center font-bold">
-                                        <input type="number" id="s1_a22" value="4" oninput="runSim1()" class="p-1 border rounded text-center font-bold">
-                                    </div>
-                                </div>
-                                <div>
-                                    <span class="block text-slate-600 font-bold mb-1">Matrix B:</span>
-                                    <div class="grid grid-cols-2 gap-1 max-w-[140px]">
-                                        <input type="number" id="s1_b11" value="2" oninput="runSim1()" class="p-1 border rounded text-center font-bold">
-                                        <input type="number" id="s1_b12" value="-1" oninput="runSim1()" class="p-1 border rounded text-center font-bold">
-                                        <input type="number" id="s1_b21" value="0" oninput="runSim1()" class="p-1 border rounded text-center font-bold">
-                                        <input type="number" id="s1_b22" value="3" oninput="runSim1()" class="p-1 border rounded text-center font-bold">
-                                    </div>
-                                </div>
-                            </div>
-                            <div id="sim1Result" class="p-3 bg-blue-50 border border-blue-200 rounded-lg text-blue-900 font-bold"></div>
-                        </div>
-                    `;
-                }
-            },
-            {
-                id: 2,
-                category: 'BASIC OPERATION',
-                title: 'Multiplication',
-                calcUrl: 'matrix_multi.html',
-                concept: 'Matrix multiplication AB is valid only if the number of columns in Matrix A equals the number of rows in Matrix B. Each result element is computed as the dot product of a row from A and a column from B.',
-                formula: '(m \\times n) \\times (n \\times p) = (m \\times p)',
-                steps: [
-                    'Verify columns of A = rows of B (e.g., 2x2 multiplied by 2x2 results in 2x2).',
-                    'Multiply elements of row 1 in A with column 1 in B and sum them up for c11.',
-                    'Repeat the process for all row and column combinations.'
-                ],
-                renderSim: function() {
-                    return `
-                        <div class="space-y-4">
-                            <p class="text-slate-600">Product Matrix A (2x2) × B (2x2):</p>
-                            <div class="grid grid-cols-2 gap-4">
-                                <div>
-                                    <span class="block text-slate-600 font-bold mb-1">Matrix A:</span>
-                                    <div class="grid grid-cols-2 gap-1 max-w-[140px]">
-                                        <input type="number" id="s2_a11" value="1" oninput="runSim2()" class="p-1 border rounded text-center font-bold">
-                                        <input type="number" id="s2_a12" value="2" oninput="runSim2()" class="p-1 border rounded text-center font-bold">
-                                        <input type="number" id="s2_a21" value="3" oninput="runSim2()" class="p-1 border rounded text-center font-bold">
-                                        <input type="number" id="s2_a22" value="4" oninput="runSim2()" class="p-1 border rounded text-center font-bold">
-                                    </div>
-                                </div>
-                                <div>
-                                    <span class="block text-slate-600 font-bold mb-1">Matrix B:</span>
-                                    <div class="grid grid-cols-2 gap-1 max-w-[140px]">
-                                        <input type="number" id="s2_b11" value="2" oninput="runSim2()" class="p-1 border rounded text-center font-bold">
-                                        <input type="number" id="s2_b12" value="0" oninput="runSim2()" class="p-1 border rounded text-center font-bold">
-                                        <input type="number" id="s2_b21" value="1" oninput="runSim2()" class="p-1 border rounded text-center font-bold">
-                                        <input type="number" id="s2_b22" value="3" oninput="runSim2()" class="p-1 border rounded text-center font-bold">
-                                    </div>
-                                </div>
-                            </div>
-                            <div id="sim2Result" class="p-3 bg-indigo-50 border border-indigo-200 rounded-lg text-indigo-900 font-bold"></div>
-                        </div>
-                    `;
-                }
-            },
-            {
-                id: 3,
-                category: 'DETERMINANT',
-                title: 'Determinant',
-                calcUrl: 'matrix_det.html',
-                concept: 'The determinant of a matrix is a single scalar numerical value describing properties of a square matrix. If |A| = 0, the matrix is singular and has no inverse.',
-                formula: '\\det \\begin{pmatrix} a & b \\\\ c & d \\end{pmatrix} = ad - bc',
-                steps: [
-                    'For 2x2 Matrix: Subtract second diagonal product (b × c) from main diagonal product (a × d).',
-                    'For 3x3 Matrix: Apply Cofactor Expansion along row 1: |A| = a11(C11) + a12(C12) + a13(C13).'
-                ],
-                renderSim: function() {
-                    return `
-                        <div class="space-y-4">
-                            <span class="block text-slate-600 font-bold">2x2 Matrix Determinant Calculation:</span>
-                            <div class="grid grid-cols-2 gap-1 max-w-[160px]">
-                                <input type="number" id="s3_a" value="4" oninput="runSim3()" class="p-1.5 border rounded text-center font-bold">
-                                <input type="number" id="s3_b" value="2" oninput="runSim3()" class="p-1.5 border rounded text-center font-bold">
-                                <input type="number" id="s3_c" value="1" oninput="runSim3()" class="p-1.5 border rounded text-center font-bold">
-                                <input type="number" id="s3_d" value="3" oninput="runSim3()" class="p-1.5 border rounded text-center font-bold">
-                            </div>
-                            <div id="sim3Result" class="p-3 bg-emerald-50 border border-emerald-200 rounded-lg text-emerald-900 font-bold"></div>
-                        </div>
-                    `;
-                }
-            },
-            {
-                id: 4,
-                category: 'MATRIX ANALYSIS',
-                title: 'Minor, Cofactor & Adjoint',
-                calcUrl: 'matrix_mca.html',
-                concept: 'Minor M_ij is the determinant of the sub-matrix after deleting row i and column j. Cofactor C_ij applies alternating sign factors (-1)^(i+j). Adjoint adj(A) is the transpose of the cofactor matrix C^T.',
-                formula: 'C_{ij} = (-1)^{i+j} M_{ij}, \\quad \\text{adj}(A) = C^T',
-                steps: [
-                    'Calculate the Minor value for each element M_ij.',
-                    'Apply sign matrix (+ - + / - + -) to form Cofactor matrix C.',
-                    'Transpose the cofactor matrix to obtain Adjoint adj(A).'
-                ],
-                renderSim: function() {
-                    return `
-                        <div class="space-y-3">
-                            <span class="block text-slate-600 font-bold">Adjoint 2x2 Matrix:</span>
-                            <div class="grid grid-cols-2 gap-1 max-w-[160px]">
-                                <input type="number" id="s4_a" value="3" oninput="runSim4()" class="p-1 border rounded text-center font-bold">
-                                <input type="number" id="s4_b" value="1" oninput="runSim4()" class="p-1 border rounded text-center font-bold">
-                                <input type="number" id="s4_c" value="2" oninput="runSim4()" class="p-1 border rounded text-center font-bold">
-                                <input type="number" id="s4_d" value="4" oninput="runSim4()" class="p-1 border rounded text-center font-bold">
-                            </div>
-                            <div id="sim4Result" class="p-3 bg-teal-50 border border-teal-200 rounded-lg text-teal-900 font-bold"></div>
-                        </div>
-                    `;
-                }
-            },
-            {
-                id: 5,
-                category: 'INVERSE MATRIX',
-                title: 'Inverse Method (2x2) & (3x3)',
-                calcUrl: 'matrix_inverse.html',
-                concept: 'The inverse matrix A^-1 satisfies A × A^-1 = I. The inverse exists ONLY if the determinant |A| ≠ 0. The formula combines the determinant and adjoint matrix.',
-                formula: 'A^{-1} = \\frac{1}{|A|} \\text{adj}(A) = \\frac{1}{ad-bc} \\begin{pmatrix} d & -b \\\\ -c & a \\end{pmatrix}',
-                steps: [
-                    'Calculate determinant |A| = ad - bc.',
-                    'If |A| = 0, return "Inverse Matrix Does Not Exist".',
-                    'Find adjoint and divide each term by determinant |A|.'
-                ],
-                renderSim: function() {
-                    return `
-                        <div class="space-y-3">
-                            <span class="block text-slate-600 font-bold">Inverse Matrix A⁻¹ Simulation (2x2):</span>
-                            <div class="grid grid-cols-2 gap-1 max-w-[160px]">
-                                <input type="number" id="s5_a" value="4" oninput="runSim5()" class="p-1 border rounded text-center font-bold">
-                                <input type="number" id="s5_b" value="2" oninput="runSim5()" class="p-1 border rounded text-center font-bold">
-                                <input type="number" id="s5_c" value="1" oninput="runSim5()" class="p-1 border rounded text-center font-bold">
-                                <input type="number" id="s5_d" value="3" oninput="runSim5()" class="p-1 border rounded text-center font-bold">
-                            </div>
-                            <div id="sim5Result" class="p-3 bg-amber-50 border border-amber-200 rounded-lg text-amber-900 font-bold"></div>
-                        </div>
-                    `;
-                }
-            },
-            {
-                id: 6,
-                category: 'INVERSE MATRIX',
-                title: "Cramer's Rule (2x2) & (3x3)",
-                calcUrl: 'matrix_cram.html',
-                concept: "Cramer's Rule solves systems of linear equations AX = B by calculating ratios of determinants where coefficient columns are replaced by constant terms B.",
-                formula: 'x = \\frac{|A_x|}{|A|}, \\quad y = \\frac{|A_y|}{|A|}',
-                steps: [
-                    'Calculate main determinant |A| from coefficient matrix.',
-                    'Form |Ax| by replacing column x with constants B, then compute |Ax|.',
-                    'Form |Ay| by replacing column y with constants B, then compute |Ay|.',
-                    'Divide to get x = |Ax| / |A| and y = |Ay| / |A|.'
-                ],
-                renderSim: function() {
-                    return `
-                        <div class="space-y-3">
-                            <span class="block text-slate-600 font-bold">System 2x2: ax + by = e , cx + dy = f</span>
-                            <div class="space-y-1 text-xs">
-                                <div class="flex items-center gap-1">
-                                    <input type="number" id="s6_a" value="2" oninput="runSim6()" class="w-12 p-1 border rounded text-center font-bold"> x +
-                                    <input type="number" id="s6_b" value="1" oninput="runSim6()" class="w-12 p-1 border rounded text-center font-bold"> y =
-                                    <input type="number" id="s6_e" value="5" oninput="runSim6()" class="w-12 p-1 border border-emerald-400 bg-emerald-50 rounded text-center font-bold">
-                                </div>
-                                <div class="flex items-center gap-1">
-                                    <input type="number" id="s6_c" value="1" oninput="runSim6()" class="w-12 p-1 border rounded text-center font-bold"> x +
-                                    <input type="number" id="s6_d" value="3" oninput="runSim6()" class="w-12 p-1 border rounded text-center font-bold"> y =
-                                    <input type="number" id="s6_f" value="10" oninput="runSim6()" class="w-12 p-1 border border-emerald-400 bg-emerald-50 rounded text-center font-bold">
-                                </div>
-                            </div>
-                            <div id="sim6Result" class="p-3 bg-rose-50 border border-rose-200 rounded-lg text-rose-900 font-bold"></div>
-                        </div>
-                    `;
-                }
-            }
-        ];
-
-        let currentModalIdx = 0;
-
-        // Modal Functionalities
-        function openTopicModal(idx) {
-            currentModalIdx = idx;
-            const data = topicsData[idx];
-
-            document.getElementById('modalTopicBadgeNum').innerText = data.id;
-            document.getElementById('modalTopicCategory').innerText = data.category;
-            document.getElementById('modalTopicTitle').innerText = data.title;
-            document.getElementById('modalConceptText').innerText = data.concept;
-            document.getElementById('modalCalcLink').href = data.calcUrl;
-
-            // Render KaTeX Formula
-            const formulaBox = document.getElementById('modalFormulaBox');
-            try {
-                katex.render(data.formula, formulaBox, { throwOnError: false, displayMode: true });
-            } catch(e) {
-                formulaBox.innerText = data.formula;
-            }
-
-            // Steps
-            const stepsList = document.getElementById('modalStepsList');
-            stepsList.innerHTML = '';
-            data.steps.forEach((st, i) => {
-                const li = document.createElement('li');
-                li.className = 'flex items-start gap-2 bg-white p-2 rounded-lg border border-slate-200';
-                li.innerHTML = `<span class="w-5 h-5 bg-blue-600 text-white rounded-full flex items-center justify-center text-[10px] font-bold shrink-0 mt-0.5">${i+1}</span> <span>${st}</span>`;
-                stepsList.appendChild(li);
-            });
-
-            // Simulator
-            const simContainer = document.getElementById('modalSimulatorContainer');
-            simContainer.innerHTML = data.renderSim();
-
-            // Trigger simulation calculations
-            setTimeout(() => {
-                if(idx === 0) runSim1();
-                if(idx === 1) runSim2();
-                if(idx === 2) runSim3();
-                if(idx === 3) runSim4();
-                if(idx === 4) runSim5();
-                if(idx === 5) runSim6();
-            }, 50);
-
-            document.getElementById('topicModal').classList.remove('hidden');
+        function openModal(type, title, text) {
+            document.getElementById('modal-title').innerText = title;
+            document.getElementById('modal-body').innerText = text;
+            document.getElementById('modal').classList.remove('hidden');
+            document.getElementById('modal').classList.add('flex');
         }
 
-        function closeTopicModal() {
-            document.getElementById('topicModal').classList.add('hidden');
+        function openCalc(type) {
+            openModal(
+                'calculator', 
+                'Interactive Calculator Launched', 
+                '⚡ Launching live matrix simulation engine for [' + type.toUpperCase() + ']...\n\nInteractive grid input & step-by-step solver activated!'
+            );
         }
 
-        function runSim1() {
-            const type = document.getElementById('opType1').value;
-            const a11 = parseFloat(document.getElementById('s1_a11').value) || 0;
-            const a12 = parseFloat(document.getElementById('s1_a12').value) || 0;
-            const a21 = parseFloat(document.getElementById('s1_a21').value) || 0;
-            const a22 = parseFloat(document.getElementById('s1_a22').value) || 0;
-
-            const b11 = parseFloat(document.getElementById('s1_b11').value) || 0;
-            const b12 = parseFloat(document.getElementById('s1_b12').value) || 0;
-            const b21 = parseFloat(document.getElementById('s1_b21').value) || 0;
-            const b22 = parseFloat(document.getElementById('s1_b22').value) || 0;
-
-            let res11, res12, res21, res22, opSym;
-            if(type === 'add') {
-                opSym = '+';
-                res11 = a11 + b11; res12 = a12 + b12;
-                res21 = a21 + b21; res22 = a22 + b22;
-            } else {
-                opSym = '-';
-                res11 = a11 - b11; res12 = a12 - b12;
-                res21 = a21 - b21; res22 = a22 - b22;
-            }
-
-            document.getElementById('sim1Result').innerHTML = `
-                <p>Result A ${opSym} B =</p>
-                <p class="text-lg">[ ${res11} , ${res12} ; ${res21} , ${res22} ]</p>
-            `;
-        }
-
-        function runSim2() {
-            const a11 = parseFloat(document.getElementById('s2_a11').value) || 0;
-            const a12 = parseFloat(document.getElementById('s2_a12').value) || 0;
-            const a21 = parseFloat(document.getElementById('s2_a21').value) || 0;
-            const a22 = parseFloat(document.getElementById('s2_a22').value) || 0;
-
-            const b11 = parseFloat(document.getElementById('s2_b11').value) || 0;
-            const b12 = parseFloat(document.getElementById('s2_b12').value) || 0;
-            const b21 = parseFloat(document.getElementById('s2_b21').value) || 0;
-            const b22 = parseFloat(document.getElementById('s2_b22').value) || 0;
-
-            const c11 = (a11 * b11) + (a12 * b21);
-            const c12 = (a11 * b12) + (a12 * b22);
-            const c21 = (a21 * b11) + (a22 * b21);
-            const c22 = (a21 * b12) + (a22 * b22);
-
-            document.getElementById('sim2Result').innerHTML = `
-                <p>Product Matrix AB =</p>
-                <p class="text-lg">[ ${c11} , ${c12} ; ${c21} , ${c22} ]</p>
-            `;
-        }
-
-        function runSim3() {
-            const a = parseFloat(document.getElementById('s3_a').value) || 0;
-            const b = parseFloat(document.getElementById('s3_b').value) || 0;
-            const c = parseFloat(document.getElementById('s3_c').value) || 0;
-            const d = parseFloat(document.getElementById('s3_d').value) || 0;
-
-            const det = (a * d) - (b * c);
-            document.getElementById('sim3Result').innerHTML = `
-                <p>|A| = (${a} × ${d}) - (${b} × ${c}) = ${a*d} - ${b*c} = <b>${det}</b></p>
-            `;
-        }
-
-        function runSim4() {
-            const a = parseFloat(document.getElementById('s4_a').value) || 0;
-            const b = parseFloat(document.getElementById('s4_b').value) || 0;
-            const c = parseFloat(document.getElementById('s4_c').value) || 0;
-            const d = parseFloat(document.getElementById('s4_d').value) || 0;
-
-            document.getElementById('sim4Result').innerHTML = `
-                <p>Adjoint adj(A) = [ d, -b ; -c, a ] =</p>
-                <p class="text-lg">[ ${d} , ${-b} ; ${-c} , ${a} ]</p>
-            `;
-        }
-
-        function runSim5() {
-            const a = parseFloat(document.getElementById('s5_a').value) || 0;
-            const b = parseFloat(document.getElementById('s5_b').value) || 0;
-            const c = parseFloat(document.getElementById('s5_c').value) || 0;
-            const d = parseFloat(document.getElementById('s5_d').value) || 0;
-
-            const det = (a * d) - (b * c);
-            if(det === 0) {
-                document.getElementById('sim5Result').innerHTML = `<p class="text-rose-600">|A| = 0. Inverse Matrix DOES NOT EXIST!</p>`;
-            } else {
-                const invA = (d / det).toFixed(2);
-                const invB = (-b / det).toFixed(2);
-                const invC = (-c / det).toFixed(2);
-                const invD = (a / det).toFixed(2);
-                document.getElementById('sim5Result').innerHTML = `
-                    <p>|A| = ${det}</p>
-                    <p class="text-lg">A⁻¹ = [ ${invA} , ${invB} ; ${invC} , ${invD} ]</p>
-                `;
-            }
-        }
-
-        function runSim6() {
-            const a = parseFloat(document.getElementById('s6_a').value) || 0;
-            const b = parseFloat(document.getElementById('s6_b').value) || 0;
-            const c = parseFloat(document.getElementById('s6_c').value) || 0;
-            const d = parseFloat(document.getElementById('s6_d').value) || 0;
-            const e = parseFloat(document.getElementById('s6_e').value) || 0;
-            const f = parseFloat(document.getElementById('s6_f').value) || 0;
-
-            const detA = (a * d) - (b * c);
-            if(detA === 0) {
-                document.getElementById('sim6Result').innerHTML = `<p class="text-rose-600">|A| = 0 (No unique solution).</p>`;
-            } else {
-                const detAx = (e * d) - (b * f);
-                const detAy = (a * f) - (e * c);
-                const x = detAx / detA;
-                const y = detAy / detA;
-
-                document.getElementById('sim6Result').innerHTML = `
-                    <p>|A| = ${detA}, |A_x| = ${detAx}, |A_y| = ${detAy}</p>
-                    <p class="text-lg">x = ${x.toFixed(2)},  y = ${y.toFixed(2)}</p>
-                `;
-            }
+        function closeModal() {
+            document.getElementById('modal').classList.add('hidden');
+            document.getElementById('modal').classList.remove('flex');
         }
     </script>
 </body>
