@@ -491,7 +491,7 @@
 
                     clearTimeout(this.timer);
                     this.timer = setTimeout(() => {
-                        alert('Session expired due to 10 minutes of inactivity. You have been logged out.');
+                        alert('Session expired due to 3 minutes of inactivity. You have been logged out.');
                         this.logout();
                     }, this.inactivityTimeout);
                 },
