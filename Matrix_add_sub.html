@@ -112,6 +112,28 @@
             border-bottom-width: 2px;
         }
 
+        .btn-3d-red {
+            background: linear-gradient(180deg, #f87171 0%, #dc2626 100%);
+            border-bottom: 4px solid #991b1b;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            transition: all 0.1s ease;
+        }
+        .btn-3d-red:active {
+            transform: translateY(2px);
+            border-bottom-width: 2px;
+        }
+
+        .btn-3d-gray {
+            background: linear-gradient(180deg, #9ca3af 0%, #4b5563 100%);
+            border-bottom: 4px solid #1f2937;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            transition: all 0.1s ease;
+        }
+        .btn-3d-gray:active {
+            transform: translateY(2px);
+            border-bottom-width: 2px;
+        }
+
         /* 3D Matrix Brackets */
         .matrix-bracket {
             display: inline-flex;
@@ -301,14 +323,17 @@
                 </div>
             </div>
 
-            <!-- Action Buttons with Home Button -->
-            <div class="flex items-center gap-2.5">
+            <!-- Action Buttons with Home, Sub-modules and Close Button -->
+            <div class="flex flex-wrap items-center justify-center md:justify-end gap-2.5">
                 <a href="index.html" class="btn-3d-green px-4 py-2.5 rounded-2xl text-white font-extrabold text-xs flex items-center gap-2 no-underline">
                     <i class="fa-solid fa-house"></i> Home
                 </a>
                 <button onclick="toggleTopicsDrawer()" class="btn-3d-blue px-4 py-2.5 rounded-2xl text-white font-extrabold text-xs flex items-center gap-2">
                     <i class="fa-solid fa-layer-group"></i> 6 Sub-modules
                 </button>
+                <a href="index.html" class="btn-3d-red px-4 py-2.5 rounded-2xl text-white font-extrabold text-xs flex items-center gap-2 no-underline" title="Close module and return to main page">
+                    <i class="fa-solid fa-circle-xmark"></i> Close
+                </a>
             </div>
         </div>
     </header>
@@ -353,105 +378,109 @@
 
             <div class="space-y-6">
                 <!-- Row 1: 2x2 Addition (A + B) Horizontal -->
-                <div class="flex items-center justify-between gap-2 sm:gap-3 bg-white/80 p-3.5 sm:p-4 rounded-2xl border-2 border-sky-200 shadow-sm">
-                    <div class="label-tag flex-shrink-0 text-center w-32 sm:w-36">
-                        ADDITION (2x2)<br>
-                        <span class="text-yellow-300 font-black text-sm">A + B</span>
-                    </div>
+                <div class="overflow-x-auto pb-2">
+                    <div class="min-w-[640px] flex items-center justify-between gap-2 sm:gap-3 bg-white/80 p-3.5 sm:p-4 rounded-2xl border-2 border-sky-200 shadow-sm">
+                        <div class="label-tag flex-shrink-0 text-center w-32 sm:w-36">
+                            ADDITION (2x2)<br>
+                            <span class="text-yellow-300 font-black text-sm">A + B</span>
+                        </div>
 
-                    <!-- Matrix A -->
-                    <div class="flex flex-col items-center">
-                        <span class="text-[10px] font-black text-slate-500 uppercase mb-1">Matrix A</span>
-                        <div class="matrix-bracket">
-                            <div class="matrix-grid grid-2x2" id="a2_add">
-                                <input type="number" value="2"><input type="number" value="4">
-                                <input type="number" value="1"><input type="number" value="3">
+                        <!-- Matrix A -->
+                        <div class="flex flex-col items-center">
+                            <span class="text-[10px] font-black text-slate-500 uppercase mb-1">Matrix A</span>
+                            <div class="matrix-bracket">
+                                <div class="matrix-grid grid-2x2" id="a2_add">
+                                    <input type="number" value="2"><input type="number" value="4">
+                                    <input type="number" value="1"><input type="number" value="3">
+                                </div>
                             </div>
                         </div>
-                    </div>
 
-                    <span class="operator-badge">+</span>
+                        <span class="operator-badge">+</span>
 
-                    <!-- Matrix B -->
-                    <div class="flex flex-col items-center">
-                        <span class="text-[10px] font-black text-slate-500 uppercase mb-1">Matrix B</span>
-                        <div class="matrix-bracket">
-                            <div class="matrix-grid grid-2x2" id="b2_add">
-                                <input type="number" value="5"><input type="number" value="1">
-                                <input type="number" value="6"><input type="number" value="2">
+                        <!-- Matrix B -->
+                        <div class="flex flex-col items-center">
+                            <span class="text-[10px] font-black text-slate-500 uppercase mb-1">Matrix B</span>
+                            <div class="matrix-bracket">
+                                <div class="matrix-grid grid-2x2" id="b2_add">
+                                    <input type="number" value="5"><input type="number" value="1">
+                                    <input type="number" value="6"><input type="number" value="2">
+                                </div>
                             </div>
                         </div>
-                    </div>
 
-                    <span class="operator-badge">=</span>
+                        <span class="operator-badge">=</span>
 
-                    <!-- Step Calculation -->
-                    <div class="flex flex-col items-center">
-                        <span class="text-[10px] font-black text-blue-600 uppercase mb-1"><i class="fa-solid fa-gears"></i> Step-by-Step</span>
-                        <div class="matrix-bracket">
-                            <div class="matrix-grid grid-step-2x2" id="step2_add"></div>
+                        <!-- Step Calculation -->
+                        <div class="flex flex-col items-center">
+                            <span class="text-[10px] font-black text-blue-600 uppercase mb-1"><i class="fa-solid fa-gears"></i> Step-by-Step</span>
+                            <div class="matrix-bracket">
+                                <div class="matrix-grid grid-step-2x2" id="step2_add"></div>
+                            </div>
                         </div>
-                    </div>
 
-                    <span class="operator-badge">=</span>
+                        <span class="operator-badge">=</span>
 
-                    <!-- Final Result -->
-                    <div class="flex flex-col items-center">
-                        <span class="text-[10px] font-black text-emerald-600 uppercase mb-1"><i class="fa-solid fa-check-double"></i> Result</span>
-                        <div class="matrix-bracket matrix-bracket-green">
-                            <div class="matrix-grid grid-2x2" id="res2_add"></div>
+                        <!-- Final Result -->
+                        <div class="flex flex-col items-center">
+                            <span class="text-[10px] font-black text-emerald-600 uppercase mb-1"><i class="fa-solid fa-check-double"></i> Result</span>
+                            <div class="matrix-bracket matrix-bracket-green">
+                                <div class="matrix-grid grid-2x2" id="res2_add"></div>
+                            </div>
                         </div>
                     </div>
                 </div>
 
                 <!-- Row 2: 2x2 Subtraction (A - B) Horizontal -->
-                <div class="flex items-center justify-between gap-2 sm:gap-3 bg-white/80 p-3.5 sm:p-4 rounded-2xl border-2 border-sky-200 shadow-sm">
-                    <div class="label-tag flex-shrink-0 text-center w-32 sm:w-36">
-                        SUBTRACTION (2x2)<br>
-                        <span class="text-yellow-300 font-black text-sm">A - B</span>
-                    </div>
+                <div class="overflow-x-auto pb-2">
+                    <div class="min-w-[640px] flex items-center justify-between gap-2 sm:gap-3 bg-white/80 p-3.5 sm:p-4 rounded-2xl border-2 border-sky-200 shadow-sm">
+                        <div class="label-tag flex-shrink-0 text-center w-32 sm:w-36">
+                            SUBTRACTION (2x2)<br>
+                            <span class="text-yellow-300 font-black text-sm">A - B</span>
+                        </div>
 
-                    <!-- Matrix A -->
-                    <div class="flex flex-col items-center">
-                        <span class="text-[10px] font-black text-slate-500 uppercase mb-1">Matrix A</span>
-                        <div class="matrix-bracket">
-                            <div class="matrix-grid grid-2x2" id="a2_sub">
-                                <input type="number" value="8"><input type="number" value="5">
-                                <input type="number" value="9"><input type="number" value="7">
+                        <!-- Matrix A -->
+                        <div class="flex flex-col items-center">
+                            <span class="text-[10px] font-black text-slate-500 uppercase mb-1">Matrix A</span>
+                            <div class="matrix-bracket">
+                                <div class="matrix-grid grid-2x2" id="a2_sub">
+                                    <input type="number" value="8"><input type="number" value="5">
+                                    <input type="number" value="9"><input type="number" value="7">
+                                </div>
                             </div>
                         </div>
-                    </div>
 
-                    <span class="operator-badge">-</span>
+                        <span class="operator-badge">-</span>
 
-                    <!-- Matrix B -->
-                    <div class="flex flex-col items-center">
-                        <span class="text-[10px] font-black text-slate-500 uppercase mb-1">Matrix B</span>
-                        <div class="matrix-bracket">
-                            <div class="matrix-grid grid-2x2" id="b2_sub">
-                                <input type="number" value="2"><input type="number" value="3">
-                                <input type="number" value="4"><input type="number" value="1">
+                        <!-- Matrix B -->
+                        <div class="flex flex-col items-center">
+                            <span class="text-[10px] font-black text-slate-500 uppercase mb-1">Matrix B</span>
+                            <div class="matrix-bracket">
+                                <div class="matrix-grid grid-2x2" id="b2_sub">
+                                    <input type="number" value="2"><input type="number" value="3">
+                                    <input type="number" value="4"><input type="number" value="1">
+                                </div>
                             </div>
                         </div>
-                    </div>
 
-                    <span class="operator-badge">=</span>
+                        <span class="operator-badge">=</span>
 
-                    <!-- Step Calculation -->
-                    <div class="flex flex-col items-center">
-                        <span class="text-[10px] font-black text-blue-600 uppercase mb-1"><i class="fa-solid fa-gears"></i> Step-by-Step</span>
-                        <div class="matrix-bracket">
-                            <div class="matrix-grid grid-step-2x2" id="step2_sub"></div>
+                        <!-- Step Calculation -->
+                        <div class="flex flex-col items-center">
+                            <span class="text-[10px] font-black text-blue-600 uppercase mb-1"><i class="fa-solid fa-gears"></i> Step-by-Step</span>
+                            <div class="matrix-bracket">
+                                <div class="matrix-grid grid-step-2x2" id="step2_sub"></div>
+                            </div>
                         </div>
-                    </div>
 
-                    <span class="operator-badge">=</span>
+                        <span class="operator-badge">=</span>
 
-                    <!-- Final Result -->
-                    <div class="flex flex-col items-center">
-                        <span class="text-[10px] font-black text-emerald-600 uppercase mb-1"><i class="fa-solid fa-check-double"></i> Result</span>
-                        <div class="matrix-bracket matrix-bracket-green">
-                            <div class="matrix-grid grid-2x2" id="res2_sub"></div>
+                        <!-- Final Result -->
+                        <div class="flex flex-col items-center">
+                            <span class="text-[10px] font-black text-emerald-600 uppercase mb-1"><i class="fa-solid fa-check-double"></i> Result</span>
+                            <div class="matrix-bracket matrix-bracket-green">
+                                <div class="matrix-grid grid-2x2" id="res2_sub"></div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -476,109 +505,113 @@
 
             <div class="space-y-6">
                 <!-- Row 1: 3x3 Addition (A + B) Horizontal -->
-                <div class="flex items-center justify-between gap-2 sm:gap-3 bg-white/80 p-3.5 sm:p-4 rounded-2xl border-2 border-emerald-200 shadow-sm">
-                    <div class="label-tag flex-shrink-0 text-center w-32 sm:w-36">
-                        ADDITION (3x3)<br>
-                        <span class="text-yellow-300 font-black text-sm">A + B</span>
-                    </div>
+                <div class="overflow-x-auto pb-2">
+                    <div class="min-w-[720px] flex items-center justify-between gap-2 sm:gap-3 bg-white/80 p-3.5 sm:p-4 rounded-2xl border-2 border-emerald-200 shadow-sm">
+                        <div class="label-tag flex-shrink-0 text-center w-32 sm:w-36">
+                            ADDITION (3x3)<br>
+                            <span class="text-yellow-300 font-black text-sm">A + B</span>
+                        </div>
 
-                    <!-- Matrix A -->
-                    <div class="flex flex-col items-center">
-                        <span class="text-[10px] font-black text-slate-500 uppercase mb-1">Matrix A</span>
-                        <div class="matrix-bracket matrix-bracket-green">
-                            <div class="matrix-grid grid-3x3" id="a3_add">
-                                <input type="number" value="1"><input type="number" value="3"><input type="number" value="2">
-                                <input type="number" value="4"><input type="number" value="0"><input type="number" value="5">
-                                <input type="number" value="2"><input type="number" value="1"><input type="number" value="3">
+                        <!-- Matrix A -->
+                        <div class="flex flex-col items-center">
+                            <span class="text-[10px] font-black text-slate-500 uppercase mb-1">Matrix A</span>
+                            <div class="matrix-bracket matrix-bracket-green">
+                                <div class="matrix-grid grid-3x3" id="a3_add">
+                                    <input type="number" value="1"><input type="number" value="3"><input type="number" value="2">
+                                    <input type="number" value="4"><input type="number" value="0"><input type="number" value="5">
+                                    <input type="number" value="2"><input type="number" value="1"><input type="number" value="3">
+                                </div>
                             </div>
                         </div>
-                    </div>
 
-                    <span class="operator-badge">+</span>
+                        <span class="operator-badge">+</span>
 
-                    <!-- Matrix B -->
-                    <div class="flex flex-col items-center">
-                        <span class="text-[10px] font-black text-slate-500 uppercase mb-1">Matrix B</span>
-                        <div class="matrix-bracket matrix-bracket-green">
-                            <div class="matrix-grid grid-3x3" id="b3_add">
-                                <input type="number" value="2"><input type="number" value="1"><input type="number" value="4">
-                                <input type="number" value="0"><input type="number" value="3"><input type="number" value="1">
-                                <input type="number" value="5"><input type="number" value="2"><input type="number" value="0">
+                        <!-- Matrix B -->
+                        <div class="flex flex-col items-center">
+                            <span class="text-[10px] font-black text-slate-500 uppercase mb-1">Matrix B</span>
+                            <div class="matrix-bracket matrix-bracket-green">
+                                <div class="matrix-grid grid-3x3" id="b3_add">
+                                    <input type="number" value="2"><input type="number" value="1"><input type="number" value="4">
+                                    <input type="number" value="0"><input type="number" value="3"><input type="number" value="1">
+                                    <input type="number" value="5"><input type="number" value="2"><input type="number" value="0">
+                                </div>
                             </div>
                         </div>
-                    </div>
 
-                    <span class="operator-badge">=</span>
+                        <span class="operator-badge">=</span>
 
-                    <!-- Step Calculation -->
-                    <div class="flex flex-col items-center">
-                        <span class="text-[10px] font-black text-blue-600 uppercase mb-1"><i class="fa-solid fa-gears"></i> Step-by-Step</span>
-                        <div class="matrix-bracket">
-                            <div class="matrix-grid grid-step-3x3" id="step3_add"></div>
+                        <!-- Step Calculation -->
+                        <div class="flex flex-col items-center">
+                            <span class="text-[10px] font-black text-blue-600 uppercase mb-1"><i class="fa-solid fa-gears"></i> Step-by-Step</span>
+                            <div class="matrix-bracket">
+                                <div class="matrix-grid grid-step-3x3" id="step3_add"></div>
+                            </div>
                         </div>
-                    </div>
 
-                    <span class="operator-badge">=</span>
+                        <span class="operator-badge">=</span>
 
-                    <!-- Final Result -->
-                    <div class="flex flex-col items-center">
-                        <span class="text-[10px] font-black text-emerald-600 uppercase mb-1"><i class="fa-solid fa-check-double"></i> Result</span>
-                        <div class="matrix-bracket matrix-bracket-green">
-                            <div class="matrix-grid grid-3x3" id="res3_add"></div>
+                        <!-- Final Result -->
+                        <div class="flex flex-col items-center">
+                            <span class="text-[10px] font-black text-emerald-600 uppercase mb-1"><i class="fa-solid fa-check-double"></i> Result</span>
+                            <div class="matrix-bracket matrix-bracket-green">
+                                <div class="matrix-grid grid-3x3" id="res3_add"></div>
+                            </div>
                         </div>
                     </div>
                 </div>
 
                 <!-- Row 2: 3x3 Subtraction (A - B) Horizontal -->
-                <div class="flex items-center justify-between gap-2 sm:gap-3 bg-white/80 p-3.5 sm:p-4 rounded-2xl border-2 border-emerald-200 shadow-sm">
-                    <div class="label-tag flex-shrink-0 text-center w-32 sm:w-36">
-                        SUBTRACTION (3x3)<br>
-                        <span class="text-yellow-300 font-black text-sm">A - B</span>
-                    </div>
+                <div class="overflow-x-auto pb-2">
+                    <div class="min-w-[720px] flex items-center justify-between gap-2 sm:gap-3 bg-white/80 p-3.5 sm:p-4 rounded-2xl border-2 border-emerald-200 shadow-sm">
+                        <div class="label-tag flex-shrink-0 text-center w-32 sm:w-36">
+                            SUBTRACTION (3x3)<br>
+                            <span class="text-yellow-300 font-black text-sm">A - B</span>
+                        </div>
 
-                    <!-- Matrix A -->
-                    <div class="flex flex-col items-center">
-                        <span class="text-[10px] font-black text-slate-500 uppercase mb-1">Matrix A</span>
-                        <div class="matrix-bracket matrix-bracket-green">
-                            <div class="matrix-grid grid-3x3" id="a3_sub">
-                                <input type="number" value="7"><input type="number" value="8"><input type="number" value="9">
-                                <input type="number" value="6"><input type="number" value="5"><input type="number" value="4">
-                                <input type="number" value="3"><input type="number" value="2"><input type="number" value="1">
+                        <!-- Matrix A -->
+                        <div class="flex flex-col items-center">
+                            <span class="text-[10px] font-black text-slate-500 uppercase mb-1">Matrix A</span>
+                            <div class="matrix-bracket matrix-bracket-green">
+                                <div class="matrix-grid grid-3x3" id="a3_sub">
+                                    <input type="number" value="7"><input type="number" value="8"><input type="number" value="9">
+                                    <input type="number" value="6"><input type="number" value="5"><input type="number" value="4">
+                                    <input type="number" value="3"><input type="number" value="2"><input type="number" value="1">
+                                </div>
                             </div>
                         </div>
-                    </div>
 
-                    <span class="operator-badge">-</span>
+                        <span class="operator-badge">-</span>
 
-                    <!-- Matrix B -->
-                    <div class="flex flex-col items-center">
-                        <span class="text-[10px] font-black text-slate-500 uppercase mb-1">Matrix B</span>
-                        <div class="matrix-bracket matrix-bracket-green">
-                            <div class="matrix-grid grid-3x3" id="b3_sub">
-                                <input type="number" value="4"><input type="number" value="3"><input type="number" value="2">
-                                <input type="number" value="1"><input type="number" value="0"><input type="number" value="-2">
-                                <input type="number" value="2"><input type="number" value="1"><input type="number" value="3">
+                        <!-- Matrix B -->
+                        <div class="flex flex-col items-center">
+                            <span class="text-[10px] font-black text-slate-500 uppercase mb-1">Matrix B</span>
+                            <div class="matrix-bracket matrix-bracket-green">
+                                <div class="matrix-grid grid-3x3" id="b3_sub">
+                                    <input type="number" value="4"><input type="number" value="3"><input type="number" value="2">
+                                    <input type="number" value="1"><input type="number" value="0"><input type="number" value="-2">
+                                    <input type="number" value="2"><input type="number" value="1"><input type="number" value="3">
+                                </div>
                             </div>
                         </div>
-                    </div>
 
-                    <span class="operator-badge">=</span>
+                        <span class="operator-badge">=</span>
 
-                    <!-- Step Calculation -->
-                    <div class="flex flex-col items-center">
-                        <span class="text-[10px] font-black text-blue-600 uppercase mb-1"><i class="fa-solid fa-gears"></i> Step-by-Step</span>
-                        <div class="matrix-bracket">
-                            <div class="matrix-grid grid-step-3x3" id="step3_sub"></div>
+                        <!-- Step Calculation -->
+                        <div class="flex flex-col items-center">
+                            <span class="text-[10px] font-black text-blue-600 uppercase mb-1"><i class="fa-solid fa-gears"></i> Step-by-Step</span>
+                            <div class="matrix-bracket">
+                                <div class="matrix-grid grid-step-3x3" id="step3_sub"></div>
+                            </div>
                         </div>
-                    </div>
 
-                    <span class="operator-badge">=</span>
+                        <span class="operator-badge">=</span>
 
-                    <!-- Final Result -->
-                    <div class="flex flex-col items-center">
-                        <span class="text-[10px] font-black text-emerald-600 uppercase mb-1"><i class="fa-solid fa-check-double"></i> Result</span>
-                        <div class="matrix-bracket matrix-bracket-green">
-                            <div class="matrix-grid grid-3x3" id="res3_sub"></div>
+                        <!-- Final Result -->
+                        <div class="flex flex-col items-center">
+                            <span class="text-[10px] font-black text-emerald-600 uppercase mb-1"><i class="fa-solid fa-check-double"></i> Result</span>
+                            <div class="matrix-bracket matrix-bracket-green">
+                                <div class="matrix-grid grid-3x3" id="res3_sub"></div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -587,17 +620,18 @@
     </main>
 
     <!-- Sub-modules Drawer -->
-    <div id="topicsDrawer" class="fixed inset-0 z-50 bg-slate-900/80 backdrop-blur-md flex items-center justify-center p-4 hidden">
-        <div class="bg-white border-4 border-sky-300 rounded-3xl max-w-xl w-full p-6 shadow-2xl space-y-3">
+    <div id="topicsDrawer" class="fixed inset-0 z-50 bg-slate-900/80 backdrop-blur-md flex items-center justify-center p-4 hidden" onclick="handleBackdropClick(event, 'topicsDrawer')">
+        <div class="bg-white border-4 border-sky-300 rounded-3xl max-w-xl w-full p-6 shadow-2xl space-y-4 relative" onclick="event.stopPropagation()">
             <div class="flex items-center justify-between border-b pb-3">
                 <h3 class="text-lg font-black text-slate-800 flex items-center gap-2">
                     <i class="fa-solid fa-list-check text-blue-600"></i> Six Sub-modules
                 </h3>
-                <button onclick="toggleTopicsDrawer()" class="text-slate-400 hover:text-slate-600 font-bold">
-                    <i class="fa-solid fa-xmark text-lg"></i>
+                <button onclick="toggleTopicsDrawer()" class="w-8 h-8 rounded-full bg-red-100 hover:bg-red-200 text-red-600 flex items-center justify-center font-bold transition-colors" title="Close drawer">
+                    <i class="fa-solid fa-xmark text-base"></i>
                 </button>
             </div>
-            <div class="space-y-2 text-xs font-semibold">
+            
+            <div class="space-y-2 text-xs font-semibold max-h-[60vh] overflow-y-auto pr-1">
                 <div class="p-3 bg-sky-100 border-2 border-sky-400 rounded-xl flex items-center justify-between font-bold text-sky-900">
                     <span>1. Basic Operation (Addition & Subtraction)</span>
                     <span class="bg-sky-500 text-white text-[10px] px-2.5 py-0.5 rounded-full uppercase">Active</span>
@@ -623,9 +657,13 @@
                     <span class="bg-slate-200 text-slate-600 text-[10px] px-2 py-0.5 rounded">Module 6</span>
                 </div>
             </div>
-            <div class="pt-2 text-right">
-                <button onclick="toggleTopicsDrawer()" class="btn-3d-blue px-4 py-2 rounded-xl text-white font-bold text-xs">
-                    Close
+
+            <div class="pt-2 flex justify-between items-center gap-2 border-t">
+                <a href="index.html" class="btn-3d-red px-4 py-2 rounded-xl text-white font-bold text-xs flex items-center gap-1.5 no-underline">
+                    <i class="fa-solid fa-house"></i> Home
+                </a>
+                <button onclick="toggleTopicsDrawer()" class="btn-3d-blue px-4 py-2 rounded-xl text-white font-bold text-xs flex items-center gap-1.5">
+                    <i class="fa-solid fa-xmark"></i> Close
                 </button>
             </div>
         </div>
@@ -682,6 +720,28 @@
         function toggleTopicsDrawer() {
             document.getElementById('topicsDrawer').classList.toggle('hidden');
         }
+
+        function confirmExit() {
+            document.getElementById('exitModal').classList.remove('hidden');
+        }
+
+        function closeExitModal() {
+            document.getElementById('exitModal').classList.add('hidden');
+        }
+
+        function handleBackdropClick(event, modalId) {
+            if (event.target.id === modalId) {
+                document.getElementById(modalId).classList.add('hidden');
+            }
+        }
+
+        // ESC Key to Close Modals
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                document.getElementById('topicsDrawer').classList.add('hidden');
+                document.getElementById('exitModal').classList.add('hidden');
+            }
+        });
 
         // Initialization
         document.addEventListener('DOMContentLoaded', () => {
