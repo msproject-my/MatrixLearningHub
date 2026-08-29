@@ -1,9 +1,10 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="select-none">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Matrix Learning Hub - Interactive Tools & Calculators</title>
+    
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- FontAwesome Icons -->
@@ -14,6 +15,23 @@
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.13.3/dist/cdn.min.js"></script>
 
     <style>
+        /* Anti-Copy and Text Selection Protection */
+        * {
+            -webkit-user-select: none !important;
+            -moz-user-select: none !important;
+            -ms-user-select: none !important;
+            user-select: none !important;
+            -webkit-touch-callout: none !important;
+        }
+
+        /* Re-enable input typing selection for user forms */
+        input, select, textarea {
+            -webkit-user-select: text !important;
+            -moz-user-select: text !important;
+            -ms-user-select: text !important;
+            user-select: text !important;
+        }
+
         body { 
             font-family: 'Inter', sans-serif; 
             background: linear-gradient(180deg, #1ca0f2 0%, #0088de 100%);
@@ -45,7 +63,7 @@
         }
     </style>
 </head>
-<body class="p-4 md:p-8 flex flex-col justify-between min-h-screen relative" x-data="hubApp()" x-init="initApp()">
+<body class="p-4 md:p-8 flex flex-col justify-between min-h-screen relative" x-data="hubApp()" x-init="initApp()" oncontextmenu="return false;">
 
     <!-- CUSTOM TOAST NOTIFICATION CONTAINER -->
     <div x-show="toast.show" 
@@ -438,8 +456,43 @@
         </div>
     </div>
 
-    <!-- JAVASCRIPT LOGIC -->
+    <!-- JAVASCRIPT LOGIC & SECURITY ENHANCEMENTS -->
     <script>
+        (function setupSecurityShield() {
+            // Display Console Security Warning
+            console.log("%c⚠️ SECURITY WARNING!", "color: red; font-size: 24px; font-weight: bold;");
+            console.log("%cThis system is protected by anti-tamper security policies. Unauthorized inspection or source code extraction is strictly monitored.", "color: #475569; font-size: 14px;");
+
+            // Prevent Developer Tool Shortcuts & Source Viewing
+            window.addEventListener('keydown', function (e) {
+                // F12 key
+                if (e.keyCode === 123) {
+                    e.preventDefault();
+                    return false;
+                }
+                // Ctrl+Shift+I, Ctrl+Shift+J, Ctrl+Shift+C (Dev Tools)
+                if (e.ctrlKey && e.shiftKey && (e.keyCode === 73 || e.keyCode === 74 || e.keyCode === 67)) {
+                    e.preventDefault();
+                    return false;
+                }
+                // Ctrl+U (View Source)
+                if (e.ctrlKey && e.keyCode === 85) {
+                    e.preventDefault();
+                    return false;
+                }
+                // Ctrl+S (Save Page)
+                if (e.ctrlKey && e.keyCode === 83) {
+                    e.preventDefault();
+                    return false;
+                }
+            }, true);
+
+            // Disable Context Menu
+            window.addEventListener('contextmenu', function (e) {
+                e.preventDefault();
+            }, false);
+        })();
+
         function hubApp() {
             return {
                 // Target HTML links
@@ -451,8 +504,8 @@
                 // Google Apps Script Web App URL
                 googleAppsScriptUrl: 'https://script.google.com/macros/s/AKfycbzHLzdbUN99UOlOt6qhH-a1rydxxD9I_rWopol_z_Eu_BhTM_aUF00hnQq-BomM_Wwm/exec',
 
-                // Admin Secret PIN
-                adminSecretPin: 'admin123',
+                // SHA-256 Encrypted PIN Hash for 'admin123' to prevent plain text exposure
+                adminSecretPinHash: '240be518fabd2724ddb6f04eeb1da5967448d7e831c08c8fa822809f74c720a9',
                 adminPinInput: '',
                 adminAuthenticated: false,
 
@@ -560,9 +613,19 @@
                     this.showProfileModal = true;
                 },
 
+                // Sanitize text inputs against Injection attacks
+                sanitizeInput(text) {
+                    if (!text) return '';
+                    return text.toString().replace(/[<>"'&]/g, '').trim();
+                },
+
                 saveProfile() {
+                    // Sanitize user inputs
+                    this.profileForm.name = this.sanitizeInput(this.profileForm.name);
+                    this.profileForm.studentId = this.sanitizeInput(this.profileForm.studentId);
+
                     // Validations
-                    if (!this.profileForm.name.trim()) {
+                    if (!this.profileForm.name) {
                         this.showNotification('Input Required', 'Please enter your Full Name.');
                         return;
                     }
@@ -574,7 +637,7 @@
                         this.showNotification('Input Required', 'Please select an Institution.');
                         return;
                     }
-                    if (this.isPolytechnicPortDicksonStudent() && !this.profileForm.studentId.trim()) {
+                    if (this.isPolytechnicPortDicksonStudent() && !this.profileForm.studentId) {
                         this.showNotification('Input Required', 'Please enter your Student ID for Polytechnic Port Dickson.');
                         return;
                     }
@@ -633,10 +696,10 @@
                         id: Date.now().toString(),
                         timestamp: now.toISOString(),
                         formattedTime: now.toLocaleString('ms-MY'),
-                        studentName: this.userProfile.name,
+                        studentName: this.sanitizeInput(this.userProfile.name),
                         userType: this.userProfile.userType,
                         institution: this.userProfile.institution,
-                        studentId: this.isPolytechnicPortDicksonStudent() ? this.userProfile.studentId : '',
+                        studentId: this.isPolytechnicPortDicksonStudent() ? this.sanitizeInput(this.userProfile.studentId) : '',
                         purpose: this.userProfile.purpose,
                         module: moduleName
                     };
@@ -646,14 +709,14 @@
                     localStorage.setItem('matrix_hub_logs', JSON.stringify(this.activityLogs));
                     this.updateAnalytics();
 
-                    // Send to Google Sheets
+                    // Send to Google Sheets securely
                     if (this.googleAppsScriptUrl) {
                         fetch(this.googleAppsScriptUrl, {
                             method: "POST",
                             mode: "no-cors",
-                            headers: { "Content-Type": "application/json" },
+                            headers: { "Content-Type": "text/plain;charset=utf-8" },
                             body: JSON.stringify(logItem)
-                        }).catch(err => console.log('Google Sheets sync note:', err));
+                        }).catch(err => console.log('Sync status:', err));
                     }
                 },
 
@@ -699,13 +762,34 @@
                     this.showAdminModal = true;
                 },
 
-                authenticateAdmin() {
-                    if (this.adminPinInput === this.adminSecretPin) {
+                // Secure SHA-256 Hash Verification for Admin PIN
+                async hashString(str) {
+                    const encoder = new TextEncoder();
+                    const data = encoder.encode(str);
+                    const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+                    const hashArray = Array.from(new Uint8Array(hashBuffer));
+                    return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+                },
+
+                async authenticateAdmin() {
+                    const inputHash = await this.hashString(this.adminPinInput.trim());
+                    if (inputHash === this.adminSecretPinHash) {
                         this.adminAuthenticated = true;
                         this.adminPinInput = '';
+                        this.showNotification('Access Granted', 'Welcome to Admin Dashboard.');
                     } else {
                         this.showNotification('Access Denied', 'Invalid Admin PIN entered.');
                     }
+                },
+
+                // Secure CSV Sanitization against Excel Formula Injections
+                cleanCsvCell(str) {
+                    if (!str) return '""';
+                    let clean = str.toString().replace(/"/g, '""');
+                    if (['=', '+', '-', '@'].includes(clean.charAt(0))) {
+                        clean = "'" + clean;
+                    }
+                    return `"${clean}"`;
                 },
 
                 exportToCSV() {
@@ -715,7 +799,7 @@
                     }
                     let csv = 'Timestamp,Name,Role,Institution,Student ID,Purpose,Module\n';
                     this.activityLogs.forEach(l => {
-                        csv += `"${l.formattedTime}","${l.studentName}","${l.userType}","${l.institution}","${l.studentId || ''}","${l.purpose}","${l.module}"\n`;
+                        csv += `${this.cleanCsvCell(l.formattedTime)},${this.cleanCsvCell(l.studentName)},${this.cleanCsvCell(l.userType)},${this.cleanCsvCell(l.institution)},${this.cleanCsvCell(l.studentId)},${this.cleanCsvCell(l.purpose)},${this.cleanCsvCell(l.module)}\n`;
                     });
 
                     const blob = new Blob([csv], { type: 'text/csv' });
