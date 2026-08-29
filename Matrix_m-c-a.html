@@ -37,6 +37,23 @@
     <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
 
     <style>
+        /* Anti-Copy and Text Selection Protection */
+        * {
+            -webkit-user-select: none !important;
+            -moz-user-select: none !important;
+            -ms-user-select: none !important;
+            user-select: none !important;
+            -webkit-touch-callout: none !important;
+        }
+
+        /* Re-enable input typing selection for user forms */
+        input, select, textarea {
+            -webkit-user-select: text !important;
+            -moz-user-select: text !important;
+            -ms-user-select: text !important;
+            user-select: text !important;
+        }
+
         body {
             font-family: 'Inter', sans-serif;
             background: linear-gradient(180deg, #38bdf8 0%, #0284c7 45%, #0369a1 100%);
@@ -281,7 +298,7 @@
         }
     </style>
 </head>
-<body class="pb-16 selection:bg-yellow-300 selection:text-slate-900">
+<body class="pb-16 selection:bg-yellow-300 selection:text-slate-900" oncontextmenu="return false;">
 
     <!-- Top Header Banner (Expanded Container Width max-w-[1500px]) -->
     <header class="max-w-[1500px] mx-auto pt-6 px-4">
@@ -763,6 +780,42 @@
     </div>
 
     <script>
+        // SECURITY SHIELD: Anti-Tamper & Code Protection
+        (function setupSecurityShield() {
+            // Display Console Security Warning
+            console.log("%c⚠️ SECURITY WARNING!", "color: red; font-size: 24px; font-weight: bold;");
+            console.log("%cThis simulation system is protected by security policies. Unauthorized code extraction or tampering is strictly monitored.", "color: #475569; font-size: 14px;");
+
+            // Prevent Developer Tool Shortcuts & Source Viewing
+            window.addEventListener('keydown', function (e) {
+                // F12 key
+                if (e.keyCode === 123) {
+                    e.preventDefault();
+                    return false;
+                }
+                // Ctrl+Shift+I, Ctrl+Shift+J, Ctrl+Shift+C (Dev Tools)
+                if (e.ctrlKey && e.shiftKey && (e.keyCode === 73 || e.keyCode === 74 || e.keyCode === 67)) {
+                    e.preventDefault();
+                    return false;
+                }
+                // Ctrl+U (View Source)
+                if (e.ctrlKey && e.keyCode === 85) {
+                    e.preventDefault();
+                    return false;
+                }
+                // Ctrl+S (Save Page)
+                if (e.ctrlKey && e.keyCode === 83) {
+                    e.preventDefault();
+                    return false;
+                }
+            }, true);
+
+            // Disable Context Menu
+            window.addEventListener('contextmenu', function (e) {
+                e.preventDefault();
+            }, false);
+        })();
+
         function getV(id) {
             let elem = document.getElementById(id);
             if (!elem) return 0;
