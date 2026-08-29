@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="select-none">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -17,9 +17,27 @@
     <script src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
     
     <style>
+        /* Anti-Copy and Text Selection Protection */
+        * {
+            -webkit-user-select: none !important;
+            -moz-user-select: none !important;
+            -ms-user-select: none !important;
+            user-select: none !important;
+            -webkit-touch-callout: none !important;
+        }
+
+        /* Re-enable input typing selection for user forms */
+        input, select, textarea {
+            -webkit-user-select: text !important;
+            -moz-user-select: text !important;
+            -ms-user-select: text !important;
+            user-select: text !important;
+        }
+
         body {
             font-family: 'Inter', sans-serif;
             background-color: #f3f4f6;
+            min-height: 100vh;
         }
 
         .handwriting {
@@ -91,7 +109,7 @@
         }
     </style>
 </head>
-<body class="min-h-screen text-slate-800 p-2 sm:p-4 md:p-6">
+<body class="min-h-screen text-slate-800 p-2 sm:p-4 md:p-6" oncontextmenu="return false;">
 
     <div class="max-w-5xl mx-auto space-y-4">
         
@@ -332,6 +350,42 @@
     </div>
 
     <script>
+        // SECURITY SHIELD: Anti-Tamper & Code Protection
+        (function setupSecurityShield() {
+            // Display Console Security Warning
+            console.log("%c⚠️ SECURITY WARNING!", "color: red; font-size: 24px; font-weight: bold;");
+            console.log("%cThis simulation system is protected by security policies. Unauthorized code extraction or tampering is strictly monitored.", "color: #475569; font-size: 14px;");
+
+            // Prevent Developer Tool Shortcuts & Source Viewing
+            window.addEventListener('keydown', function (e) {
+                // F12 key
+                if (e.keyCode === 123) {
+                    e.preventDefault();
+                    return false;
+                }
+                // Ctrl+Shift+I, Ctrl+Shift+J, Ctrl+Shift+C (Dev Tools)
+                if (e.ctrlKey && e.shiftKey && (e.keyCode === 73 || e.keyCode === 74 || e.keyCode === 67)) {
+                    e.preventDefault();
+                    return false;
+                }
+                // Ctrl+U (View Source)
+                if (e.ctrlKey && e.keyCode === 85) {
+                    e.preventDefault();
+                    return false;
+                }
+                // Ctrl+S (Save Page)
+                if (e.ctrlKey && e.keyCode === 83) {
+                    e.preventDefault();
+                    return false;
+                }
+            }, true);
+
+            // Disable Context Menu
+            window.addEventListener('contextmenu', function (e) {
+                e.preventDefault();
+            }, false);
+        })();
+
         /* Fraction helper class for exact fraction representation and formatting */
         class Fraction {
             constructor(num, den = 1) {
