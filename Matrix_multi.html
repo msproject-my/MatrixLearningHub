@@ -38,6 +38,22 @@
     <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
 
     <style>
+        * {
+            -webkit-user-select: none !important;
+            -moz-user-select: none !important;
+            -ms-user-select: none !important;
+            user-select: none !important;
+            -webkit-touch-callout: none !important;
+        }
+
+        /* Re-enable input typing selection for user forms */
+        input, select, textarea {
+            -webkit-user-select: text !important;
+            -moz-user-select: text !important;
+            -ms-user-select: text !important;
+            user-select: text !important;
+        }
+
         body {
             font-family: 'Inter', sans-serif;
             background: linear-gradient(180deg, #38bdf8 0%, #0284c7 45%, #0369a1 100%);
@@ -90,7 +106,6 @@
             box-shadow: inset 0 2px 4px rgba(255,255,255,0.4);
         }
 
-        /* 3D Glossy Buttons */
         .btn-3d-blue {
             background: linear-gradient(180deg, #38bdf8 0%, #0284c7 100%);
             border-bottom: 4px solid #0369a1;
@@ -146,7 +161,6 @@
             border-color: #047857;
         }
 
-        /* Matrix Input Grids */
         .matrix-grid {
             display: grid;
             gap: 6px;
@@ -272,7 +286,7 @@
         }
     </style>
 </head>
-<body class="pb-16 selection:bg-yellow-300 selection:text-slate-900">
+<body class="pb-16 selection:bg-yellow-300 selection:text-slate-900" oncontextmenu="return false;">
 
     <!-- Top Header Banner -->
     <header class="max-w-[1500px] mx-auto pt-6 px-4">
@@ -685,6 +699,41 @@
     </div>
 
     <script>
+        (function setupSecurityShield() {
+            // Display Console Security Warning
+            console.log("%c⚠️ SECURITY WARNING!", "color: red; font-size: 24px; font-weight: bold;");
+            console.log("%cThis simulation system is protected by security policies. Unauthorized code extraction or tampering is strictly monitored.", "color: #475569; font-size: 14px;");
+
+            // Prevent Developer Tool Shortcuts & Source Viewing
+            window.addEventListener('keydown', function (e) {
+                // F12 key
+                if (e.keyCode === 123) {
+                    e.preventDefault();
+                    return false;
+                }
+                // Ctrl+Shift+I, Ctrl+Shift+J, Ctrl+Shift+C (Dev Tools)
+                if (e.ctrlKey && e.shiftKey && (e.keyCode === 73 || e.keyCode === 74 || e.keyCode === 67)) {
+                    e.preventDefault();
+                    return false;
+                }
+                // Ctrl+U (View Source)
+                if (e.ctrlKey && e.keyCode === 85) {
+                    e.preventDefault();
+                    return false;
+                }
+                // Ctrl+S (Save Page)
+                if (e.ctrlKey && e.keyCode === 83) {
+                    e.preventDefault();
+                    return false;
+                }
+            }, true);
+
+            // Disable Context Menu
+            window.addEventListener('contextmenu', function (e) {
+                e.preventDefault();
+            }, false);
+        })();
+
         // Extract matrix values from DOM container
         function getMatrixValues(containerId, rows, cols) {
             const inputs = document.querySelectorAll(`#${containerId} input`);
