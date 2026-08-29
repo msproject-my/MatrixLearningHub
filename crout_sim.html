@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="select-none">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -17,6 +17,22 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
   <style>
+    * {
+      -webkit-user-select: none !important;
+      -moz-user-select: none !important;
+      -ms-user-select: none !important;
+      user-select: none !important;
+      -webkit-touch-callout: none !important;
+    }
+
+    /* Re-enable input typing selection for user forms */
+    input, select, textarea {
+      -webkit-user-select: text !important;
+      -moz-user-select: text !important;
+      -ms-user-select: text !important;
+      user-select: text !important;
+    }
+
     body {
       font-family: 'Inter', sans-serif;
       background-color: #f1f5f9;
@@ -80,7 +96,7 @@
     }
   </style>
 </head>
-<body class="p-3 sm:p-6 min-h-screen flex flex-col items-center">
+<body class="p-3 sm:p-6 min-h-screen flex flex-col items-center" oncontextmenu="return false;">
 
   <!-- Top Navigation Header Container -->
   <div class="w-full max-w-5xl bg-white rounded-2xl shadow-sm border border-slate-200 p-4 mb-4 flex flex-col md:flex-row items-center justify-between gap-4">
@@ -309,6 +325,42 @@
   </div>
 
   <script>
+    // SECURITY SHIELD: Anti-Tamper & Code Protection
+    (function setupSecurityShield() {
+      // Display Console Security Warning
+      console.log("%c⚠️ SECURITY WARNING!", "color: red; font-size: 24px; font-weight: bold;");
+      console.log("%cThis simulation system is protected by security policies. Unauthorized code extraction or tampering is strictly monitored.", "color: #475569; font-size: 14px;");
+
+      // Prevent Developer Tool Shortcuts & Source Viewing
+      window.addEventListener('keydown', function (e) {
+        // F12 key
+        if (e.keyCode === 123) {
+          e.preventDefault();
+          return false;
+        }
+        // Ctrl+Shift+I, Ctrl+Shift+J, Ctrl+Shift+C (Dev Tools)
+        if (e.ctrlKey && e.shiftKey && (e.keyCode === 73 || e.keyCode === 74 || e.keyCode === 67)) {
+          e.preventDefault();
+          return false;
+        }
+        // Ctrl+U (View Source)
+        if (e.ctrlKey && e.keyCode === 85) {
+          e.preventDefault();
+          return false;
+        }
+        // Ctrl+S (Save Page)
+        if (e.ctrlKey && e.keyCode === 83) {
+          e.preventDefault();
+          return false;
+        }
+      }, true);
+
+      // Disable Context Menu
+      window.addEventListener('contextmenu', function (e) {
+        e.preventDefault();
+      }, false);
+    })();
+
     // --- Exact Fraction Math Class ---
     class Fraction {
       constructor(num, den = 1) {
