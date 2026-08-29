@@ -428,6 +428,7 @@
                             <thead class="bg-slate-100 text-slate-700 sticky top-0 border-b">
                                 <tr>
                                     <th class="p-2.5">Time</th>
+                                    <th class="p-2.5">Session ID</th>
                                     <th class="p-2.5">Name</th>
                                     <th class="p-2.5">Role</th>
                                     <th class="p-2.5">Institution</th>
@@ -440,6 +441,7 @@
                                 <template x-for="log in activityLogs" :key="log.id">
                                     <tr class="hover:bg-slate-50">
                                         <td class="p-2.5 text-slate-500" x-text="log.formattedTime"></td>
+                                        <td class="p-2.5 font-mono text-slate-500 text-[10px]" x-text="log.sessionId || '-'"></td>
                                         <td class="p-2.5 font-bold text-slate-800" x-text="log.studentName"></td>
                                         <td class="p-2.5" x-text="log.userType"></td>
                                         <td class="p-2.5" x-text="log.institution"></td>
@@ -516,9 +518,12 @@
                     message: ''
                 },
 
-                // Inactivity Timer Setup (10 Minit)
-                inactivityTimeout: 10 * 60 * 1000, 
+                // Inactivity Timer Setup (5 Minit Auto-Logout)
+                inactivityTimeout: 5 * 60 * 1000, 
                 timer: null,
+
+                // Session Tracking ID
+                currentSessionId: null,
 
                 // Modals & User Profile
                 showProfileModal: false,
@@ -569,6 +574,16 @@
                         try {
                             this.userProfile = JSON.parse(saved);
                             this.userProfile.registered = true;
+                            
+                            // Initialize active session ID if not set
+                            const savedSession = sessionStorage.getItem('matrix_hub_session_id');
+                            if (savedSession) {
+                                this.currentSessionId = savedSession;
+                            } else {
+                                this.currentSessionId = 'SESS-' + Date.now();
+                                sessionStorage.setItem('matrix_hub_session_id', this.currentSessionId);
+                            }
+
                             this.startInactivityTimer();
                         } catch (e) {
                             this.showProfileModal = true;
@@ -593,7 +608,7 @@
 
                     clearTimeout(this.timer);
                     this.timer = setTimeout(() => {
-                        this.showNotification('Session Expired', 'You have been automatically logged out due to inactivity.');
+                        // Silent auto-logout without notice after 5 minutes of inactivity
                         this.logout();
                     }, this.inactivityTimeout);
                 },
@@ -651,6 +666,10 @@
                         registered: true
                     };
                     
+                    // Create new Session ID on Login
+                    this.currentSessionId = 'SESS-' + Date.now();
+                    sessionStorage.setItem('matrix_hub_session_id', this.currentSessionId);
+
                     localStorage.setItem('matrix_hub_user_profile', JSON.stringify(this.userProfile));
                     this.showProfileModal = false;
                     this.startInactivityTimer();
@@ -660,6 +679,9 @@
                 logout() {
                     clearTimeout(this.timer);
                     localStorage.removeItem('matrix_hub_user_profile');
+                    sessionStorage.removeItem('matrix_hub_session_id');
+                    
+                    this.currentSessionId = null;
                     this.userProfile = {
                         registered: false,
                         userType: '',
@@ -692,8 +714,14 @@
 
                 recordActivity(moduleName) {
                     const now = new Date();
+                    if (!this.currentSessionId) {
+                        this.currentSessionId = 'SESS-' + Date.now();
+                        sessionStorage.setItem('matrix_hub_session_id', this.currentSessionId);
+                    }
+
                     const logItem = {
                         id: Date.now().toString(),
+                        sessionId: this.currentSessionId,
                         timestamp: now.toISOString(),
                         formattedTime: now.toLocaleString('ms-MY'),
                         studentName: this.sanitizeInput(this.userProfile.name),
@@ -797,9 +825,9 @@
                         this.showNotification('Export Warning', 'No log data available to export.');
                         return;
                     }
-                    let csv = 'Timestamp,Name,Role,Institution,Student ID,Purpose,Module\n';
+                    let csv = 'Timestamp,Session ID,Name,Role,Institution,Student ID,Purpose,Module\n';
                     this.activityLogs.forEach(l => {
-                        csv += `${this.cleanCsvCell(l.formattedTime)},${this.cleanCsvCell(l.studentName)},${this.cleanCsvCell(l.userType)},${this.cleanCsvCell(l.institution)},${this.cleanCsvCell(l.studentId)},${this.cleanCsvCell(l.purpose)},${this.cleanCsvCell(l.module)}\n`;
+                        csv += `${this.cleanCsvCell(l.formattedTime)},${this.cleanCsvCell(l.sessionId)},${this.cleanCsvCell(l.studentName)},${this.cleanCsvCell(l.userType)},${this.cleanCsvCell(l.institution)},${this.cleanCsvCell(l.studentId)},${this.cleanCsvCell(l.purpose)},${this.cleanCsvCell(l.module)}\n`;
                     });
 
                     const blob = new Blob([csv], { type: 'text/csv' });
