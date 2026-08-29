@@ -45,7 +45,28 @@
         }
     </style>
 </head>
-<body class="p-4 md:p-8 flex flex-col justify-between" x-data="hubApp()" x-init="initApp()">
+<body class="p-4 md:p-8 flex flex-col justify-between min-h-screen relative" x-data="hubApp()" x-init="initApp()">
+
+    <!-- CUSTOM TOAST NOTIFICATION CONTAINER -->
+    <div x-show="toast.show" 
+         x-transition:enter="transition ease-out duration-300"
+         x-transition:enter-start="opacity-0 transform translate-y-[-20px]"
+         x-transition:enter-end="opacity-100 transform translate-y-0"
+         x-transition:leave="transition ease-in duration-200"
+         x-transition:leave-start="opacity-100 transform translate-y-0"
+         x-transition:leave-end="opacity-0 transform translate-y-[-20px]"
+         class="fixed top-5 right-5 z-50 max-w-sm w-full bg-slate-900 text-white p-4 rounded-2xl shadow-2xl border border-slate-700 flex items-start space-x-3">
+        <div class="text-amber-400 text-xl pt-0.5">
+            <i class="fa-solid fa-circle-info"></i>
+        </div>
+        <div class="flex-1">
+            <h4 class="font-bold text-sm text-slate-100" x-text="toast.title">Notification</h4>
+            <p class="text-xs text-slate-300 mt-0.5" x-text="toast.message"></p>
+        </div>
+        <button @click="toast.show = false" class="text-slate-400 hover:text-white">
+            <i class="fa-solid fa-xmark"></i>
+        </button>
+    </div>
 
     <div>
         <!-- TOP NAVIGATION BAR -->
@@ -66,9 +87,13 @@
                     </button>
                 </template>
             </div>
-        </header>
 
-            
+            <!-- Right: Secret Admin Entry Button -->
+            <button @click="openAdminModal()" class="text-white/80 hover:text-white text-xs font-semibold flex items-center space-x-1 px-3 py-1.5 rounded-lg hover:bg-white/10 transition">
+                <i class="fa-solid fa-user-shield"></i>
+                <span class="hidden md:inline">Admin Access</span>
+            </button>
+        </header>
 
         <!-- MAIN CONTAINER -->
         <main class="max-w-5xl mx-auto main-card rounded-3xl p-6 md:p-10 border border-white/60 mb-8">
@@ -247,60 +272,63 @@
             </div>
 
             <form @submit.prevent="saveProfile()" class="space-y-4">
+                
+                <!-- 1. FULL NAME -->
                 <div>
-                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">User Role</label>
-                    <select x-model="profileForm.userType" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-blue-500" required>
+                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Full Name</label>
+                    <input type="text" x-model="profileForm.name" placeholder="Enter full name..." class="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-blue-500" required>
+                </div>
+
+                <!-- 2. EDUCATION ROLE -->
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Education Role</label>
+                    <select x-model="profileForm.userType" class="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-blue-500" required>
+                        <option value="" disabled selected>-- Select Education Role --</option>
                         <option value="Student">🎓 Student</option>
-                        <option value="Teacher / Lecturer">👨‍🏫 Teacher / Lecturer</option>
+                        <option value="Teacher/Lecturer">👨‍🏫 Teacher/Lecturer</option>
                         <option value="Other">👤 Other</option>
                     </select>
                 </div>
 
+                <!-- 3. INSTITUTION -->
                 <div>
-                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Full Name</label>
-                    <input type="text" x-model="profileForm.name" placeholder="e.g. Ahmad Hakimi" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-blue-500" required>
-                </div>
-
-                <!-- DROPDOWN INSTITUTION -->
-                <div>
-                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Institution / School</label>
-                    <select x-model="profileForm.institution" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-blue-500" required>
+                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Institution</label>
+                    <select x-model="profileForm.institution" class="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-blue-500" required>
                         <option value="" disabled selected>-- Select Institution --</option>
-                        <option value="Sekolah Menengah">🏫 Sekolah Menengah</option>
-                        <option value="Politeknik">🏛️ Politeknik</option>
-                        <option value="Kolej Komuniti">🏫 Kolej Komuniti</option>
-                        <option value="Universiti Awam">🎓 Universiti Awam (UA)</option>
-                        <option value="IPTS">🏫 IPTS</option>
-                        <option value="Lain-lain">👤 Lain-lain</option>
+                        <option value="Polytechnic">🏛️ Polytechnic</option>
+                        <option value="Polytechnic Port Dickson">🏛️ Polytechnic Port Dickson</option>
+                        <option value="Community College">🏫 Community College</option>
+                        <option value="Secondary School">🏫 Secondary School</option>
+                        <option value="Others">👤 Others</option>
                     </select>
                 </div>
 
-                <div class="grid grid-cols-2 gap-3">
-                    <div>
-                        <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Purpose</label>
-                        <select x-model="profileForm.purpose" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-blue-500">
-                            <option value="Learning">Learning</option>
-                            <option value="Teaching">Teaching</option>
-                            <option value="Research / Project">Research / Project</option>
-                            <option value="Self-learning">Self-learning</option>
-                            <option value="Other">Other</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Discovery Source</label>
-                        <select x-model="profileForm.discoverySource" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-blue-500">
-                            <option value="Lecturer / Teacher">Lecturer / Teacher</option>
-                            <option value="QR Code">QR Code</option>
-                            <option value="Google Search">Google Search</option>
-                            <option value="Friend / Student">Friend / Student</option>
-                            <option value="Social Media">Social Media</option>
-                            <option value="Other">Other</option>
-                        </select>
-                    </div>
+                <!-- 4. CONDITIONAL STUDENT ID (Only if Polytechnic Port Dickson & Student) -->
+                <div x-show="isPolytechnicPortDicksonStudent()" x-transition class="bg-amber-50 p-3 rounded-xl border border-amber-200 space-y-1">
+                    <label class="block text-xs font-bold text-amber-900 uppercase tracking-wider">
+                        Student ID <span class="text-red-500">*</span>
+                    </label>
+                    <input type="text" 
+                           x-model="profileForm.studentId" 
+                           placeholder="e.g. 06DKM22F1001" 
+                           class="w-full px-3 py-2 bg-white border border-amber-300 rounded-lg text-sm focus:outline-none focus:border-amber-600 font-mono font-bold uppercase"
+                           :required="isPolytechnicPortDicksonStudent()">
+                    <p class="text-[10px] text-amber-700">Required for Polytechnic Port Dickson students</p>
                 </div>
 
+                <!-- 5. PURPOSE -->
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Purpose</label>
+                    <select x-model="profileForm.purpose" class="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-blue-500" required>
+                        <option value="" disabled selected>-- Select Purpose --</option>
+                        <option value="Teaching">📚 Teaching</option>
+                        <option value="Self-Learning">📖 Self-Learning</option>
+                    </select>
+                </div>
+
+                <!-- SUBMIT & ACTION BUTTONS -->
                 <div class="flex space-x-2 pt-2">
-                    <button type="submit" class="flex-1 py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl shadow-lg hover:shadow-blue-500/30 transition text-sm uppercase">
+                    <button type="submit" class="flex-1 py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl shadow-lg hover:shadow-blue-500/30 transition text-sm uppercase tracking-wide">
                         <span x-text="userProfile.registered ? 'SAVE CHANGES' : 'ENTER HUB'"></span>
                     </button>
 
@@ -316,7 +344,7 @@
         </div>
     </div>
 
-    <!-- ADMIN ANALYTICS MODAL (TERBINA DALAM WEB) -->
+    <!-- ADMIN ANALYTICS MODAL -->
     <div x-show="showAdminModal" x-transition.opacity class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 overflow-y-auto">
         <div class="bg-white rounded-3xl max-w-4xl w-full p-6 main-card border border-slate-200 my-8 relative shadow-2xl">
             <div class="flex justify-between items-center mb-6 pb-4 border-b">
@@ -369,7 +397,7 @@
 
                     <!-- Actions -->
                     <div class="flex justify-between items-center bg-slate-50 p-4 rounded-2xl border">
-                        <span class="text-xs text-slate-500 font-bold uppercase tracking-wider">Recent User Access Activity</span>
+                        <span class="text-xs text-slate-500 font-bold uppercase tracking-wider">Recent User Access Activity Log</span>
                         <button @click="exportToCSV()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl shadow transition flex items-center space-x-1.5">
                             <i class="fa-solid fa-file-excel"></i>
                             <span>Export Excel (CSV)</span>
@@ -385,6 +413,8 @@
                                     <th class="p-2.5">Name</th>
                                     <th class="p-2.5">Role</th>
                                     <th class="p-2.5">Institution</th>
+                                    <th class="p-2.5">Student ID</th>
+                                    <th class="p-2.5">Purpose</th>
                                     <th class="p-2.5">Module</th>
                                 </tr>
                             </thead>
@@ -395,6 +425,8 @@
                                         <td class="p-2.5 font-bold text-slate-800" x-text="log.studentName"></td>
                                         <td class="p-2.5" x-text="log.userType"></td>
                                         <td class="p-2.5" x-text="log.institution"></td>
+                                        <td class="p-2.5 font-mono text-slate-600" x-text="log.studentId || '-'"></td>
+                                        <td class="p-2.5" x-text="log.purpose"></td>
                                         <td class="p-2.5 font-semibold text-blue-700" x-text="log.module"></td>
                                     </tr>
                                 </template>
@@ -424,6 +456,13 @@
                 adminPinInput: '',
                 adminAuthenticated: false,
 
+                // Toast Notification State
+                toast: {
+                    show: false,
+                    title: '',
+                    message: ''
+                },
+
                 // Inactivity Timer Setup (10 Minit)
                 inactivityTimeout: 10 * 60 * 1000, 
                 timer: null,
@@ -433,18 +472,18 @@
                 showAdminModal: false,
                 userProfile: {
                     registered: false,
-                    userType: 'Student',
+                    userType: '',
                     name: '',
                     institution: '',
-                    purpose: 'Learning',
-                    discoverySource: 'Lecturer / Teacher'
+                    studentId: '',
+                    purpose: ''
                 },
                 profileForm: {
-                    userType: 'Student',
+                    userType: '',
                     name: '',
                     institution: '',
-                    purpose: 'Learning',
-                    discoverySource: 'Lecturer / Teacher'
+                    studentId: '',
+                    purpose: ''
                 },
 
                 // Session Tracking & Logs
@@ -455,6 +494,20 @@
                     totalAccesses: 0,
                     topModule: '-',
                     uniqueInstitutions: 0
+                },
+
+                showNotification(title, message) {
+                    this.toast.title = title;
+                    this.toast.message = message;
+                    this.toast.show = true;
+                    setTimeout(() => {
+                        this.toast.show = false;
+                    }, 4000);
+                },
+
+                isPolytechnicPortDicksonStudent() {
+                    return this.profileForm.institution === 'Polytechnic Port Dickson' && 
+                           this.profileForm.userType === 'Student';
                 },
 
                 initApp() {
@@ -487,7 +540,7 @@
 
                     clearTimeout(this.timer);
                     this.timer = setTimeout(() => {
-                        alert('Session expired due to 3 minutes of inactivity. You have been logged out.');
+                        this.showNotification('Session Expired', 'You have been automatically logged out due to inactivity.');
                         this.logout();
                     }, this.inactivityTimeout);
                 },
@@ -495,22 +548,50 @@
                 openProfileModal() {
                     if (this.userProfile.registered) {
                         this.profileForm = { ...this.userProfile };
+                    } else {
+                        this.profileForm = {
+                            userType: '',
+                            name: '',
+                            institution: '',
+                            studentId: '',
+                            purpose: ''
+                        };
                     }
                     this.showProfileModal = true;
                 },
 
                 saveProfile() {
-                    if (!this.profileForm.name.trim() || !this.profileForm.institution) {
-                        alert('Please fill in your Name and select an Institution.');
+                    // Validations
+                    if (!this.profileForm.name.trim()) {
+                        this.showNotification('Input Required', 'Please enter your Full Name.');
                         return;
                     }
+                    if (!this.profileForm.userType) {
+                        this.showNotification('Input Required', 'Please select an Education Role.');
+                        return;
+                    }
+                    if (!this.profileForm.institution) {
+                        this.showNotification('Input Required', 'Please select an Institution.');
+                        return;
+                    }
+                    if (this.isPolytechnicPortDicksonStudent() && !this.profileForm.studentId.trim()) {
+                        this.showNotification('Input Required', 'Please enter your Student ID for Polytechnic Port Dickson.');
+                        return;
+                    }
+                    if (!this.profileForm.purpose) {
+                        this.showNotification('Input Required', 'Please select a Purpose.');
+                        return;
+                    }
+
                     this.userProfile = {
                         ...this.profileForm,
                         registered: true
                     };
+                    
                     localStorage.setItem('matrix_hub_user_profile', JSON.stringify(this.userProfile));
                     this.showProfileModal = false;
                     this.startInactivityTimer();
+                    this.showNotification('Welcome!', `Logged in successfully as ${this.userProfile.name}`);
                 },
 
                 logout() {
@@ -518,11 +599,11 @@
                     localStorage.removeItem('matrix_hub_user_profile');
                     this.userProfile = {
                         registered: false,
-                        userType: 'Student',
+                        userType: '',
                         name: '',
                         institution: '',
-                        purpose: 'Learning',
-                        discoverySource: 'Lecturer / Teacher'
+                        studentId: '',
+                        purpose: ''
                     };
                     this.profileForm = { ...this.userProfile };
                     this.sessionLoggedModules = [];
@@ -531,6 +612,7 @@
 
                 navigateToModule(moduleName, targetUrl) {
                     if (!this.userProfile.registered) {
+                        this.showNotification('Access Restricted', 'Please fill in your user profile to access learning tools.');
                         this.showProfileModal = true;
                         return;
                     }
@@ -554,8 +636,8 @@
                         studentName: this.userProfile.name,
                         userType: this.userProfile.userType,
                         institution: this.userProfile.institution,
+                        studentId: this.isPolytechnicPortDicksonStudent() ? this.userProfile.studentId : '',
                         purpose: this.userProfile.purpose,
-                        discoverySource: this.userProfile.discoverySource,
                         module: moduleName
                     };
 
@@ -622,18 +704,18 @@
                         this.adminAuthenticated = true;
                         this.adminPinInput = '';
                     } else {
-                        alert('Invalid Admin PIN!');
+                        this.showNotification('Access Denied', 'Invalid Admin PIN entered.');
                     }
                 },
 
                 exportToCSV() {
                     if (this.activityLogs.length === 0) {
-                        alert('No data available to export.');
+                        this.showNotification('Export Warning', 'No log data available to export.');
                         return;
                     }
-                    let csv = 'Timestamp,Name,Role,Institution,Purpose,Discovery Source,Module\n';
+                    let csv = 'Timestamp,Name,Role,Institution,Student ID,Purpose,Module\n';
                     this.activityLogs.forEach(l => {
-                        csv += `"${l.formattedTime}","${l.studentName}","${l.userType}","${l.institution}","${l.purpose}","${l.discoverySource}","${l.module}"\n`;
+                        csv += `"${l.formattedTime}","${l.studentName}","${l.userType}","${l.institution}","${l.studentId || ''}","${l.purpose}","${l.module}"\n`;
                     });
 
                     const blob = new Blob([csv], { type: 'text/csv' });
