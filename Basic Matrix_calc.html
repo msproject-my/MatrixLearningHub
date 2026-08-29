@@ -573,40 +573,7 @@
                     'Match elements located at the same position (e.g., row 1 column 1 with row 1 column 1).',
                     'Perform addition or subtraction for each corresponding pair of elements.'
                 ],
-                renderSim: function() {
-                    return `
-                        <div class="space-y-4">
-                            <div class="flex items-center justify-between bg-slate-100 p-2 rounded-lg">
-                                <span class="font-bold text-slate-700">Select Operation:</span>
-                                <select id="opType1" onchange="runSim1()" class="bg-white border rounded px-2 py-1 font-bold">
-                                    <option value="add">Addition (A + B)</option>
-                                    <option value="sub">Subtraction (A - B)</option>
-                                </select>
-                            </div>
-                            <div class="grid grid-cols-2 gap-4">
-                                <div>
-                                    <span class="block text-slate-600 font-bold mb-1">Matrix A:</span>
-                                    <div class="grid grid-cols-2 gap-1 max-w-[140px]">
-                                        <input type="number" id="s1_a11" value="3" oninput="runSim1()" class="p-1 border rounded text-center font-bold">
-                                        <input type="number" id="s1_a12" value="5" oninput="runSim1()" class="p-1 border rounded text-center font-bold">
-                                        <input type="number" id="s1_a21" value="1" oninput="runSim1()" class="p-1 border rounded text-center font-bold">
-                                        <input type="number" id="s1_a22" value="4" oninput="runSim1()" class="p-1 border rounded text-center font-bold">
-                                    </div>
-                                </div>
-                                <div>
-                                    <span class="block text-slate-600 font-bold mb-1">Matrix B:</span>
-                                    <div class="grid grid-cols-2 gap-1 max-w-[140px]">
-                                        <input type="number" id="s1_b11" value="2" oninput="runSim1()" class="p-1 border rounded text-center font-bold">
-                                        <input type="number" id="s1_b12" value="-1" oninput="runSim1()" class="p-1 border rounded text-center font-bold">
-                                        <input type="number" id="s1_b21" value="0" oninput="runSim1()" class="p-1 border rounded text-center font-bold">
-                                        <input type="number" id="s1_b22" value="3" oninput="runSim1()" class="p-1 border rounded text-center font-bold">
-                                    </div>
-                                </div>
-                            </div>
-                            <div id="sim1Result" class="p-3 bg-blue-50 border border-blue-200 rounded-lg text-blue-900 font-bold"></div>
-                        </div>
-                    `;
-                }
+                renderSim: function() { ... }
             },
             {
                 id: 2,
@@ -620,34 +587,7 @@
                     'Multiply elements of row 1 in A with column 1 in B and sum them up for c11.',
                     'Repeat the process for all row and column combinations.'
                 ],
-                renderSim: function() {
-                    return `
-                        <div class="space-y-4">
-                            <p class="text-slate-600">Product Matrix A (2x2) × B (2x2):</p>
-                            <div class="grid grid-cols-2 gap-4">
-                                <div>
-                                    <span class="block text-slate-600 font-bold mb-1">Matrix A:</span>
-                                    <div class="grid grid-cols-2 gap-1 max-w-[140px]">
-                                        <input type="number" id="s2_a11" value="1" oninput="runSim2()" class="p-1 border rounded text-center font-bold">
-                                        <input type="number" id="s2_a12" value="2" oninput="runSim2()" class="p-1 border rounded text-center font-bold">
-                                        <input type="number" id="s2_a21" value="3" oninput="runSim2()" class="p-1 border rounded text-center font-bold">
-                                        <input type="number" id="s2_a22" value="4" oninput="runSim2()" class="p-1 border rounded text-center font-bold">
-                                    </div>
-                                </div>
-                                <div>
-                                    <span class="block text-slate-600 font-bold mb-1">Matrix B:</span>
-                                    <div class="grid grid-cols-2 gap-1 max-w-[140px]">
-                                        <input type="number" id="s2_b11" value="2" oninput="runSim2()" class="p-1 border rounded text-center font-bold">
-                                        <input type="number" id="s2_b12" value="0" oninput="runSim2()" class="p-1 border rounded text-center font-bold">
-                                        <input type="number" id="s2_b21" value="1" oninput="runSim2()" class="p-1 border rounded text-center font-bold">
-                                        <input type="number" id="s2_b22" value="3" oninput="runSim2()" class="p-1 border rounded text-center font-bold">
-                                    </div>
-                                </div>
-                            </div>
-                            <div id="sim2Result" class="p-3 bg-indigo-50 border border-indigo-200 rounded-lg text-indigo-900 font-bold"></div>
-                        </div>
-                    `;
-                }
+                renderSim: function() { ... }
             },
             {
                 id: 3,
@@ -660,20 +600,7 @@
                     'For 2x2 Matrix: Subtract second diagonal product (b × c) from main diagonal product (a × d).',
                     'For 3x3 Matrix: Apply Cofactor Expansion along row 1: |A| = a11(C11) + a12(C12) + a13(C13).'
                 ],
-                renderSim: function() {
-                    return `
-                        <div class="space-y-4">
-                            <span class="block text-slate-600 font-bold">2x2 Matrix Determinant Calculation:</span>
-                            <div class="grid grid-cols-2 gap-1 max-w-[160px]">
-                                <input type="number" id="s3_a" value="4" oninput="runSim3()" class="p-1.5 border rounded text-center font-bold">
-                                <input type="number" id="s3_b" value="2" oninput="runSim3()" class="p-1.5 border rounded text-center font-bold">
-                                <input type="number" id="s3_c" value="1" oninput="runSim3()" class="p-1.5 border rounded text-center font-bold">
-                                <input type="number" id="s3_d" value="3" oninput="runSim3()" class="p-1.5 border rounded text-center font-bold">
-                            </div>
-                            <div id="sim3Result" class="p-3 bg-emerald-50 border border-emerald-200 rounded-lg text-emerald-900 font-bold"></div>
-                        </div>
-                    `;
-                }
+                renderSim: function() { ... }
             },
             {
                 id: 4,
@@ -687,20 +614,7 @@
                     'Apply sign matrix (+ - + / - + -) to form Cofactor matrix C.',
                     'Transpose the cofactor matrix to obtain Adjoint adj(A).'
                 ],
-                renderSim: function() {
-                    return `
-                        <div class="space-y-3">
-                            <span class="block text-slate-600 font-bold">Adjoint 2x2 Matrix:</span>
-                            <div class="grid grid-cols-2 gap-1 max-w-[160px]">
-                                <input type="number" id="s4_a" value="3" oninput="runSim4()" class="p-1 border rounded text-center font-bold">
-                                <input type="number" id="s4_b" value="1" oninput="runSim4()" class="p-1 border rounded text-center font-bold">
-                                <input type="number" id="s4_c" value="2" oninput="runSim4()" class="p-1 border rounded text-center font-bold">
-                                <input type="number" id="s4_d" value="4" oninput="runSim4()" class="p-1 border rounded text-center font-bold">
-                            </div>
-                            <div id="sim4Result" class="p-3 bg-teal-50 border border-teal-200 rounded-lg text-teal-900 font-bold"></div>
-                        </div>
-                    `;
-                }
+                renderSim: function() { ... }
             },
             {
                 id: 5,
@@ -714,20 +628,7 @@
                     'If |A| = 0, return "Inverse Matrix Does Not Exist".',
                     'Find adjoint and divide each term by determinant |A|.'
                 ],
-                renderSim: function() {
-                    return `
-                        <div class="space-y-3">
-                            <span class="block text-slate-600 font-bold">Inverse Matrix A⁻¹ Simulation (2x2):</span>
-                            <div class="grid grid-cols-2 gap-1 max-w-[160px]">
-                                <input type="number" id="s5_a" value="4" oninput="runSim5()" class="p-1 border rounded text-center font-bold">
-                                <input type="number" id="s5_b" value="2" oninput="runSim5()" class="p-1 border rounded text-center font-bold">
-                                <input type="number" id="s5_c" value="1" oninput="runSim5()" class="p-1 border rounded text-center font-bold">
-                                <input type="number" id="s5_d" value="3" oninput="runSim5()" class="p-1 border rounded text-center font-bold">
-                            </div>
-                            <div id="sim5Result" class="p-3 bg-amber-50 border border-amber-200 rounded-lg text-amber-900 font-bold"></div>
-                        </div>
-                    `;
-                }
+                renderSim: function() { ... }
             },
             {
                 id: 6,
@@ -742,26 +643,7 @@
                     'Form |Ay| by replacing column y with constants B, then compute |Ay|.',
                     'Divide to get x = |Ax| / |A| and y = |Ay| / |A|.'
                 ],
-                renderSim: function() {
-                    return `
-                        <div class="space-y-3">
-                            <span class="block text-slate-600 font-bold">System 2x2: ax + by = e , cx + dy = f</span>
-                            <div class="space-y-1 text-xs">
-                                <div class="flex items-center gap-1">
-                                    <input type="number" id="s6_a" value="2" oninput="runSim6()" class="w-12 p-1 border rounded text-center font-bold"> x +
-                                    <input type="number" id="s6_b" value="1" oninput="runSim6()" class="w-12 p-1 border rounded text-center font-bold"> y =
-                                    <input type="number" id="s6_e" value="5" oninput="runSim6()" class="w-12 p-1 border border-emerald-400 bg-emerald-50 rounded text-center font-bold">
-                                </div>
-                                <div class="flex items-center gap-1">
-                                    <input type="number" id="s6_c" value="1" oninput="runSim6()" class="w-12 p-1 border rounded text-center font-bold"> x +
-                                    <input type="number" id="s6_d" value="3" oninput="runSim6()" class="w-12 p-1 border rounded text-center font-bold"> y =
-                                    <input type="number" id="s6_f" value="10" oninput="runSim6()" class="w-12 p-1 border border-emerald-400 bg-emerald-50 rounded text-center font-bold">
-                                </div>
-                            </div>
-                            <div id="sim6Result" class="p-3 bg-rose-50 border border-rose-200 rounded-lg text-rose-900 font-bold"></div>
-                        </div>
-                    `;
-                }
+                renderSim: function() { ... }
             }
         ];
 
