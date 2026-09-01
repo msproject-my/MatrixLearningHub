@@ -536,8 +536,9 @@
                 },
 
                 isPolytechnicPortDicksonStudent() {
-                    return this.profileForm.institution === 'Polytechnic Port Dickson' && 
-                           this.profileForm.userType === 'Student';
+                    const inst = this.profileForm.institution || this.userProfile.institution;
+                    const role = this.profileForm.userType || this.userProfile.userType;
+                    return inst === 'Polytechnic Port Dickson' && role === 'Student';
                 },
 
                 initApp() {
@@ -710,7 +711,7 @@
                         studentName: this.sanitizeInput(this.userProfile.name),
                         userType: this.userProfile.userType,
                         institution: this.userProfile.institution,
-                        studentId: this.isPolytechnicPortDicksonStudent() ? this.sanitizeInput(this.userProfile.studentId) : '',
+                        studentId: this.sanitizeInput(this.userProfile.studentId || ''),
                         purpose: this.userProfile.purpose,
                         module: moduleName
                     };
