@@ -109,7 +109,6 @@
             <!-- Right: Secret Admin Entry Button -->
             <button @click="openAdminModal()" class="text-white/80 hover:text-white text-xs font-semibold flex items-center space-x-1 px-3 py-1.5 rounded-lg hover:bg-white/10 transition">
                 <i class="fa-solid fa-user-shield"></i>
-            
             </button>
         </header>
 
@@ -461,71 +460,44 @@
     <!-- JAVASCRIPT LOGIC & SECURITY ENHANCEMENTS -->
     <script>
         (function setupSecurityShield() {
-            // Display Console Security Warning
             console.log("%c⚠️ SECURITY WARNING!", "color: red; font-size: 24px; font-weight: bold;");
             console.log("%cThis system is protected by anti-tamper security policies. Unauthorized inspection or source code extraction is strictly monitored.", "color: #475569; font-size: 14px;");
 
-            // Prevent Developer Tool Shortcuts & Source Viewing
             window.addEventListener('keydown', function (e) {
-                // F12 key
-                if (e.keyCode === 123) {
-                    e.preventDefault();
-                    return false;
-                }
-                // Ctrl+Shift+I, Ctrl+Shift+J, Ctrl+Shift+C (Dev Tools)
-                if (e.ctrlKey && e.shiftKey && (e.keyCode === 73 || e.keyCode === 74 || e.keyCode === 67)) {
-                    e.preventDefault();
-                    return false;
-                }
-                // Ctrl+U (View Source)
-                if (e.ctrlKey && e.keyCode === 85) {
-                    e.preventDefault();
-                    return false;
-                }
-                // Ctrl+S (Save Page)
-                if (e.ctrlKey && e.keyCode === 83) {
-                    e.preventDefault();
-                    return false;
-                }
+                if (e.keyCode === 123) { e.preventDefault(); return false; }
+                if (e.ctrlKey && e.shiftKey && (e.keyCode === 73 || e.keyCode === 74 || e.keyCode === 67)) { e.preventDefault(); return false; }
+                if (e.ctrlKey && e.keyCode === 85) { e.preventDefault(); return false; }
+                if (e.ctrlKey && e.keyCode === 83) { e.preventDefault(); return false; }
             }, true);
 
-            // Disable Context Menu
-            window.addEventListener('contextmenu', function (e) {
-                e.preventDefault();
-            }, false);
+            window.addEventListener('contextmenu', function (e) { e.preventDefault(); }, false);
         })();
 
         function hubApp() {
             return {
-                // Target HTML links
                 basicMatrixUrl: 'Basic Matrix_calc.html',
                 gaussianUrl: 'gaussian_sim.html',
                 doolittleUrl: 'doolittle_sim.html',
                 croutUrl: 'crout_sim.html',
 
-                // Google Apps Script Web App URL
                 googleAppsScriptUrl: 'https://script.google.com/macros/s/AKfycbzHLzdbUN99UOlOt6qhH-a1rydxxD9I_rWopol_z_Eu_BhTM_aUF00hnQq-BomM_Wwm/exec',
 
-                // SHA-256 Encrypted PIN Hash for 'admin123' to prevent plain text exposure
                 adminSecretPinHash: '240be518fabd2724ddb6f04eeb1da5967448d7e831c08c8fa822809f74c720a9',
                 adminPinInput: '',
                 adminAuthenticated: false,
 
-                // Toast Notification State
                 toast: {
                     show: false,
                     title: '',
                     message: ''
                 },
 
-                // Inactivity Timer Setup (5 Minit Auto-Logout)
+                // Inactivity Timer Setup (5 Minutes Auto-Logout)
                 inactivityTimeout: 5 * 60 * 1000, 
                 timer: null,
 
-                // Session Tracking ID
                 currentSessionId: null,
 
-                // Modals & User Profile
                 showProfileModal: false,
                 showAdminModal: false,
                 userProfile: {
@@ -544,7 +516,6 @@
                     purpose: ''
                 },
 
-                // Session Tracking & Logs
                 sessionLoggedModules: [],
                 activityLogs: [],
                 analyticsStats: {
@@ -570,12 +541,22 @@
 
                 initApp() {
                     const saved = localStorage.getItem('matrix_hub_user_profile');
+                    const lastActive = localStorage.getItem('matrix_hub_last_active');
+                    const now = Date.now();
+
+                    // Semakan Cap Masa: Jika tidak aktif melebihi 5 minit (300,000ms), terus automatik logout
+                    if (saved && lastActive && (now - parseInt(lastActive)) > this.inactivityTimeout) {
+                        this.logout();
+                        this.showNotification('Sesi Tamat', 'Sesi anda telah tamat kerana tidak aktif melebihi 5 minit.');
+                        this.loadLogs();
+                        return;
+                    }
+
                     if (saved) {
                         try {
                             this.userProfile = JSON.parse(saved);
                             this.userProfile.registered = true;
                             
-                            // Initialize active session ID if not set
                             const savedSession = sessionStorage.getItem('matrix_hub_session_id');
                             if (savedSession) {
                                 this.currentSessionId = savedSession;
@@ -606,10 +587,13 @@
                 resetTimer() {
                     if (!this.userProfile.registered) return;
 
+                    // Kemaskini masa terakhir pengguna aktif dalam localStorage
+                    localStorage.setItem('matrix_hub_last_active', Date.now().toString());
+
                     clearTimeout(this.timer);
                     this.timer = setTimeout(() => {
-                        // Silent auto-logout without notice after 5 minutes of inactivity
                         this.logout();
+                        this.showNotification('Auto Logout', 'Sesi anda tamat secara automatik kerana tiada aktiviti selama 5 minit.');
                     }, this.inactivityTimeout);
                 },
 
@@ -628,18 +612,15 @@
                     this.showProfileModal = true;
                 },
 
-                // Sanitize text inputs against Injection attacks
                 sanitizeInput(text) {
                     if (!text) return '';
                     return text.toString().replace(/[<>"'&]/g, '').trim();
                 },
 
                 saveProfile() {
-                    // Sanitize user inputs
                     this.profileForm.name = this.sanitizeInput(this.profileForm.name);
                     this.profileForm.studentId = this.sanitizeInput(this.profileForm.studentId);
 
-                    // Validations
                     if (!this.profileForm.name) {
                         this.showNotification('Input Required', 'Please enter your Full Name.');
                         return;
@@ -666,11 +647,12 @@
                         registered: true
                     };
                     
-                    // Create new Session ID on Login
                     this.currentSessionId = 'SESS-' + Date.now();
                     sessionStorage.setItem('matrix_hub_session_id', this.currentSessionId);
 
                     localStorage.setItem('matrix_hub_user_profile', JSON.stringify(this.userProfile));
+                    localStorage.setItem('matrix_hub_last_active', Date.now().toString());
+
                     this.showProfileModal = false;
                     this.startInactivityTimer();
                     this.showNotification('Welcome!', `Logged in successfully as ${this.userProfile.name}`);
@@ -679,6 +661,7 @@
                 logout() {
                     clearTimeout(this.timer);
                     localStorage.removeItem('matrix_hub_user_profile');
+                    localStorage.removeItem('matrix_hub_last_active');
                     sessionStorage.removeItem('matrix_hub_session_id');
                     
                     this.currentSessionId = null;
@@ -732,12 +715,10 @@
                         module: moduleName
                     };
 
-                    // Add to local activity logs
                     this.activityLogs.unshift(logItem);
                     localStorage.setItem('matrix_hub_logs', JSON.stringify(this.activityLogs));
                     this.updateAnalytics();
 
-                    // Send to Google Sheets securely
                     if (this.googleAppsScriptUrl) {
                         fetch(this.googleAppsScriptUrl, {
                             method: "POST",
@@ -790,7 +771,6 @@
                     this.showAdminModal = true;
                 },
 
-                // Secure SHA-256 Hash Verification for Admin PIN
                 async hashString(str) {
                     const encoder = new TextEncoder();
                     const data = encoder.encode(str);
@@ -810,7 +790,6 @@
                     }
                 },
 
-                // Secure CSV Sanitization against Excel Formula Injections
                 cleanCsvCell(str) {
                     if (!str) return '""';
                     let clean = str.toString().replace(/"/g, '""');
