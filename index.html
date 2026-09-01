@@ -480,7 +480,8 @@
                 doolittleUrl: 'doolittle_sim.html',
                 croutUrl: 'crout_sim.html',
 
-                googleAppsScriptUrl: 'https://script.google.com/macros/s/AKfycbzHLzdbUN99UOlOt6qhH-a1rydxxD9I_rWopol_z_Eu_BhTM_aUF00hnQq-BomM_Wwm/exec',
+                // Google Apps Script Web App URL (Kemaskini URL Baharu)
+                googleAppsScriptUrl: 'https://script.google.com/macros/s/AKfycbz3mllAd4Ld9NExsUNrGm3BdNSChvsl-Wn4Q1D9V-Fxr2XkcAqZuGxhjzAdLRpzCgDL/exec',
 
                 adminSecretPinHash: '240be518fabd2724ddb6f04eeb1da5967448d7e831c08c8fa822809f74c720a9',
                 adminPinInput: '',
@@ -653,6 +654,9 @@
                     localStorage.setItem('matrix_hub_user_profile', JSON.stringify(this.userProfile));
                     localStorage.setItem('matrix_hub_last_active', Date.now().toString());
 
+                    // Rekod maklumat login pengguna ke Google Sheets & Log
+                    this.recordActivity('User Login');
+
                     this.showProfileModal = false;
                     this.startInactivityTimer();
                     this.showNotification('Welcome!', `Logged in successfully as ${this.userProfile.name}`);
@@ -685,17 +689,13 @@
                         return;
                     }
 
-                    if (!this.sessionLoggedModules.includes(moduleName)) {
-                        this.recordActivity(moduleName);
-                        this.sessionLoggedModules.push(moduleName);
-                    }
-
+                    // Hanya terus navigasi ke URL tanpa merekodkan aktiviti modul
                     if (targetUrl) {
                         window.location.href = targetUrl;
                     }
                 },
 
-                recordActivity(moduleName) {
+                recordActivity(moduleName = 'User Login') {
                     const now = new Date();
                     if (!this.currentSessionId) {
                         this.currentSessionId = 'SESS-' + Date.now();
